@@ -1,5 +1,5 @@
 (define-syntax check-equal?
-  (syntax-rules (value)
+  (syntax-rules ()
     ((_ expr expected-value)
      (let ((value expr))
        (or (equal? value expected-value)
