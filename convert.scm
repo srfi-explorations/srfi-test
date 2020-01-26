@@ -73,6 +73,18 @@
 
 ;;
 
+(define (write-chibi-test srfi-number)
+  (let ((basename (string-append (number->string srfi-number) ".scm")))
+    (write-source-file "chibi" basename
+                       `((import (scheme base)
+                                 (scheme char)
+                                 (scheme write)
+                                 (chibi)
+                                 (srfi 64) ;; snow-chibi install '(srfi 64)'
+                                 (srfi ,srfi-number))
+                         ,@prelude
+                         ,@(read-source-file basename)))))
+
 (define (write-gauche-test srfi-number)
   (let ((basename (string-append (number->string srfi-number) ".scm")))
     (write-source-file "gauche" basename
@@ -96,5 +108,6 @@
 
 (define all-srfis '(69 175))
 
+(for-each write-chibi-test all-srfis)
 (for-each write-gauche-test all-srfis)
 (for-each write-kawa-test all-srfis)
