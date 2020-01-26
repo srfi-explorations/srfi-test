@@ -1,3 +1,5 @@
+;; TODO: License. From Chibi-Scheme. Written by Alex Shinn?
+
 (test-begin "srfi-69")
 
 (define (car-string<? a b) (string<? (car a) (car b)))
