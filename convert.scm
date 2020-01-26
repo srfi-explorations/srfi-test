@@ -117,7 +117,7 @@
 
 ;;
 
-(define all-srfis '(69 175))
+(define all-srfis '(69 151 175))
 
 (for-each write-chibi-test all-srfis)
 (for-each write-gauche-test all-srfis)
