@@ -47,14 +47,19 @@
 ;;
 
 (define prelude
-  '((define (list-stable-sort less? xs)
+  '(
+
+    ;; Insertion sort with SRFI 132 procedure name and args.
+    (define (list-stable-sort less? xs)
       (if (null? xs) '()
           (let insert ((x (car xs)) (xs (list-stable-sort less? (cdr xs))))
             (if (null? xs) (list x)
                 (let ((y (car xs)) (ys (cdr xs)))
                   (if (less? x y) (cons x xs) (cons y (insert x ys))))))))
 
-    (define (symbol<? a b) (string<? (symbol->string a) (symbol->string b)))))
+    (define (symbol<? a b) (string<? (symbol->string a) (symbol->string b)))
+
+    ))
 
 ;;
 
