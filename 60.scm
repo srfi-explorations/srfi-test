@@ -1,8 +1,9 @@
 ;; TODO: License. From Gauche. Written by Shiro Kawai?
 
-(test-begin "srfi-60")
+;; TODO: There are more tests for procedure sin this SRFI in Gauche's
+;; test/numbers.scm.
 
-;; Most procedures are builtin and tested in test/numbers.scm.
+(test-begin "srfi-60")
 
 (test-eqv "bitwise-if"
   #b01100110 (bitwise-if #b10101100 #b00110101 #b11001010))
