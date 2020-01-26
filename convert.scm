@@ -79,5 +79,6 @@
 
 ;;
 
-(write-gauche-test 69)
-(write-gauche-test 175)
+(define all-srfis '(69 175))
+
+(for-each write-gauche-test all-srfis)
