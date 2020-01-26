@@ -236,32 +236,32 @@
 (test-end "field")
 
 (test-begin "conversion")
-(test-eqv "test-103" '(#t #f #t #f #t #t #t) (bits->list #b1110101))
-(test-eqv "test-104" '(#f #t #f #t) (bits->list #b111010 4))
+(test-equal "test-103" '(#t #f #t #f #t #t #t) (bits->list #b1110101))
+(test-equal "test-104" '(#f #t #f #t) (bits->list #b111010 4))
 (test-eqv "test-106" #b1110101 (list->bits '(#t #f #t #f #t #t #t)))
 (test-eqv "test-107" #b111010100 (list->bits '(#f #f #t #f #t #f #t #t #t)))
-(test-eqv "test-223" '(#t #t) (bits->list 3))
-(test-eqv "test-224" '(#f #t #t #f) (bits->list 6 4))
-(test-eqv "test-225" '(#f #t) (bits->list 6 2))
-(test-eqv "test-226" '(#t #f #f #f #f #f #f #f #f #f #f #f #f #f #f #f
-                          #f #f #f #f #f #f #f #f #f #f #f #f #f #f #f #f
-                          #f #f #f #f #f #f #f #f #f #f #f #f #f #f #f #f
-                          #f #f #f #f #f #f #f #f #f #f #f #f #f #f #f #f
-                          #f #f #f #f #f #f #f #f #f #f #f #f #f #f #f #f
-                          #f #f #f #f #f #f #f #f #f #f #f #f #f #f #f #f
-                          #f #f #f #f #f #f #f #f #f #f #f #f #f #f #f #f
-                          #f #f #f #f #f #f #f #f #f #f #f #f #f #f #f #f)
-          (bits->list 1 128))
-(test-eqv "test-228" '(#f
-                       #f #f #f #f #f #f #f #f #f #f #f #f #f #f #f #f
-                       #f #f #f #f #f #f #f #f #f #f #f #f #f #f #f #f
-                       #f #f #f #f #f #f #f #f #f #f #f #f #f #f #f #f
-                       #f #f #f #f #f #f #f #f #f #f #f #f #f #f #f #f
-                       #f #f #f #f #f #f #f #f #f #f #f #f #f #f #f #f
-                       #f #f #f #f #f #f #f #f #f #f #f #f #f #f #f #f
-                       #f #f #f #f #f #f #f #f #f #f #f #f #f #f #f #f
-                       #f #f #f #f #f #f #f #f #f #f #f #f #f #f #f #t)
-          (bits->list #x100000000000000000000000000000000))
+(test-equal "test-223" '(#t #t) (bits->list 3))
+(test-equal "test-224" '(#f #t #t #f) (bits->list 6 4))
+(test-equal "test-225" '(#f #t) (bits->list 6 2))
+(test-equal "test-226" '(#t #f #f #f #f #f #f #f #f #f #f #f #f #f #f #f
+                            #f #f #f #f #f #f #f #f #f #f #f #f #f #f #f #f
+                            #f #f #f #f #f #f #f #f #f #f #f #f #f #f #f #f
+                            #f #f #f #f #f #f #f #f #f #f #f #f #f #f #f #f
+                            #f #f #f #f #f #f #f #f #f #f #f #f #f #f #f #f
+                            #f #f #f #f #f #f #f #f #f #f #f #f #f #f #f #f
+                            #f #f #f #f #f #f #f #f #f #f #f #f #f #f #f #f
+                            #f #f #f #f #f #f #f #f #f #f #f #f #f #f #f #f)
+            (bits->list 1 128))
+(test-equal "test-228" '(#f
+                         #f #f #f #f #f #f #f #f #f #f #f #f #f #f #f #f
+                         #f #f #f #f #f #f #f #f #f #f #f #f #f #f #f #f
+                         #f #f #f #f #f #f #f #f #f #f #f #f #f #f #f #f
+                         #f #f #f #f #f #f #f #f #f #f #f #f #f #f #f #f
+                         #f #f #f #f #f #f #f #f #f #f #f #f #f #f #f #f
+                         #f #f #f #f #f #f #f #f #f #f #f #f #f #f #f #f
+                         #f #f #f #f #f #f #f #f #f #f #f #f #f #f #f #f
+                         #f #f #f #f #f #f #f #f #f #f #f #f #f #f #f #t)
+            (bits->list #x100000000000000000000000000000000))
 (test-eqv "test-229" 6 (list->bits '(#f #t #t)))
 (test-eqv "test-230" 12 (list->bits '(#f #f #t #t)))
 (test-eqv "test-231" 6 (list->bits '(#f #t #t #f)))
@@ -322,15 +322,15 @@
 (test-eqv "test-490" 1 (list->bits '(#t #f)))
 (test-eqv "test-108" #b1110101 (vector->bits '#(#t #f #t #f #t #t #t)))
 (test-eqv "test-109" #b00011010100 (vector->bits '#(#f #f #t #f #t #f #t #t)))
-(test-eqv "test-105" '#(#t #t #t #f #t #f #t #f #f) (bits->vector #b1010111 9))
-(test-eqv "test-105" '#(#t #t #t #f #t #f #t #f #f) (bits->vector #b1010111 9))
+(test-equal "test-105" '#(#t #t #t #f #t #f #t #f #f) (bits->vector #b1010111 9))
+(test-equal "test-105" '#(#t #t #t #f #t #f #t #f #f) (bits->vector #b1010111 9))
 (test-eqv "test-110" #b1110101 (bits #t #f #t #f #t #t #t))
 (test-eqv "test-243" 0 (bits))
 (test-eqv "test-111" #b111010100 (bits #f #f #t #f #t #f #t #t #t))
 (test-end "conversion")
 
 (test-begin "fold")
-(test-eqv "test-112" '(#t #f #t #f #t #t #t) (bitwise-fold cons '() #b1010111))
+(test-equal "test-112" '(#t #f #t #f #t #t #t) (bitwise-fold cons '() #b1010111))
 (test-eqv "test-113" 5
           (let ((count 0))
             (bitwise-for-each (lambda (b) (if b (set! count (+ count 1))))
