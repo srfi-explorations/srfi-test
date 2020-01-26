@@ -1,7 +1,7 @@
 ;;; Test program for SRFI 132 (Sort Libraries).
 
 ;;; Copyright © William D Clinger (2016).
-;;; 
+;;;
 ;;; Permission is hereby granted, free of charge, to any person
 ;;; obtaining a copy of this software and associated documentation
 ;;; files (the "Software"), to deal in the Software without
@@ -10,10 +10,10 @@
 ;;; sell copies of the Software, and to permit persons to whom the
 ;;; Software is furnished to do so, subject to the following
 ;;; conditions:
-;;; 
+;;;
 ;;; The above copyright notice and this permission notice shall be
 ;;; included in all copies or substantial portions of the Software.
-;;; 
+;;;
 ;;; THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
 ;;; EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
 ;;; OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
@@ -172,17 +172,17 @@
 ;; Three-way comparison for numbers
 (define (my-c x y)
   (cond ((= x y) 0)
-	((< x y) -1)
-	(else 1)))
-  
+        ((< x y) -1)
+        (else 1)))
+
 ;;; For testing stable sort -- 3 & -3 compare the same.
 (define (my< x y) (< (abs x) (abs y)))
 
 (define (unstable-sort-test v) ; quick & heap vs simple insert
   (let ((v1 (vector-copy v))
-	(v2 (vector-copy v))
-	(v3 (vector-copy v))
-	(v4 (vector-copy v)))
+        (v2 (vector-copy v))
+        (v3 (vector-copy v))
+        (v4 (vector-copy v)))
     (vector-heap-sort!    < v1)
     (vector-insert-sort!  < v2)
     (vector-quick-sort!   < v3)
@@ -194,9 +194,9 @@
 
 (define (stable-sort-test v) ; insert, list & vector merge sorts
   (let ((v1 (vector-copy v))
-	(v2 (vector-copy v))
-	(v3 (list->vector (list-merge-sort! my< (vector->list v))))
-	(v4 (list->vector (list-merge-sort  my< (vector->list v)))))
+        (v2 (vector-copy v))
+        (v3 (list->vector (list-merge-sort! my< (vector->list v))))
+        (v4 (list->vector (list-merge-sort  my< (vector->list v)))))
     (vector-merge-sort! my< v1)
     (vector-insert-sort! my< v2)
     (check-that v1 (is (lambda (v) (vector-sorted? my< v))))
@@ -207,9 +207,9 @@
 (define (run-sort-test sort-test count max-size)
   (let loop ((i 0))
     (if (< i count)
-	(begin
-	  (sort-test (random-vector (random-integer max-size)))
-	  (loop (+ 1 i))))))
+        (begin
+          (sort-test (random-vector (random-integer max-size)))
+          (loop (+ 1 i))))))
 
 (define-test-case stable-sort sort-tests
   (run-sort-test stable-sort-test 10 4096))
@@ -225,16 +225,16 @@
 (define (fill-vector-randomly! v range)
   (let ((half (quotient range 2)))
     (do ((i (- (vector-length v) 1) (- i 1)))
-	((< i 0))
+        ((< i 0))
       (vector-set! v i (- (random-integer range) half)))))
 
 (define (vector-portion-copy vec start end)
   (let* ((len (vector-length vec))
-	 (new-len (- end start))
-	 (new (make-vector new-len)))
+         (new-len (- end start))
+         (new (make-vector new-len)))
     (do ((i start (+ i 1))
-	 (j 0 (+ j 1)))
-	((= i end) new)
+         (j 0 (+ j 1)))
+        ((= i end) new)
       (vector-set! new j (vector-ref vec i)))))
 
 (define (vector-copy vec)
@@ -1647,7 +1647,7 @@
              (s (get-output-string p))
              (k (string-length s))
              (s (string-append s (make-string (max 0 (- 10 k)) #\space))))
-        (display s)))             
+        (display s)))
     (run-sorter "R6RS list-sort     "  r6rs-list-sort l l2)
     (run-sorter "list-sort          "  list-sort l l2)
     (run-sorter "list-stable-sort   "  list-stable-sort l l2)
