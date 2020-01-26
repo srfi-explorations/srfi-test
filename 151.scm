@@ -1,7 +1,6 @@
-(import (scheme base) (srfi-151) (chibi test))
-(current-test-verbosity #f)
-(test-group "bitwise"
- (test-group "bitwise/basic"
+(test-begin "bitwise")
+
+(test-begin "basic")
   (test "test-1" -1 (bitwise-not 0))
   (test "test-122" 0 (bitwise-not -1))
   (test "test-248" -11 (bitwise-not 10))
@@ -57,8 +56,9 @@
   (test "test-323" -1 (bitwise-orc2 -1 0))
   (test "test-324" 0 (bitwise-orc2 0 -1))
   (test "test-325" -124 (bitwise-orc2 0 123))
- )
- (test-group "bitwise/integer"
+(test-end "basic")
+
+(test-begin "integer")
   (test "test-78" #x1000000000000000100000000000000000000000000000000
       (arithmetic-shift #x100000000000000010000000000000000 64))
   (test "test-79" #x8e73b0f7da0e6452c810f32b809079e5
@@ -112,8 +112,9 @@
   (test "test-126" 0 (bitwise-if 3 8 1))
   (test "test-373" 3 (bitwise-if 1 1 2))
   (test "test-378" #b00110011 (bitwise-if #b00111100 #b11110000 #b00001111))
- )
- (test-group "bitwise/single"
+(test-end "integer")
+
+(test-begin "single")
   (test "test-160" #t (bit-set? 0 1))
   (test "test-161" #f (bit-set? 1 1))
   (test "test-162" #f (bit-set? 1 8))
@@ -176,8 +177,9 @@
   (test "test-283" 2 (first-set-bit -28))
   (test "test-284" 99 (first-set-bit (expt  2 99)))
   (test "test-285" 99 (first-set-bit (expt -2 99)))
- )
- (test-group "bitwise/field"
+(test-end "single")
+
+(test-begin "field")
   (test "test-189" 0 (bit-field 6 0 1))
   (test "test-190" 3 (bit-field 6 1 3))
   (test "test-191" 1 (bit-field 6 2 999))
@@ -231,8 +233,9 @@
   (test "test-221" (bitwise-ior (arithmetic-shift -1 32) #x7FFFFFFF)
 		 (bit-field-reverse -2 0 32))
   (test "test-222" 5 (bit-field-reverse #x140000000000000000000000000000000 0 129))
- )
- (test-group "bitwise/conversion"
+(test-end "field")
+
+(test-begin "conversion")
   (test "test-103" '(#t #f #t #f #t #t #t) (bits->list #b1110101))
   (test "test-104" '(#f #t #f #t) (bits->list #b111010 4))
   (test "test-106" #b1110101 (list->bits '(#t #f #t #f #t #t #t)))
@@ -324,8 +327,9 @@
   (test "test-110" #b1110101 (bits #t #f #t #f #t #t #t))
   (test "test-243" 0 (bits))
   (test "test-111" #b111010100 (bits #f #f #t #f #t #f #t #t #t))
- )
- (test-group "bitwise/fold"
+(test-end "conversion")
+
+(test-begin "fold")
   (test "test-112" '(#t #f #t #f #t #t #t) (bitwise-fold cons '() #b1010111))
   (test "test-113" 5
       (let ((count 0))
@@ -339,6 +343,4 @@
     (test "test-244b" #t (g))
     (test "test-244c" #t (g))
     (test "test-244d" #f (g)))
- )
-)
-(test-exit)
+(test-end "fold")
