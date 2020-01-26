@@ -77,8 +77,17 @@
                          ,@prelude
                          ,@(read-source-file basename)))))
 
+(define (write-kawa-test srfi-number)
+  (let ((basename (string-append (number->string srfi-number) ".scm")))
+    (write-source-file "kawa" basename
+                       `((import (kawa base) ; base includes SRFI 64
+                                 (srfi ,srfi-number))
+                         ,@prelude
+                         ,@(read-source-file basename)))))
+
 ;;
 
 (define all-srfis '(69 175))
 
 (for-each write-gauche-test all-srfis)
+(for-each write-kawa-test all-srfis)
