@@ -1,7 +1,7 @@
 ;; TODO: License. From sample implementation. Written by John Cowan?
 ;; Shiro Kawai contributed some fixes.
 
-(test-begin "bitwise")
+(test-begin "srfi-151")
 
 (test-begin "basic")
 (test-eqv "test-1" -1 (bitwise-not 0))
@@ -347,3 +347,5 @@
   (test-eqv "test-244c" #t (g))
   (test-eqv "test-244d" #f (g)))
 (test-end "fold")
+
+(test-end "srfi-151")
