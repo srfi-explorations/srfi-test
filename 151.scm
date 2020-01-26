@@ -1,3 +1,6 @@
+;; TODO: License. From sample implementation. Written by John Cowan?
+;; Shiro Kawai contributed some fixes.
+
 (test-begin "bitwise")
 
 (test-begin "basic")
