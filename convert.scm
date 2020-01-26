@@ -96,6 +96,17 @@
                          ,@prelude
                          ,@(read-source-file basename)))))
 
+(define (write-guile-test srfi-number)
+  (let ((basename (string-append (number->string srfi-number) ".scm")))
+    (write-source-file "guile" basename
+                       `((import (guile)
+                                 (srfi :64)
+                                 (srfi ,(string->symbol
+                                         (string-append
+                                          ":" (number->string srfi-number)))))
+                         ,@prelude
+                         ,@(read-source-file basename)))))
+
 (define (write-kawa-test srfi-number)
   (let ((basename (string-append (number->string srfi-number) ".scm")))
     (write-source-file "kawa" basename
@@ -110,4 +121,5 @@
 
 (for-each write-chibi-test all-srfis)
 (for-each write-gauche-test all-srfis)
+(for-each write-guile-test all-srfis)
 (for-each write-kawa-test all-srfis)

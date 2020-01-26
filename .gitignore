@@ -1,4 +1,5 @@
 *.log
 /chibi
 /gauche
+/guile
 /kawa
