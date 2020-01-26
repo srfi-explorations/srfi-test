@@ -22,18 +22,21 @@
 (test-eqv "test-293" #b110 (bitwise-and -2 #b111))
 (test-eqv "test-294" 3769478 (bitwise-and -4290775858 1694076839))
 (test-eqv "test-11" -4294967295 (bitwise-ior 1 (- -1 #xffffffff)))
-(test-eqv "test-12" -18446744073709551615 (bitwise-ior 1 (- -1 #xffffffffffffffff)))
+(test-eqv "test-12"
+  -18446744073709551615 (bitwise-ior 1 (- -1 #xffffffffffffffff)))
 (test-eqv "test-117" 14 (bitwise-ior 10 12))
 (test-eqv "test-250" 11 (bitwise-ior 3  10))
 (test-eqv "test-13" -4294967126 (bitwise-xor #b10101010 (- -1 #xffffffff)))
-(test-eqv "test-15" -18446744073709551446 (bitwise-xor #b10101010 (- -1 #xffffffffffffffff)))
+(test-eqv "test-15"
+  -18446744073709551446 (bitwise-xor #b10101010 (- -1 #xffffffffffffffff)))
 (test-eqv "test-16" -2600468497 (bitwise-ior 1694076839 -4290775858))
 (test-eqv "test-17" -184549633 (bitwise-ior -193073517 1689392892))
 (test-eqv "test-18" -2604237975 (bitwise-xor 1694076839 -4290775858))
 (test-eqv "test-19" -1865418641 (bitwise-xor -193073517 1689392892))
 (test-eqv "test-119" 6 (bitwise-xor 10 12))
 (test-eqv "test-252" 9 (bitwise-xor 3 10))
-(test-eqv "test-14" (bitwise-not -4294967126) (bitwise-eqv #b10101010 (- -1 #xffffffff)))
+(test-eqv "test-14"
+  (bitwise-not -4294967126) (bitwise-eqv #b10101010 (- -1 #xffffffff)))
 (test-eqv "test-253" -42 (bitwise-eqv 37 12))
 (test-eqv "test-27" -1 (bitwise-nand 0 0))
 (test-eqv "test-28" -1 (bitwise-nand 0 -1))
@@ -64,8 +67,9 @@
 (test-begin "integer")
 (test-eqv "test-78" #x1000000000000000100000000000000000000000000000000
           (arithmetic-shift #x100000000000000010000000000000000 64))
-(test-eqv "test-79" #x8e73b0f7da0e6452c810f32b809079e5
-          (arithmetic-shift #x8e73b0f7da0e6452c810f32b809079e562f8ead2522c6b7b -64))
+(test-eqv "test-79"
+  #x8e73b0f7da0e6452c810f32b809079e5
+  (arithmetic-shift #x8e73b0f7da0e6452c810f32b809079e562f8ead2522c6b7b -64))
 (test-eqv "test-196" 2 (arithmetic-shift 1 1))
 (test-eqv "test-197" 0 (arithmetic-shift 1 -1))
 (test-eqv "test-331" 1 (arithmetic-shift 1 0))
@@ -81,7 +85,8 @@
 (test-eqv "test-342" (expt 2 127) (arithmetic-shift 1 127))
 (test-eqv "test-343" (expt 2 128) (arithmetic-shift 1 128))
 (test-eqv "test-344" (expt 2 129) (arithmetic-shift 1 129))
-(test-eqv "test-345" 3028397001194014464 (arithmetic-shift 11829675785914119 8))
+(test-eqv "test-345"
+  3028397001194014464 (arithmetic-shift 11829675785914119 8))
 (test-eqv "test-346" -1 (arithmetic-shift -1 0))
 (test-eqv "test-347" -2 (arithmetic-shift -1 1))
 (test-eqv "test-348" -4 (arithmetic-shift -1 2))
@@ -102,7 +107,8 @@
 (test-eqv "test-255" 32 (arithmetic-shift 8 2))
 (test-eqv "test-256" 4 (arithmetic-shift 4 0))
 (test-eqv "test-257" 4 (arithmetic-shift 8 -1))
-(test-eqv "test-258" -79 (arithmetic-shift -100000000000000000000000000000000 -100))
+(test-eqv "test-258" -79
+          (arithmetic-shift -100000000000000000000000000000000 -100))
 (test-eqv "test-135" 2 (bit-count 12))
 (test-eqv "test-263" 0 (integer-length  0))
 (test-eqv "test-264" 1 (integer-length  1))
@@ -186,7 +192,8 @@
 (test-eqv "test-189" 0 (bit-field 6 0 1))
 (test-eqv "test-190" 3 (bit-field 6 1 3))
 (test-eqv "test-191" 1 (bit-field 6 2 999))
-(test-eqv "test-192" 1 (bit-field #x100000000000000000000000000000000 128 129))
+(test-eqv "test-192"
+  1 (bit-field #x100000000000000000000000000000000 128 129))
 (test-eqv "test-363" #b1010 (bit-field #b1101101010 0 4))
 (test-eqv "test-364" #b101101 (bit-field #b1101101010 3 9))
 (test-eqv "test-365" #b10110 (bit-field #b1101101010 4 9))
@@ -217,7 +224,8 @@
           (bit-field-rotate #x100000000000000000000000000000001 -3 0 64))
 (test-eqv "test-208" #b110 (bit-field-rotate #b110 0 0 10))
 (test-eqv "test-209" #b110 (bit-field-rotate #b110 0 0 256))
-(test-eqv "test-475" 1 (bit-field-rotate #x100000000000000000000000000000000 1 0 129))
+(test-eqv "test-475"
+  1 (bit-field-rotate #x100000000000000000000000000000000 1 0 129))
 (test-eqv "test-211" 6 (bit-field-reverse 6 1 3))
 (test-eqv "test-212" 12 (bit-field-reverse 6 1 4))
 (test-eqv "test-213" #x80000000 (bit-field-reverse 1 0 32))
@@ -235,7 +243,8 @@
           (bit-field-reverse -2 0 31))
 (test-eqv "test-221" (bitwise-ior (arithmetic-shift -1 32) #x7FFFFFFF)
           (bit-field-reverse -2 0 32))
-(test-eqv "test-222" 5 (bit-field-reverse #x140000000000000000000000000000000 0 129))
+(test-eqv "test-222"
+  5 (bit-field-reverse #x140000000000000000000000000000000 0 129))
 (test-end "field")
 
 (test-begin "conversion")
@@ -269,15 +278,16 @@
 (test-eqv "test-230" 12 (list->bits '(#f #f #t #t)))
 (test-eqv "test-231" 6 (list->bits '(#f #t #t #f)))
 (test-eqv "test-232" 2 (list->bits '(#f #t)))
-(test-eqv "test-233" 1 (list->bits
-                        '(#t #f #f #f #f #f #f #f #f #f #f #f #f #f #f #f
-                             #f #f #f #f #f #f #f #f #f #f #f #f #f #f #f #f
-                             #f #f #f #f #f #f #f #f #f #f #f #f #f #f #f #f
-                             #f #f #f #f #f #f #f #f #f #f #f #f #f #f #f #f
-                             #f #f #f #f #f #f #f #f #f #f #f #f #f #f #f #f
-                             #f #f #f #f #f #f #f #f #f #f #f #f #f #f #f #f
-                             #f #f #f #f #f #f #f #f #f #f #f #f #f #f #f #f
-                             #f #f #f #f #f #f #f #f #f #f #f #f #f #f #f #f)))
+(test-eqv "test-233"
+  1 (list->bits
+     '(#t #f #f #f #f #f #f #f #f #f #f #f #f #f #f #f
+          #f #f #f #f #f #f #f #f #f #f #f #f #f #f #f #f
+          #f #f #f #f #f #f #f #f #f #f #f #f #f #f #f #f
+          #f #f #f #f #f #f #f #f #f #f #f #f #f #f #f #f
+          #f #f #f #f #f #f #f #f #f #f #f #f #f #f #f #f
+          #f #f #f #f #f #f #f #f #f #f #f #f #f #f #f #f
+          #f #f #f #f #f #f #f #f #f #f #f #f #f #f #f #f
+          #f #f #f #f #f #f #f #f #f #f #f #f #f #f #f #f)))
 (test-eqv "test-234" #x100000000000000000000000000000000
           (list->bits
            '(#f
@@ -325,15 +335,18 @@
 (test-eqv "test-490" 1 (list->bits '(#t #f)))
 (test-eqv "test-108" #b1110101 (vector->bits '#(#t #f #t #f #t #t #t)))
 (test-eqv "test-109" #b00011010100 (vector->bits '#(#f #f #t #f #t #f #t #t)))
-(test-equal "test-105" '#(#t #t #t #f #t #f #t #f #f) (bits->vector #b1010111 9))
-(test-equal "test-105" '#(#t #t #t #f #t #f #t #f #f) (bits->vector #b1010111 9))
+(test-equal "test-105"
+  '#(#t #t #t #f #t #f #t #f #f) (bits->vector #b1010111 9))
+(test-equal "test-105"
+  '#(#t #t #t #f #t #f #t #f #f) (bits->vector #b1010111 9))
 (test-eqv "test-110" #b1110101 (bits #t #f #t #f #t #t #t))
 (test-eqv "test-243" 0 (bits))
 (test-eqv "test-111" #b111010100 (bits #f #f #t #f #t #f #t #t #t))
 (test-end "conversion")
 
 (test-begin "fold")
-(test-equal "test-112" '(#t #f #t #f #t #t #t) (bitwise-fold cons '() #b1010111))
+(test-equal "test-112"
+  '(#t #f #t #f #t #t #t) (bitwise-fold cons '() #b1010111))
 (test-eqv "test-113" 5
           (let ((count 0))
             (bitwise-for-each (lambda (b) (if b (set! count (+ count 1))))
