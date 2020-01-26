@@ -187,10 +187,14 @@
 
 (test-eqv #t (subset? ascii-space-or-tab? ascii-whitespace?))
 (test-eqv #t (subset? ascii-other-graphic? ascii-non-control?))
-(test-eqv #t (subset? ascii-upper-case?   ascii-alphabetic? ascii-non-control?))
-(test-eqv #t (subset? ascii-lower-case?   ascii-alphabetic? ascii-non-control?))
-(test-eqv #t (subset? ascii-alphabetic?   ascii-alphanumeric? ascii-non-control?))
-(test-eqv #t (subset? decimal-numeric?    ascii-alphanumeric? ascii-non-control?))
+(test-eqv #t (subset? ascii-upper-case?
+                      ascii-alphabetic? ascii-non-control?))
+(test-eqv #t (subset? ascii-lower-case?
+                      ascii-alphabetic? ascii-non-control?))
+(test-eqv #t (subset? ascii-alphabetic?
+                      ascii-alphanumeric? ascii-non-control?))
+(test-eqv #t (subset? decimal-numeric?
+                      ascii-alphanumeric? ascii-non-control?))
 (test-eqv #t (subset? ascii-alphanumeric? ascii-non-control?))
 
 (test-eqv #t (disjoint? ascii-control? ascii-non-control?))
