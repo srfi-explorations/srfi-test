@@ -1,3 +1,6 @@
+;; Copyright 2016, 2018 John Cowan
+;; SPDX-License-Identifier: MIT
+
 (test-begin "vectors")
 
 (test-begin "basics")
