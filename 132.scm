@@ -153,7 +153,8 @@
 (test-equal "vector-stable-sort:iota10-quotient2:3"
   '#(7 4 5 3 2 0 1)
   (let ((v (vector 9 8 6 3 0 4 2 5 7 1)))
-    (vector-stable-sort (lambda (x y) (> (quotient x 2) (quotient y 2))) v 3)))
+    (vector-stable-sort
+     (lambda (x y) (> (quotient x 2) (quotient y 2))) v 3)))
 
 (test-equal "vector-sort:empty-vector:0:0"
   '#()
@@ -190,7 +191,8 @@
 (test-equal "vector-stable-sort:iota10-quotient2:1:8"
   '#(8 6 4 5 3 2 0)
   (let ((v (vector 9 8 6 3 0 4 2 5 7 1)))
-    (vector-stable-sort (lambda (x y) (> (quotient x 2) (quotient y 2))) v 1 8)))
+    (vector-stable-sort
+     (lambda (x y) (> (quotient x 2) (quotient y 2))) v 1 8)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -338,7 +340,8 @@
 (test-equal "vector-stable-sort!:iota10-quotient2:1:8"
   '#(9 8 6 4 5 3 2 0 7 1)
   (let ((v (vector 9 8 6 3 0 4 2 5 7 1)))
-    (vector-stable-sort! (lambda (x y) (> (quotient x 2) (quotient y 2))) v 1 8)
+    (vector-stable-sort!
+     (lambda (x y) (> (quotient x 2) (quotient y 2))) v 1 8)
     v))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -505,7 +508,8 @@
 
 (test-equal "vector-merge!:empty:empty:2"
   '#(#f #f #f #f #f #f #f #f #f #f #f #f)
-  (let ((v (make-vector 12 #f))) (vector-merge! > v (vector) (vector) 2 0 0) v))
+  (let ((v (make-vector 12 #f)))
+    (vector-merge! > v (vector) (vector) 2 0 0) v))
 
 (test-equal "vector-merge!:empty:nonempty:2"
   '#(#f #f 9 6 3 0 #f #f #f #f #f #f)
