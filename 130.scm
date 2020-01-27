@@ -20,7 +20,8 @@
 (test-equal "string-every" #t (string-every char-set:lower-case "aaba"))
 (test-equal "string-every" #f (string-every char-set:lower-case "aAba"))
 (test-equal "string-every" #t (string-every char-set:lower-case ""))
-(test-equal "string-every" #t (string-every (lambda (x) (char->integer x)) "aAbA"))
+(test-equal "string-every"
+  #t (string-every (lambda (x) (char->integer x)) "aAbA"))
 (test-equal "string-every" #t (string-every (lambda (x) (error "hoge")) ""))
 (test-equal "string-any" #t (string-any #\a "aaaa"))
 (test-equal "string-any" #f (string-any #\a "Abcd"))
@@ -70,9 +71,11 @@
 
 (test-equal "string-take-right" "rules" (string-take-right "Beta rules" 5))
 (test-equal "string-take-right" ""      (string-take-right "Beta rules" 0))
-(test-equal "string-take-right" "Beta rules" (string-take-right "Beta rules" 10))
+(test-equal "string-take-right"
+  "Beta rules" (string-take-right "Beta rules" 10))
 (test-equal "string-drop-right" "Beta " (string-drop-right "Beta rules" 5))
-(test-equal "string-drop-right" "Beta rules" (string-drop-right "Beta rules" 0))
+(test-equal "string-drop-right"
+  "Beta rules" (string-drop-right "Beta rules" 0))
 (test-equal "string-drop-right" ""      (string-drop-right "Beta rules" 10))
 
 (test-equal "string-pad" "  325" (string-pad "325" 5))
@@ -97,15 +100,17 @@
 
 (test-equal "string-trim-right"  "  \t  a b c d"
             (string-trim-right "  \t  a b c d  \n"))
-(test-equal "string-trim-right"  "  \t  a b c d  "
-            (string-trim-right "  \t  a b c d  \n" (lambda (ch) (eqv? ch #\newline))))
+(test-equal "string-trim-right"
+  "  \t  a b c d  "
+  (string-trim-right "  \t  a b c d  \n" (lambda (ch) (eqv? ch #\newline))))
 (test-equal "string-trim-right"  "349853a b c d"
             (string-trim-right "349853a b c d03490" char-numeric?))
 
 (test-equal "string-trim-both"  "a b c d"
             (string-trim-both "  \t  a b c d  \n"))
-(test-equal "string-trim-both"  "  \t  a b c d  "
-            (string-trim-both "  \t  a b c d  \n" (lambda (ch) (eqv? ch #\newline))))
+(test-equal "string-trim-both"
+  "  \t  a b c d  "
+  (string-trim-both "  \t  a b c d  \n" (lambda (ch) (eqv? ch #\newline))))
 (test-equal "string-trim-both"  "a b c d"
             (string-trim-both "349853a b c d03490" char-numeric?))
 
@@ -121,22 +126,31 @@
 (test-equal "string-suffix?" #t (string-suffix? "defg" "abcdefg"))
 (test-equal "string-suffix?" #f (string-suffix? "aefg" "abcdefg"))
 
-(test-equal "string-index #1" 4
-            (string-index->index "abcd:efgh:ijkl" (lambda (ch) (eqv? ch #\:))))
-(test-equal "string-index #2" 4
-            (string-index->index "abcd:efgh;ijkl" (lambda (ch) (char-set-contains? char-set:not-letter ch))))
-(test-equal "string-index #3" 14
-            (string-index->index "abcd:efgh;ijkl" (lambda (ch) (char-set-contains? char-set:digit ch))))
-(test-equal "string-index #4" 9
-            (string-index->index "abcd:efgh:ijkl" (lambda (ch) (eqv? ch #\:)) 5))
-(test-equal "string-index-right #1" 5
-            (string-index-right->index "abcd:efgh;ijkl" (lambda (ch) (eqv? ch #\:))))
-(test-equal "string-index-right #2" 10
-            (string-index-right->index "abcd:efgh;ijkl" (lambda (ch) (char-set-contains? char-set:not-letter ch))))
+(test-equal "string-index #1"
+  4 (string-index->index "abcd:efgh:ijkl" (lambda (ch) (eqv? ch #\:))))
+(test-equal "string-index #2"
+  4 (string-index->index
+     "abcd:efgh;ijkl"
+     (lambda (ch) (char-set-contains? char-set:not-letter ch))))
+(test-equal "string-index #3"
+  14 (string-index->index
+      "abcd:efgh;ijkl"
+      (lambda (ch) (char-set-contains? char-set:digit ch))))
+(test-equal "string-index #4"
+  9 (string-index->index
+     "abcd:efgh:ijkl" (lambda (ch) (eqv? ch #\:)) 5))
+(test-equal "string-index-right #1"
+  5 (string-index-right->index "abcd:efgh;ijkl" (lambda (ch) (eqv? ch #\:))))
+(test-equal "string-index-right #2"
+  10 (string-index-right->index
+      "abcd:efgh;ijkl"
+      (lambda (ch) (char-set-contains? char-set:not-letter ch))))
 (test-equal "string-index-right #3" 14
             (string-index-right->index "abcd:efgh;ijkl" char-alphabetic?))
-(test-equal "string-index-right #4" 10
-            (string-index-right->index "abcd:efgh;ijkl" (lambda (ch) (char-set-contains? char-set:not-letter ch)) 7))
+(test-equal "string-index-right #4"
+  10 (string-index-right->index
+      "abcd:efgh;ijkl"
+      (lambda (ch) (char-set-contains? char-set:not-letter ch)) 7))
 
 (test-equal "string-count #1" 2
             (string-count "abc def\tghi jkl" (lambda (ch) (eqv? ch #\space))))
@@ -161,7 +175,8 @@
     #f (string-contains s "mer" 1 5)))
 (let ((s "eek -- it's a geek."))
   (test-equal 15 (string-cursor->index s (string-contains-right s "ee")))
-  (test-equal 15 (string-cursor->index s (string-contains-right s "ee" 12 18)))
+  (test-equal 15
+    (string-cursor->index s (string-contains-right s "ee" 12 18)))
   (test-equal 19 (string-cursor->index s (string-contains-right s "")))
   (test-equal 0 (string-cursor->index "" (string-contains-right "" "")))
   (test-equal #f (string-contains-right s "kee" 12 18)))
@@ -177,22 +192,24 @@
             (let ((s "test")) (eq? s (string-append s))))
 (test-equal "string-concatenate" #f
             (let ((s "test")) (eq? s (string-concatenate (list s)))))
-(test-equal "string-concatenate" "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"
-            (string-concatenate
-             '("A" "B" "C" "D" "E" "F" "G" "H"
-               "I" "J" "K" "L" "M" "N" "O" "P"
-               "Q" "R" "S" "T" "U" "V" "W" "X" "Y" "Z"
-               "a" "b" "c" "d" "e" "f" "g" "h"
-               "i" "j" "k" "l" "m" "n" "o" "p"
-               "q" "r" "s" "t" "u" "v" "w" "x" "y" "z")))
-(test-equal "string-concatenate-reverse" "zyxwvutsrqponmlkjihgfedcbaZYXWVUTSRQPONMLKJIHGFEDCBA"
-            (string-concatenate-reverse
-             '("A" "B" "C" "D" "E" "F" "G" "H"
-               "I" "J" "K" "L" "M" "N" "O" "P"
-               "Q" "R" "S" "T" "U" "V" "W" "X" "Y" "Z"
-               "a" "b" "c" "d" "e" "f" "g" "h"
-               "i" "j" "k" "l" "m" "n" "o" "p"
-               "q" "r" "s" "t" "u" "v" "w" "x" "y" "z")))
+(test-equal "string-concatenate"
+  "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"
+  (string-concatenate
+   '("A" "B" "C" "D" "E" "F" "G" "H"
+     "I" "J" "K" "L" "M" "N" "O" "P"
+     "Q" "R" "S" "T" "U" "V" "W" "X" "Y" "Z"
+     "a" "b" "c" "d" "e" "f" "g" "h"
+     "i" "j" "k" "l" "m" "n" "o" "p"
+     "q" "r" "s" "t" "u" "v" "w" "x" "y" "z")))
+(test-equal "string-concatenate-reverse"
+  "zyxwvutsrqponmlkjihgfedcbaZYXWVUTSRQPONMLKJIHGFEDCBA"
+  (string-concatenate-reverse
+   '("A" "B" "C" "D" "E" "F" "G" "H"
+     "I" "J" "K" "L" "M" "N" "O" "P"
+     "Q" "R" "S" "T" "U" "V" "W" "X" "Y" "Z"
+     "a" "b" "c" "d" "e" "f" "g" "h"
+     "i" "j" "k" "l" "m" "n" "o" "p"
+     "q" "r" "s" "t" "u" "v" "w" "x" "y" "z")))
 (test-equal "string-concatenate-reverse" #f
             (let ((s "test"))
               (eq? s (string-concatenate-reverse (list s)))))
@@ -269,18 +286,21 @@
 ;;                      "Common Lisp, the Language" 1 10)
 ;;     (get-output-string out)))
 
-(test-equal "string-for-each-cursor" '(4 3 2 1 0)
-            (let ((r '()))
-              (string-for-each-cursor (lambda (i) (set! r (cons i r))) "hello")
-              (map (lambda (sc) (string-cursor->index "hello" sc)) r)))
-(test-equal "string-for-each-cursor" '(4 3 2 1)
-            (let ((r '()))
-              (string-for-each-cursor (lambda (i) (set! r (cons i r))) "hello" 1)
-              (map (lambda (sc) (string-cursor->index "hello" sc)) r)))
-(test-equal "string-for-each-cursor" '(2 1)
-            (let ((r '()))
-              (string-for-each-cursor (lambda (i) (set! r (cons i r))) "hello" 1 3)
-              (map (lambda (sc) (string-cursor->index "hello" sc)) r)))
+(test-equal "string-for-each-cursor"
+  '(4 3 2 1 0)
+  (let ((r '()))
+    (string-for-each-cursor (lambda (i) (set! r (cons i r))) "hello")
+    (map (lambda (sc) (string-cursor->index "hello" sc)) r)))
+(test-equal "string-for-each-cursor"
+  '(4 3 2 1)
+  (let ((r '()))
+    (string-for-each-cursor (lambda (i) (set! r (cons i r))) "hello" 1)
+    (map (lambda (sc) (string-cursor->index "hello" sc)) r)))
+(test-equal "string-for-each-cursor"
+  '(2 1)
+  (let ((r '()))
+    (string-for-each-cursor (lambda (i) (set! r (cons i r))) "hello" 1 3)
+    (map (lambda (sc) (string-cursor->index "hello" sc)) r)))
 
 (test-equal "string-replicate" "cdefab"
             (string-replicate "abcdef" 2 8))
@@ -308,7 +328,8 @@
             (string-filter (lambda (ch) (eqv? ch #\r))
                            "Help make programs run, run, RUN!"))
 (test-equal "string-filter" "HelpmakeprogramsrunrunRUN"
-            (string-filter char-alphabetic? "Help make programs run, run, RUN!"))
+            (string-filter char-alphabetic?
+                           "Help make programs run, run, RUN!"))
 
 (test-equal "string-filter" "programsrunrun"
             (string-filter (lambda (c) (char-lower-case? c))
@@ -320,7 +341,8 @@
             (string-remove (lambda (ch) (eqv? ch #\r))
                            "Help make programs run, run, RUN!"))
 (test-equal "string-remove" "   , , !"
-            (string-remove char-alphabetic? "Help make programs run, run, RUN!"))
+            (string-remove char-alphabetic?
+                           "Help make programs run, run, RUN!"))
 (test-equal "string-remove" " , , RUN!"
             (string-remove (lambda (c) (char-lower-case? c))
                            "Help make programs run, run, RUN!"
@@ -361,11 +383,12 @@
                                         ;
 ;; Matthias.
 
-(test-equal "string-contains" 1
-            (string-cursor->index "aabc" (string-contains "aabc" "ab")))
+(test-equal "string-contains"
+  1 (string-cursor->index "aabc" (string-contains "aabc" "ab")))
 
-(test-equal "string-contains" 5
-            (string-cursor->index "ababdabdabxxas" (string-contains "ababdabdabxxas" "abdabx")))
+(test-equal "string-contains"
+  5 (string-cursor->index "ababdabdabxxas"
+                          (string-contains "ababdabdabxxas" "abdabx")))
 
 ;; (message continues)
 ;;
