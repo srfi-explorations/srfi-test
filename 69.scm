@@ -23,11 +23,11 @@
   (test-eqv 'grey (hash-table-ref ht 'goose (lambda () 'grey)))
   (test-eqv 'grey (hash-table-ref/default ht 'goose 'grey))
   (test-equal '(cat dog elephant)
-    (list-stable-sort symbol<? (hash-table-keys ht)))
+    (list-sort symbol<? (hash-table-keys ht)))
   (test-equal '(black pink white)
-    (list-stable-sort symbol<? (hash-table-values ht)))
+    (list-sort symbol<? (hash-table-values ht)))
   (test-equal '((cat . black) (dog . white) (elephant . pink))
-    (list-stable-sort car-symbol<? (hash-table->alist ht)))
+    (list-sort car-symbol<? (hash-table->alist ht)))
 
   ;; remove an element
   (hash-table-delete! ht 'dog)
@@ -39,11 +39,11 @@
   (test-eqv 'black (hash-table-ref ht 'cat))
   (test-eqv 'pink (hash-table-ref ht 'elephant))
   (test-equal '(cat elephant)
-    (list-stable-sort symbol<? (hash-table-keys ht)))
+    (list-sort symbol<? (hash-table-keys ht)))
   (test-equal '(black pink)
-    (list-stable-sort symbol<? (hash-table-values ht)))
+    (list-sort symbol<? (hash-table-values ht)))
   (test-equal '((cat . black) (elephant . pink))
-    (list-stable-sort car-symbol<? (hash-table->alist ht)))
+    (list-sort car-symbol<? (hash-table->alist ht)))
 
   ;; remove a non-existing element
   (hash-table-delete! ht 'dog)
@@ -60,19 +60,19 @@
   (test-eqv 'calico (hash-table-ref ht 'cat))
   (test-eqv 'pink (hash-table-ref ht 'elephant))
   (test-equal '(cat elephant)
-    (list-stable-sort symbol<? (hash-table-keys ht)))
+    (list-sort symbol<? (hash-table-keys ht)))
   (test-equal '(calico pink)
-    (list-stable-sort symbol<? (hash-table-values ht)))
+    (list-sort symbol<? (hash-table-values ht)))
   (test-equal '((cat . calico) (elephant . pink))
-    (list-stable-sort car-symbol<? (hash-table->alist ht)))
+    (list-sort car-symbol<? (hash-table->alist ht)))
 
   ;; walk and fold
   (test-equal '((cat . calico) (elephant . pink))
     (let ((a '()))
       (hash-table-walk ht (lambda (k v) (set! a (cons (cons k v) a))))
-      (list-stable-sort car-symbol<? a)))
+      (list-sort car-symbol<? a)))
   (test-equal '((cat . calico) (elephant . pink))
-    (list-stable-sort
+    (list-sort
      car-symbol<?
      (hash-table-fold ht (lambda (k v a) (cons (cons k v) a)) '())))
 
@@ -86,11 +86,11 @@
     (test-eqv 'calico (hash-table-ref ht2 'cat))
     (test-eqv 'pink (hash-table-ref ht2 'elephant))
     (test-equal '(cat elephant)
-      (list-stable-sort symbol<? (hash-table-keys ht2)))
+      (list-sort symbol<? (hash-table-keys ht2)))
     (test-equal '(calico pink)
-      (list-stable-sort symbol<? (hash-table-values ht2)))
+      (list-sort symbol<? (hash-table-values ht2)))
     (test-equal '((cat . calico) (elephant . pink))
-      (list-stable-sort car-symbol<? (hash-table->alist ht2))))
+      (list-sort car-symbol<? (hash-table->alist ht2))))
 
   ;; merge
   (let ((ht2 (make-hash-table eq?)))
@@ -110,15 +110,15 @@
     (test-error (hash-table-ref ht2 'goose))
     (test-eqv 'grey (hash-table-ref/default ht2 'goose 'grey))
     (test-equal '(bear cat elephant)
-      (list-stable-sort symbol<? (hash-table-keys ht2)))
+      (list-sort symbol<? (hash-table-keys ht2)))
     (test-equal '(brown calico pink)
-      (list-stable-sort symbol<? (hash-table-values ht2)))
+      (list-sort symbol<? (hash-table-values ht2)))
     (test-equal '((bear . brown) (cat . calico) (elephant . pink))
-      (list-stable-sort car-symbol<? (hash-table->alist ht2))))
+      (list-sort car-symbol<? (hash-table->alist ht2))))
 
   ;; alist->hash-table
-  (test-equal (list-stable-sort car-symbol<? (hash-table->alist ht))
-    (list-stable-sort car-symbol<?
+  (test-equal (list-sort car-symbol<? (hash-table->alist ht))
+    (list-sort car-symbol<?
                       (hash-table->alist
                        (alist->hash-table
                         '((cat . calico) (elephant . pink)))))))
@@ -147,11 +147,11 @@
   (test-error (hash-table-ref ht "goose"))
   (test-eqv 'grey (hash-table-ref/default ht "goose" 'grey))
   (test-equal '("cat" "dog" "elephant")
-    (list-stable-sort string<? (hash-table-keys ht)))
+    (list-sort string<? (hash-table-keys ht)))
   (test-equal '(black pink white)
-    (list-stable-sort symbol<? (hash-table-values ht)))
+    (list-sort symbol<? (hash-table-values ht)))
   (test-equal '(("cat" . black) ("dog" . white) ("elephant" . pink))
-    (list-stable-sort car-string<? (hash-table->alist ht))))
+    (list-sort car-string<? (hash-table->alist ht))))
 
 ;; string-ci keys
 (let ((ht (make-hash-table string-ci=? string-ci-hash)))
@@ -164,11 +164,11 @@
   (test-eqv 'pink (hash-table-ref ht "eLePhAnT"))
   (test-error (hash-table-ref ht "goose"))
   (test-equal '("cat" "dog" "elephant")
-    (list-stable-sort string<? (hash-table-keys ht)))
+    (list-sort string<? (hash-table-keys ht)))
   (test-equal '(black pink white)
-    (list-stable-sort symbol<? (hash-table-values ht)))
+    (list-sort symbol<? (hash-table-values ht)))
   (test-equal '(("cat" . black) ("dog" . white) ("elephant" . pink))
-    (list-stable-sort car-string<? (hash-table->alist ht))))
+    (list-sort car-string<? (hash-table->alist ht))))
 
 ;; stress test
 (test-eqv 625
