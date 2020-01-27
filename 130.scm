@@ -1,3 +1,5 @@
+;; TODO: License. From Chibi-Scheme. Written by Alex Shinn?
+
 (define-library (srfi 130 test)
   (export run-tests)
   (import (scheme base) (scheme char)
