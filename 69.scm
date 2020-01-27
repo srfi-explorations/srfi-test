@@ -1,4 +1,5 @@
-;; TODO: License. From Chibi-Scheme. Written by Alex Shinn?
+;; Copyright 2015, 2016 Alex Shinn
+;; SPDX-License-Identifier: BSD-3-Clause
 
 (test-begin "srfi-69")
 
