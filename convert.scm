@@ -67,6 +67,10 @@
                 (let ((y (car xs)) (ys (cdr xs)))
                   (if (less? x y) (cons x xs) (cons y (insert x ys))))))))
 
+    (define (written x)
+      (call-with-port (open-output-string)
+                      (lambda (out) (write x out) (get-output-string out))))
+
     (define (symbol<? a b) (string<? (symbol->string a) (symbol->string b)))
 
     ))
@@ -83,6 +87,8 @@
                                  (srfi 27)
                                  (srfi 64)  ; snow-chibi install '(srfi 64)'
                                  (srfi ,srfi-number))
+                         (define (call-with-false-on-error proc)
+                           (guard (_ (else #f)) (proc)))
                          ,@prelude
                          ,@(read-source-file basename)))))
 
@@ -95,6 +101,8 @@
                                  (srfi 27)
                                  (srfi 64)
                                  (srfi ,srfi-number))
+                         (define (call-with-false-on-error proc)
+                           (guard (_ (else #f)) (proc)))
                          ,@prelude
                          ,@(read-source-file basename)))))
 
@@ -107,6 +115,8 @@
                                  (srfi ,(string->symbol
                                          (string-append
                                           ":" (number->string srfi-number)))))
+                         (define (call-with-false-on-error proc)
+                           (catch #t proc (lambda (return) (return #f))))
                          ,@prelude
                          ,@(read-source-file basename)))))
 
@@ -117,12 +127,14 @@
                                  (srfi ,srfi-number))
                          (define (random-integer limit)
                            ((java.util.Random):nextInt limit))
+                         (define (call-with-false-on-error proc)
+                           (guard (_ (else #f)) (proc)))
                          ,@prelude
                          ,@(read-source-file basename)))))
 
 ;;
 
-(define all-srfis '(60 69 132 151 175))
+(define all-srfis '(13 60 69 132 151 175))
 
 (for-each write-chibi-test all-srfis)
 (for-each write-gauche-test all-srfis)
