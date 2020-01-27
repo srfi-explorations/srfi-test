@@ -1,3 +1,6 @@
+;; Copyright 2015 John Cowan
+;; SPDX-License-Identifier: MIT
+
 ;;;; Chicken-specific tests for titlecase library
 
 ;;; Note:  The strings embed Unicode characters using the Chicken-specific lexical
