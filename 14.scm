@@ -1,13 +1,10 @@
 ;; Copyright 2000 Olin Shivers
 ;; SPDX-License-Identifier: MIT
 
-(let-syntax ((test (syntax-rules ()
-                     ((test form ...)
-                      (cond ((not form) (error "Test failed" 'form)) ...
-                            (else 'OK))))))
-  (let ((vowel? (lambda (c) (member c '(#\a #\e #\i #\o #\u)))))
+(test-begin "srfi-132")
 
-(test
+(define (vowel? c) (member c '(#\a #\e #\i #\o #\u)))
+
  (not (char-set? 5))
 
  (char-set? (char-set #\a #\e #\i #\o #\u))
@@ -195,6 +192,6 @@
                                                   (char-set-copy char-set:letter)))
    (lambda (d i)
      (and (char-set= d (->char-set "0123456789"))
-          (char-set= i (->char-set "abcdefABCDEF"))))))
+          (char-set= i (->char-set "abcdefABCDEF")))))
 
-))
+(test-end "srfi-132")
