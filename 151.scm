@@ -1,5 +1,6 @@
-;; TODO: License. From sample implementation. Written by John Cowan?
-;; Shiro Kawai contributed some fixes.
+;; Copyright 2017 John Cowan
+;; Copyright 2017 Shiro Kawai
+;; SPDX-License-Identifier: MIT
 
 (test-begin "srfi-151")
 
