@@ -105,8 +105,10 @@
                          (define-syntax test-arity-error
                            (syntax-rules ()
                              ((_ test-expr)
-                              (guard (_ (arity-error? #t))
-                                (lambda () test-expr)))))
+                              (test-assert (guard (_ (arity-error? #t)
+                                                     (else #f))
+                                             test-expr
+                                             #f)))))
                          (define (call-with-false-on-error proc)
                            (guard (_ (else #f)) (proc)))
                          ,@prelude
