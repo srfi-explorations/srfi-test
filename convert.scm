@@ -165,7 +165,7 @@
 
 ;;
 
-(define all-srfis '(13 14 60 69 130 132 133 151 175))
+(define all-srfis '(13 14 60 69 130 132 133 151 160 175))
 
 (for-each write-chibi-test all-srfis)
 (for-each write-gauche-test all-srfis)
