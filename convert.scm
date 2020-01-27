@@ -81,7 +81,7 @@
                                  (scheme write)
                                  (chibi)
                                  (srfi 27)
-                                 (srfi 64) ;; snow-chibi install '(srfi 64)'
+                                 (srfi 64)  ; snow-chibi install '(srfi 64)'
                                  (srfi ,srfi-number))
                          ,@prelude
                          ,@(read-source-file basename)))))
