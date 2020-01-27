@@ -61,40 +61,6 @@
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-;;; The test program contains optional benchmarks that can be
-;;; enabled by defining display-benchmark-results? as true.
-
-(define-library (local benchmarking)
-  (export display-benchmark-results?
-          r6rs-list-sort
-          r6rs-vector-sort
-          r6rs-vector-sort!)
-  (import (scheme base)
-          (srfi 132))
-
-  (cond-expand
-   ((library (rnrs sorting))
-    (import
-     (rename (rnrs sorting)
-             (list-sort    r6rs-list-sort)
-             (vector-sort  r6rs-vector-sort)
-             (vector-sort! r6rs-vector-sort!))))
-   (else
-    (begin
-     (define r6rs-list-sort    list-sort)
-     (define r6rs-vector-sort  vector-sort)
-     (define r6rs-vector-sort! vector-sort!))))
-
-  (begin
-
-   ;; To display benchmark results, change this to true.
-
-   (define display-benchmark-results? #f)
-
-  ))
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
 (import (except (scheme base) vector-copy)
         (rename (scheme base)
                 (vector-copy r7rs-vector-copy))
@@ -103,8 +69,7 @@
         (scheme time)
         (only (srfi 27) random-integer)
         (srfi 132)
-        (local olin)
-        (local benchmarking))
+        (local olin))
 
 ;;; These definitions avoid having to change Olin's code.
 
@@ -1563,99 +1528,3 @@
 (for-each test-all-sorts
           '( 3  5 10 10 10 20 20 10 10 10 10 10  10  10  10  10  10)
           '( 0  1  2  3  4  5 10 20 30 40 50 99 100 101 499 500 501))
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;
-;;; Benchmarks.
-;;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-(define (mostly-sorted-random-vector n)
-  (define fraction-not-sorted 1/20)
-  (define k (round (* n fraction-not-sorted)))
-  (let* ((v  (random-vector n))
-         (v2 (r6rs-vector-sort < v)))
-    (do ((i 0 (+ i 1)))
-        ((= i k))
-      (vector-set! v2 i (vector-ref v i)))
-    v2))
-
-;;; Performs n calls of f on a fresh copy of the vector or list v
-;;; and returns the average time per call in seconds, rounded to
-;;; the nearest microsecond.
-
-(define (average-time n f v)
-  (define (call-loop i jiffies)
-    (if (> i 0)
-        (let* ((v2 (if (vector? v)
-                       (vector-copy v)
-                       (list-copy v)))
-               (t0 (current-jiffy))
-               (result (f < v2))
-               (t1 (current-jiffy)))
-          (call-loop (- i 1) (+ jiffies (- t1 t0))))
-        (let* ((dt (/ jiffies (jiffies-per-second)))
-               (dt (/ dt n))
-               (dt (/ (round (* 1e6 dt)) 1e6)))
-          dt)))
-  (call-loop n 0))
-
-(define (run-some-benchmarks m n)
-  (newline)
-  (display "Average time (in seconds) for a sequence of length ")
-  (write n)
-  (display " : ")
-  (newline)
-  (newline)
-  (display "                       random      mostly sorted\n")
-  (let* ((v (random-vector n))
-         (l (vector->list v))
-         (v2 (mostly-sorted-random-vector n))
-         (l2 (vector->list v2)))
-    (define (run-sorter name f v v2)
-      (display name)
-      (display "    ")
-      (write10 (average-time m f v))
-      (display "    ")
-      (write10 (average-time m f v2))
-      (newline))
-    (define (write10 x)
-      (let* ((p (open-output-string))
-             (ignored (write x p))
-             (s (get-output-string p))
-             (k (string-length s))
-             (s (string-append s (make-string (max 0 (- 10 k)) #\space))))
-        (display s)))
-    (run-sorter "R6RS list-sort     "  r6rs-list-sort l l2)
-    (run-sorter "list-sort          "  list-sort l l2)
-    (run-sorter "list-stable-sort   "  list-stable-sort l l2)
-    (run-sorter "list-sort!         "  list-sort! l l2)
-    (run-sorter "list-stable-sort!  "  list-stable-sort! l l2)
-    (run-sorter "R6RS vector-sort   "  r6rs-vector-sort v v2)
-    (run-sorter "R6RS vector-sort!  "  r6rs-vector-sort! v v2)
-    (run-sorter "vector-sort        "  vector-sort v v2)
-    (run-sorter "vector-stable-sort "  vector-stable-sort v v2)
-    (run-sorter "vector-sort!       "  vector-sort! v v2)
-    (run-sorter "vector-stable-sort!"  vector-stable-sort! v v2)
-    (run-sorter "vector-find-median "
-                (lambda (< v)
-                  (vector-find-median < v -1))
-                v v2)
-    (run-sorter "vector-find-median!"
-                (lambda (< v)
-                  (vector-find-median! < v -1))
-                v v2)))
-
-(if display-benchmark-results?
-    (run-some-benchmarks 1000 100))
-
-(if display-benchmark-results?
-    (run-some-benchmarks 50 9999))
-
-(if display-benchmark-results?
-    (run-some-benchmarks 50 10000))
-
-(if display-benchmark-results?
-    (run-some-benchmarks 3 1000000))
-
-(display "Done.\n")
