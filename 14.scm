@@ -1,7 +1,7 @@
 ;; Copyright 2000 Olin Shivers
 ;; SPDX-License-Identifier: MIT
 
-(test-begin "srfi-132")
+(test-begin "srfi-14")
 
 (define (vowel? c) (member c '(#\a #\e #\i #\o #\u)))
 
@@ -194,4 +194,4 @@
     (and (char-set= d (->char-set "0123456789"))
          (char-set= i (->char-set "abcdefABCDEF")))))
 
-(test-end "srfi-132")
+(test-end "srfi-14")
