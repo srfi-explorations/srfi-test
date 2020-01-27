@@ -56,6 +56,13 @@
 
 ;;
 
+(define (srfi-dependencies srfi-number)
+  (case srfi-number
+    ((13) '(14))
+    (else '())))
+
+;;
+
 (define prelude
   '(
 
@@ -84,9 +91,12 @@
                                  (scheme char)
                                  (scheme write)
                                  (chibi)
-                                 (srfi 27)
-                                 (srfi 64)  ; snow-chibi install '(srfi 64)'
-                                 (srfi ,srfi-number))
+                                 ,@(map (lambda (n) `(srfi ,n))
+                                        (append
+                                         ;; snow-chibi install '(srfi 64)'
+                                         '(27 64)
+                                         (srfi-dependencies srfi-number)
+                                         (list srfi-number))))
                          (define (call-with-false-on-error proc)
                            (guard (_ (else #f)) (proc)))
                          ,@prelude
@@ -95,12 +105,14 @@
 (define (write-gauche-test srfi-number)
   (let ((basename (string-append (number->string srfi-number) ".scm")))
     (write-source-file "gauche" basename
-                       `((import (scheme base)
-                                 (scheme char)
-                                 (scheme write)
-                                 (srfi 27)
-                                 (srfi 64)
-                                 (srfi ,srfi-number))
+                       `((import
+                           (scheme base)
+                           (scheme char)
+                           (scheme write)
+                           ,@(map (lambda (n) `(srfi ,n))
+                                  (append '(27 64)
+                                          (srfi-dependencies srfi-number)
+                                          (list srfi-number))))
                          (define (call-with-false-on-error proc)
                            (guard (_ (else #f)) (proc)))
                          ,@prelude
@@ -109,12 +121,15 @@
 (define (write-guile-test srfi-number)
   (let ((basename (string-append (number->string srfi-number) ".scm")))
     (write-source-file "guile" basename
-                       `((import (guile)
-                                 (srfi :27)
-                                 (srfi :64)
-                                 (srfi ,(string->symbol
-                                         (string-append
-                                          ":" (number->string srfi-number)))))
+                       `((import
+                           (guile)
+                           ,@(map (lambda (n)
+                                    `(srfi ,(string->symbol
+                                             (string-append
+                                              ":" (number->string n)))))
+                                  (append '(27 64)
+                                          (srfi-dependencies srfi-number)
+                                          (list srfi-number))))
                          (define (call-with-false-on-error proc)
                            (catch #t proc (lambda (return) (return #f))))
                          ,@prelude
@@ -123,8 +138,11 @@
 (define (write-kawa-test srfi-number)
   (let ((basename (string-append (number->string srfi-number) ".scm")))
     (write-source-file "kawa" basename
-                       `((import (kawa base) ; base includes SRFI 64
-                                 (srfi ,srfi-number))
+                       `((import
+                           (kawa base) ; base includes SRFI 64
+                           ,@(map (lambda (n) `(srfi ,n))
+                                  (append (srfi-dependencies srfi-number)
+                                          (list srfi-number))))
                          (define (random-integer limit)
                            (let ((source (java.util.Random)))
                              (source:nextInt limit)))

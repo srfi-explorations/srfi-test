@@ -1,5 +1,3 @@
-(import (srfi 14))
-
 (define (fill text)
   (let* ((len (string-length text))
          (max-text-len 60)
