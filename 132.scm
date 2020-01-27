@@ -1,1484 +1,1154 @@
 ;; Copyright 2016 William D Clinger
 ;; SPDX-License-Identifier: MIT
 
-;;; Embeds Olin's test harness.  Here is his copyright notice:
+(test-begin "srfi-132")
 
-;;; This code is
-;;;     Copyright (c) 1998 by Olin Shivers.
-;;; The terms are: You may do as you please with this code, as long as
-;;; you do not delete this notice or hold me responsible for any outcome
-;;; related to its use.
-;;;
-;;; Blah blah blah. Don't you think source files should contain more lines
-;;; of code than copyright notice?
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;
-;;; To run this program in Larceny, from this directory:
-;;;
-;;; % mkdir srfi
-;;; % cp 132.sld *.scm srfi
-;;; % larceny --r7rs --program srfi-132-test.sps --path .
-;;;
-;;; Other implementations of the R7RS may use other conventions
-;;; for naming and locating library files, but the conventions
-;;; assumed by this program are the most widely implemented.
-;;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-;;; Olin's test harness tests some procedures that aren't part of SRFI 132,
-;;; so the (local olin) library defined here is just to support Olin's tests.
-;;; (Including Olin's code within the test program would create name
-;;; conflicts.)
-
-(define-library (local olin)
-
-  (export list-merge-sort  vector-merge-sort               ; not part of SRFI 132
-          list-merge-sort! vector-merge-sort!              ; not part of SRFI 132
-          vector-insert-sort vector-insert-sort!           ; not part of SRFI 132
-          vector-heap-sort   vector-heap-sort!             ; not part of SRFI 132
-          vector-quick-sort  vector-quick-sort!            ; not part of SRFI 132
-          vector-quick-sort3 vector-quick-sort3!           ; not part of SRFI 132
-          )
-
-  (import (except (scheme base) vector-copy vector-copy!)
-          (rename (only (scheme base) vector-copy vector-copy!)
-                  (vector-copy  r7rs-vector-copy)
-                  (vector-copy! r7rs-vector-copy!))
-          (scheme cxr)
-          (only (srfi 27) random-integer))
-
-  (include "delndups.scm")
-  (include "lmsort.scm")
-  (include "sortp.scm")
-  (include "vector-util.scm")
-  (include "vhsort.scm")
-  (include "visort.scm")
-  (include "vmsort.scm")
-  (include "vqsort2.scm")
-  (include "vqsort3.scm")
-  )
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-(import (except (scheme base) vector-copy)
-        (rename (scheme base)
-                (vector-copy r7rs-vector-copy))
-        (scheme write)
-        (scheme process-context)
-        (scheme time)
-        (only (srfi 27) random-integer)
-        (srfi 132)
-        (local olin))
-
-;;; These definitions avoid having to change Olin's code.
-
-(define-syntax define-test-suite
-  (syntax-rules ()
-   ((_ name)
-    (define (name test-name thunk)
-      (thunk)))))
-
-(define-syntax define-test-case
-  (syntax-rules ()
-   ((_ test-name suite-name expr)
-    (define (test-name)
-      (suite-name 'test-name (lambda () expr))))))
-
-(define (is x) x)
-
-(define (check-that x y)
-  (or (if (procedure? y)
-          (y x)
-          (equal? x y))
-      (fail "some test failed")))
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;
-;;; Olin's code.
-;;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-;;; Little test harness, 'cause I'm paraoid about tricky code.
-
-;;; This code is
-;;;     Copyright (c) 1998 by Olin Shivers.
-;;; The terms are: You may do as you please with this code, as long as
-;;; you do not delete this notice or hold me responsible for any outcome
-;;; related to its use.
-;;;
-;;; Blah blah blah. Don't you think source files should contain more lines
-;;; of code than copyright notice?
-
-(define-test-suite sort-tests)
-
-;; Three-way comparison for numbers
-(define (my-c x y)
-  (cond ((= x y) 0)
-        ((< x y) -1)
-        (else 1)))
-
-;;; For testing stable sort -- 3 & -3 compare the same.
-(define (my< x y) (< (abs x) (abs y)))
-
-(define (unstable-sort-test v) ; quick & heap vs simple insert
-  (let ((v1 (vector-copy v))
-        (v2 (vector-copy v))
-        (v3 (vector-copy v))
-        (v4 (vector-copy v)))
-    (vector-heap-sort!    < v1)
-    (vector-insert-sort!  < v2)
-    (vector-quick-sort!   < v3)
-    (vector-quick-sort3!  my-c v4)
-    (check-that v2 (is v1))
-    (check-that v3 (is v1))
-    (check-that v4 (is v1))
-    (check-that v1 (is (lambda (v) (vector-sorted? < v))))))
-
-(define (stable-sort-test v) ; insert, list & vector merge sorts
-  (let ((v1 (vector-copy v))
-        (v2 (vector-copy v))
-        (v3 (list->vector (list-merge-sort! my< (vector->list v))))
-        (v4 (list->vector (list-merge-sort  my< (vector->list v)))))
-    (vector-merge-sort! my< v1)
-    (vector-insert-sort! my< v2)
-    (check-that v1 (is (lambda (v) (vector-sorted? my< v))))
-    (check-that v2 (is v1))
-    (check-that v3 (is v1))
-    (check-that v4 (is v1))))
-
-(define (run-sort-test sort-test count max-size)
-  (let loop ((i 0))
-    (if (< i count)
-        (begin
-          (sort-test (random-vector (random-integer max-size)))
-          (loop (+ 1 i))))))
-
-(define-test-case stable-sort sort-tests
-  (run-sort-test stable-sort-test 10 4096))
-
-(define-test-case unstable-sort sort-tests
-  (run-sort-test unstable-sort-test 10 4096))
+(define r7rs-vector-copy vector-copy)
 
 (define (random-vector size)
-  (let ((v (make-vector size)))
-    (fill-vector-randomly! v (* 10 size))
+  (let* ((v (make-vector size))
+         (range (* 10 size))
+         (half (quotient range 2)))
+    (let loop ((i (vector-length v)))
+      (if (= i 0) v (let ((i (- i 1)))
+                      (vector-set! v i (- (random-integer range) half))
+                      (loop i))))))
+
+(test-eqv "list-sorted?:empty-list"
+  #t (list-sorted? > '()))
+
+(test-eqv "list-sorted?:singleton"
+  #t (list-sorted? > '(987)))
+
+(test-eqv "list-sorted?:non-empty-list"
+  #t (list-sorted? > '(9 8 7)))
+
+(test-eqv "vector-sorted?:empty-vector"
+  #t (vector-sorted? > '#()))
+
+(test-eqv "vector-sorted?:singleton"
+  #t (vector-sorted? > '#(987)))
+
+(test-eqv "vector-sorted?:non-empty-vector"
+  #t (vector-sorted? > '#(9 8 7 6 5)))
+
+(test-eqv "vector-sorted?:empty-vector:0"
+  #t (vector-sorted? > '#() 0))
+
+(test-eqv "vector-sorted?:singleton:1"
+  #t (vector-sorted? > '#(987) 1))
+
+(test-eqv "vector-sorted?:non-empty-vector:1"
+  #t (vector-sorted? > '#(9 8 7 6 5) 1))
+
+(test-eqv "vector-sorted?:empty-vector:0:0"
+  #t (vector-sorted? > '#() 0 0))
+
+(test-eqv "vector-sorted?:singleton:1:1"
+  #t (vector-sorted? > '#(987) 1 1))
+
+(test-eqv "vector-sorted?:non-empty-vector:1:2"
+  #t (vector-sorted? > '#(9 8 7 6 5) 1 2))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(test-equal "list-sort:empty-list" '() (list-sort > (list)))
+
+(test-equal "list-sort:singleton" '(987) (list-sort > (list 987)))
+
+(test-equal "list-sort:doubleton" '(987 654) (list-sort > (list 987 654)))
+
+(test-equal "list-sort:iota10"
+  '(9 8 7 6 5 4 3 2 1 0)
+  (list-sort > (list 9 8 6 3 0 4 2 5 7 1)))
+
+(test-equal "list-stable-sort:empty-list"
+  '() (list-stable-sort > (list)))
+
+(test-equal "list-stable-sort:singleton"
+  '(987) (list-stable-sort > (list 987)))
+
+(test-equal "list-stable-sort:doubleton"
+  '(987 654)
+  (list-stable-sort > (list 987 654)))
+
+(test-equal "list-stable-sort:iota10"
+  '(9 8 7 6 5 4 3 2 1 0)
+  (list-stable-sort > (list 9 8 6 3 0 4 2 5 7 1)))
+
+(test-equal "list-stable-sort:iota10-quotient2"
+  '(9 8 6 7 4 5 3 2 0 1)
+  (list-stable-sort
+   (lambda (x y) (> (quotient x 2) (quotient y 2)))
+   (list 9 8 6 3 0 4 2 5 7 1)))
+
+(test-equal "vector-sort:empty-vector"
+  '#() (let ((v (vector))) (vector-sort > v)))
+
+(test-equal "vector-sort:singleton"
+  '#(987)
+  (let ((v (vector 987))) (vector-sort > (vector 987))))
+
+(test-equal "vector-sort:doubleton"
+  '#(987 654)
+  (let ((v (vector 987 654))) (vector-sort > v)))
+
+(test-equal "vector-sort:iota10"
+  '#(9 8 7 6 5 4 3 2 1 0)
+  (let ((v (vector 9 8 6 3 0 4 2 5 7 1))) (vector-sort > v)))
+
+(test-equal "vector-stable-sort:empty-vector"
+  '#()
+  (let ((v (vector))) (vector-stable-sort > v)))
+
+(test-equal "vector-stable-sort:singleton"
+  '#(987)
+  (let ((v (vector 987))) (vector-stable-sort > (vector 987))))
+
+(test-equal "vector-stable-sort:doubleton"
+  '#(987 654)
+  (let ((v (vector 987 654))) (vector-stable-sort > v)))
+
+(test-equal "vector-stable-sort:iota10"
+  '#(9 8 7 6 5 4 3 2 1 0)
+  (let ((v (vector 9 8 6 3 0 4 2 5 7 1))) (vector-stable-sort > v)))
+
+(test-equal "vector-stable-sort:iota10-quotient2"
+  '#(9 8 6 7 4 5 3 2 0 1)
+  (let ((v (vector 9 8 6 3 0 4 2 5 7 1)))
+    (vector-stable-sort (lambda (x y) (> (quotient x 2) (quotient y 2))) v)))
+
+(test-equal "vector-sort:empty-vector:0"
+  '#()
+  (let ((v (vector))) (vector-sort > v 0)))
+
+(test-equal "vector-sort:singleton:1"
+  '#()
+  (let ((v (vector 987))) (vector-sort > (vector 987) 1)))
+
+(test-equal "vector-sort:doubleton:1"
+  '#(654)
+  (let ((v (vector 987 654))) (vector-sort > v 1)))
+
+(test-equal "vector-sort:iota10:3"
+  '#(7 5 4 3 2 1 0)
+  (let ((v (vector 9 8 6 3 0 4 2 5 7 1))) (vector-sort > v 3)))
+
+(test-equal "vector-stable-sort:empty-vector:0"
+  '#()
+  (let ((v (vector))) (vector-stable-sort > v 0)))
+
+(test-equal "vector-stable-sort:singleton:1"
+  '#()
+  (let ((v (vector 987))) (vector-stable-sort > (vector 987) 1)))
+
+(test-equal "vector-stable-sort:doubleton:0:2"
+  '#(654 987)
+  (let ((v (vector 987 654))) (vector-stable-sort < v 0 2)))
+
+(test-equal "vector-stable-sort:iota10:3"
+  '#(7 5 4 3 2 1 0)
+  (let ((v (vector 9 8 6 3 0 4 2 5 7 1))) (vector-stable-sort > v 3)))
+
+(test-equal "vector-stable-sort:iota10-quotient2:3"
+  '#(7 4 5 3 2 0 1)
+  (let ((v (vector 9 8 6 3 0 4 2 5 7 1)))
+    (vector-stable-sort (lambda (x y) (> (quotient x 2) (quotient y 2))) v 3)))
+
+(test-equal "vector-sort:empty-vector:0:0"
+  '#()
+  (let ((v (vector))) (vector-sort > v 0 0)))
+
+(test-equal "vector-sort:singleton:1:1"
+  '#()
+  (let ((v (vector 987))) (vector-sort > (vector 987) 1 1)))
+
+(test-equal "vector-sort:doubleton:1:2"
+  '#(654)
+  (let ((v (vector 987 654))) (vector-sort > v 1 2)))
+
+(test-equal "vector-sort:iota10:4:8"
+  '#(5 4 2 0)
+  (let ((v (vector 9 8 6 3 0 4 2 5 7 1))) (vector-sort > v 4 8)))
+
+(test-equal "vector-stable-sort:empty-vector:0:0"
+  '#()
+  (let ((v (vector))) (vector-stable-sort > v 0 0)))
+
+(test-equal "vector-stable-sort:singleton:1:1"
+  '#()
+  (let ((v (vector 987))) (vector-stable-sort > (vector 987) 1 1)))
+
+(test-equal "vector-stable-sort:doubleton:1:2"
+  '#(654)
+  (let ((v (vector 987 654))) (vector-stable-sort > v 1 2)))
+
+(test-equal "vector-stable-sort:iota10:2:6"
+  '#(6 4 3 0)
+  (let ((v (vector 9 8 6 3 0 4 2 5 7 1))) (vector-stable-sort > v 2 6)))
+
+(test-equal "vector-stable-sort:iota10-quotient2:1:8"
+  '#(8 6 4 5 3 2 0)
+  (let ((v (vector 9 8 6 3 0 4 2 5 7 1)))
+    (vector-stable-sort (lambda (x y) (> (quotient x 2) (quotient y 2))) v 1 8)))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(test-equal "list-sort!:empty-list"
+  '() (list-sort! > (list)))
+
+(test-equal "list-sort!:singleton"
+  '(987) (list-sort! > (list 987)))
+
+(test-equal "list-sort!:doubleton"
+  '(987 654) (list-sort! > (list 987 654)))
+
+(test-equal "list-sort!:iota10"
+  '(9 8 7 6 5 4 3 2 1 0)
+  (list-sort! > (list 9 8 6 3 0 4 2 5 7 1)))
+
+(test-equal "list-stable-sort!:empty-list"
+  '() (list-stable-sort! > (list)))
+
+(test-equal "list-stable-sort!:singleton"
+  '(987) (list-stable-sort! > (list 987)))
+
+(test-equal "list-stable-sort!:doubleton"
+  '(987 654)
+  (list-stable-sort! > (list 987 654)))
+
+(test-equal "list-stable-sort!:iota10"
+  '(9 8 7 6 5 4 3 2 1 0)
+  (list-stable-sort! > (list 9 8 6 3 0 4 2 5 7 1)))
+
+(test-equal "list-stable-sort!:iota10-quotient2"
+  '(9 8 6 7 4 5 3 2 0 1)
+  (list-stable-sort!
+   (lambda (x y) (> (quotient x 2) (quotient y 2)))
+   (list 9 8 6 3 0 4 2 5 7 1)))
+
+(test-equal "vector-sort!:empty-vector"
+  '#()
+  (let ((v (vector))) (vector-sort! > v) v))
+
+(test-equal "vector-sort!:singleton"
+  '#(987)
+  (let ((v (vector 987))) (vector-sort! > (vector 987)) v))
+
+(test-equal "vector-sort!:doubleton"
+  '#(987 654)
+  (let ((v (vector 987 654))) (vector-sort! > v) v))
+
+(test-equal "vector-sort!:iota10"
+  '#(9 8 7 6 5 4 3 2 1 0)
+  (let ((v (vector 9 8 6 3 0 4 2 5 7 1))) (vector-sort! > v) v))
+
+(test-equal "vector-stable-sort!:empty-vector"
+  '#()
+  (let ((v (vector))) (vector-stable-sort! > v) v))
+
+(test-equal "vector-stable-sort!:singleton"
+  '#(987)
+  (let ((v (vector 987))) (vector-stable-sort! > (vector 987)) v))
+
+(test-equal "vector-stable-sort!:doubleton"
+  '#(987 654)
+  (let ((v (vector 987 654))) (vector-stable-sort! > v) v))
+
+(test-equal "vector-stable-sort!:iota10"
+  '#(9 8 7 6 5 4 3 2 1 0)
+  (let ((v (vector 9 8 6 3 0 4 2 5 7 1))) (vector-stable-sort! > v) v))
+
+(test-equal "vector-stable-sort!:iota10-quotient2"
+  '#(9 8 6 7 4 5 3 2 0 1)
+  (let ((v (vector 9 8 6 3 0 4 2 5 7 1)))
+    (vector-stable-sort! (lambda (x y) (> (quotient x 2) (quotient y 2))) v)
     v))
 
-(define (fill-vector-randomly! v range)
-  (let ((half (quotient range 2)))
-    (do ((i (- (vector-length v) 1) (- i 1)))
-        ((< i 0))
-      (vector-set! v i (- (random-integer range) half)))))
+(test-equal "vector-sort!:empty-vector:0"
+  '#()
+  (let ((v (vector))) (vector-sort! > v 0) v))
 
-(define (vector-portion-copy vec start end)
-  (let* ((len (vector-length vec))
-         (new-len (- end start))
-         (new (make-vector new-len)))
-    (do ((i start (+ i 1))
-         (j 0 (+ j 1)))
-        ((= i end) new)
-      (vector-set! new j (vector-ref vec i)))))
+(test-equal "vector-sort!:singleton:1"
+  '#(987)
+  (let ((v (vector 987))) (vector-sort! > (vector 987) 1) v))
 
-(define (vector-copy vec)
-  (vector-portion-copy vec 0 (vector-length vec)))
+(test-equal "vector-sort!:doubleton:1"
+  '#(987 654)
+  (let ((v (vector 987 654))) (vector-sort! > v 1) v))
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;
-;;; End of Olin's code.
-;;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(test-equal "vector-sort!:iota10:3"
+  '#(9 8 6 7 5 4 3 2 1 0)
+  (let ((v (vector 9 8 6 3 0 4 2 5 7 1))) (vector-sort! > v 3) v))
 
-(define (writeln . xs)
-  (for-each display xs)
-  (newline))
+(test-equal "vector-stable-sort!:empty-vector:0"
+  '#()
+  (let ((v (vector))) (vector-stable-sort! > v 0) v))
 
-(define (fail token . more)
-  (writeln "Error: test failed: " token)
-  #f)
+(test-equal "vector-stable-sort!:singleton:1"
+  '#(987)
+  (let ((v (vector 987))) (vector-stable-sort! > (vector 987) 1) v))
 
-(stable-sort)
-(unstable-sort)
+(test-equal "vector-stable-sort!:doubleton:0:2"
+  '#(654 987)
+  (let ((v (vector 987 654))) (vector-stable-sort! < v 0 2) v))
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;
-;;; Additional tests written specifically for SRFI 132.
-;;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(test-equal "vector-stable-sort!:iota10:3"
+  '#(9 8 6 7 5 4 3 2 1 0)
+  (let ((v (vector 9 8 6 3 0 4 2 5 7 1))) (vector-stable-sort! > v 3) v))
 
-(or (list-sorted? > '())
-    (fail 'list-sorted?:empty-list))
+(test-equal "vector-stable-sort!:iota10-quotient2:3"
+  '#(9 8 6 7 4 5 3 2 0 1)
+  (let ((v (vector 9 8 6 3 0 4 2 5 7 1)))
+    (vector-stable-sort! (lambda (x y) (> (quotient x 2) (quotient y 2))) v 3)
+    v))
 
-(or (list-sorted? > '(987))
-    (fail 'list-sorted?:singleton))
+(test-equal "vector-sort!:empty-vector:0:0"
+  '#()
+  (let ((v (vector))) (vector-sort! > v 0 0) v))
 
-(or (list-sorted? > '(9 8 7))
-    (fail 'list-sorted?:non-empty-list))
+(test-equal "vector-sort!:singleton:1:1"
+  '#(987)
+  (let ((v (vector 987))) (vector-sort! > (vector 987) 1 1) v))
 
-(or (vector-sorted? > '#())
-    (fail 'vector-sorted?:empty-vector))
+(test-equal "vector-sort!:doubleton:1:2"
+  '#(987 654)
+  (let ((v (vector 987 654))) (vector-sort! > v 1 2) v))
 
-(or (vector-sorted? > '#(987))
-    (fail 'vector-sorted?:singleton))
+(test-equal "vector-sort!:iota10:4:8"
+  '#(9 8 6 3 5 4 2 0 7 1)
+  (let ((v (vector 9 8 6 3 0 4 2 5 7 1))) (vector-sort! > v 4 8) v))
 
-(or (vector-sorted? > '#(9 8 7 6 5))
-    (fail 'vector-sorted?:non-empty-vector))
+(test-equal "vector-stable-sort!:empty-vector:0:0"
+  '#()
+  (let ((v (vector))) (vector-stable-sort! > v 0 0) v))
 
-(or (vector-sorted? > '#() 0)
-    (fail 'vector-sorted?:empty-vector:0))
+(test-equal "vector-stable-sort!:singleton:1:1"
+  '#(987)
+  (let ((v (vector 987))) (vector-stable-sort! > (vector 987) 1 1) v))
 
-(or (vector-sorted? > '#(987) 1)
-    (fail 'vector-sorted?:singleton:1))
+(test-equal "vector-stable-sort!:doubleton:1:2"
+  '#(987 654)
+  (let ((v (vector 987 654))) (vector-stable-sort! > v 1 2) v))
 
-(or (vector-sorted? > '#(9 8 7 6 5) 1)
-    (fail 'vector-sorted?:non-empty-vector:1))
+(test-equal "vector-stable-sort!:iota10:2:6"
+  '#(9 8 6 4 3 0 2 5 7 1)
+  (let ((v (vector 9 8 6 3 0 4 2 5 7 1))) (vector-stable-sort! > v 2 6) v))
 
-(or (vector-sorted? > '#() 0 0)
-    (fail 'vector-sorted?:empty-vector:0:0))
-
-(or (vector-sorted? > '#(987) 1 1)
-    (fail 'vector-sorted?:singleton:1:1))
-
-(or (vector-sorted? > '#(9 8 7 6 5) 1 2)
-    (fail 'vector-sorted?:non-empty-vector:1:2))
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-(or (equal? (list-sort > (list))
-            '())
-    (fail 'list-sort:empty-list))
-
-(or (equal? (list-sort > (list 987))
-            '(987))
-    (fail 'list-sort:singleton))
-
-(or (equal? (list-sort > (list 987 654))
-            '(987 654))
-    (fail 'list-sort:doubleton))
-
-(or (equal? (list-sort > (list 9 8 6 3 0 4 2 5 7 1))
-            '(9 8 7 6 5 4 3 2 1 0))
-    (fail 'list-sort:iota10))
-
-(or (equal? (list-stable-sort > (list))
-            '())
-    (fail 'list-stable-sort:empty-list))
-
-(or (equal? (list-stable-sort > (list 987))
-            '(987))
-    (fail 'list-stable-sort:singleton))
-
-(or (equal? (list-stable-sort > (list 987 654))
-            '(987 654))
-    (fail 'list-stable-sort:doubleton))
-
-(or (equal? (list-stable-sort > (list 9 8 6 3 0 4 2 5 7 1))
-            '(9 8 7 6 5 4 3 2 1 0))
-    (fail 'list-stable-sort:iota10))
-
-(or (equal? (list-stable-sort (lambda (x y)
-                                 (> (quotient x 2)
-                                    (quotient y 2)))
-                               (list 9 8 6 3 0 4 2 5 7 1))
-            '(9 8 6 7 4 5 3 2 0 1))
-    (fail 'list-stable-sort:iota10-quotient2))
-
-(or (equal? (let ((v (vector)))
-              (vector-sort > v))
-            '#())
-    (fail 'vector-sort:empty-vector))
-
-(or (equal? (let ((v (vector 987)))
-              (vector-sort > (vector 987)))
-            '#(987))
-    (fail 'vector-sort:singleton))
-
-(or (equal? (let ((v (vector 987 654)))
-              (vector-sort > v))
-            '#(987 654))
-    (fail 'vector-sort:doubleton))
-
-(or (equal? (let ((v (vector 9 8 6 3 0 4 2 5 7 1)))
-              (vector-sort > v))
-            '#(9 8 7 6 5 4 3 2 1 0))
-    (fail 'vector-sort:iota10))
-
-(or (equal? (let ((v (vector)))
-              (vector-stable-sort > v))
-            '#())
-    (fail 'vector-stable-sort:empty-vector))
-
-(or (equal? (let ((v (vector 987)))
-              (vector-stable-sort > (vector 987)))
-            '#(987))
-    (fail 'vector-stable-sort:singleton))
-
-(or (equal? (let ((v (vector 987 654)))
-              (vector-stable-sort > v))
-            '#(987 654))
-    (fail 'vector-stable-sort:doubleton))
-
-(or (equal? (let ((v (vector 9 8 6 3 0 4 2 5 7 1)))
-              (vector-stable-sort > v))
-            '#(9 8 7 6 5 4 3 2 1 0))
-    (fail 'vector-stable-sort:iota10))
-
-(or (equal? (let ((v (vector 9 8 6 3 0 4 2 5 7 1)))
-              (vector-stable-sort (lambda (x y)
-                                     (> (quotient x 2)
-                                        (quotient y 2)))
-                                   v))
-            '#(9 8 6 7 4 5 3 2 0 1))
-    (fail 'vector-stable-sort:iota10-quotient2))
-
-(or (equal? (let ((v (vector)))
-              (vector-sort > v 0))
-            '#())
-    (fail 'vector-sort:empty-vector:0))
-
-(or (equal? (let ((v (vector 987)))
-              (vector-sort > (vector 987) 1))
-            '#())
-    (fail 'vector-sort:singleton:1))
-
-(or (equal? (let ((v (vector 987 654)))
-              (vector-sort > v 1))
-            '#(654))
-    (fail 'vector-sort:doubleton:1))
-
-(or (equal? (let ((v (vector 9 8 6 3 0 4 2 5 7 1)))
-              (vector-sort > v 3))
-            '#(7 5 4 3 2 1 0))
-    (fail 'vector-sort:iota10:3))
-
-(or (equal? (let ((v (vector)))
-              (vector-stable-sort > v 0))
-            '#())
-    (fail 'vector-stable-sort:empty-vector:0))
-
-(or (equal? (let ((v (vector 987)))
-              (vector-stable-sort > (vector 987) 1))
-            '#())
-    (fail 'vector-stable-sort:singleton:1))
-
-(or (equal? (let ((v (vector 987 654)))
-              (vector-stable-sort < v 0 2))
-            '#(654 987))
-    (fail 'vector-stable-sort:doubleton:0:2))
-
-(or (equal? (let ((v (vector 9 8 6 3 0 4 2 5 7 1)))
-              (vector-stable-sort > v 3))
-            '#(7 5 4 3 2 1 0))
-    (fail 'vector-stable-sort:iota10:3))
-
-(or (equal? (let ((v (vector 9 8 6 3 0 4 2 5 7 1)))
-              (vector-stable-sort (lambda (x y)
-                                     (> (quotient x 2)
-                                        (quotient y 2)))
-                                   v
-                                   3))
-            '#(7 4 5 3 2 0 1))
-    (fail 'vector-stable-sort:iota10-quotient2:3))
-
-(or (equal? (let ((v (vector)))
-              (vector-sort > v 0 0))
-            '#())
-    (fail 'vector-sort:empty-vector:0:0))
-
-(or (equal? (let ((v (vector 987)))
-              (vector-sort > (vector 987) 1 1))
-            '#())
-    (fail 'vector-sort:singleton:1:1))
-
-(or (equal? (let ((v (vector 987 654)))
-              (vector-sort > v 1 2))
-            '#(654))
-    (fail 'vector-sort:doubleton:1:2))
-
-(or (equal? (let ((v (vector 9 8 6 3 0 4 2 5 7 1)))
-              (vector-sort > v 4 8))
-            '#(5 4 2 0))
-    (fail 'vector-sort:iota10:4:8))
-
-(or (equal? (let ((v (vector)))
-              (vector-stable-sort > v 0 0))
-            '#())
-    (fail 'vector-stable-sort:empty-vector:0:0))
-
-(or (equal? (let ((v (vector 987)))
-              (vector-stable-sort > (vector 987) 1 1))
-            '#())
-    (fail 'vector-stable-sort:singleton:1:1))
-
-(or (equal? (let ((v (vector 987 654)))
-              (vector-stable-sort > v 1 2))
-            '#(654))
-    (fail 'vector-stable-sort:doubleton:1:2))
-
-(or (equal? (let ((v (vector 9 8 6 3 0 4 2 5 7 1)))
-              (vector-stable-sort > v 2 6))
-            '#(6 4 3 0))
-    (fail 'vector-stable-sort:iota10:2:6))
-
-(or (equal? (let ((v (vector 9 8 6 3 0 4 2 5 7 1)))
-              (vector-stable-sort (lambda (x y)
-                                     (> (quotient x 2)
-                                        (quotient y 2)))
-                                   v
-                                   1
-                                   8))
-            '#(8 6 4 5 3 2 0))
-    (fail 'vector-stable-sort:iota10-quotient2:1:8))
+(test-equal "vector-stable-sort!:iota10-quotient2:1:8"
+  '#(9 8 6 4 5 3 2 0 7 1)
+  (let ((v (vector 9 8 6 3 0 4 2 5 7 1)))
+    (vector-stable-sort! (lambda (x y) (> (quotient x 2) (quotient y 2))) v 1 8)
+    v))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(or (equal? (list-sort! > (list))
-            '())
-    (fail 'list-sort!:empty-list))
-
-(or (equal? (list-sort! > (list 987))
-            '(987))
-    (fail 'list-sort!:singleton))
-
-(or (equal? (list-sort! > (list 987 654))
-            '(987 654))
-    (fail 'list-sort!:doubleton))
-
-(or (equal? (list-sort! > (list 9 8 6 3 0 4 2 5 7 1))
-            '(9 8 7 6 5 4 3 2 1 0))
-    (fail 'list-sort!:iota10))
-
-(or (equal? (list-stable-sort! > (list))
-            '())
-    (fail 'list-stable-sort!:empty-list))
-
-(or (equal? (list-stable-sort! > (list 987))
-            '(987))
-    (fail 'list-stable-sort!:singleton))
-
-(or (equal? (list-stable-sort! > (list 987 654))
-            '(987 654))
-    (fail 'list-stable-sort!:doubleton))
-
-(or (equal? (list-stable-sort! > (list 9 8 6 3 0 4 2 5 7 1))
-            '(9 8 7 6 5 4 3 2 1 0))
-    (fail 'list-stable-sort!:iota10))
-
-(or (equal? (list-stable-sort! (lambda (x y)
-                                 (> (quotient x 2)
-                                    (quotient y 2)))
-                               (list 9 8 6 3 0 4 2 5 7 1))
-            '(9 8 6 7 4 5 3 2 0 1))
-    (fail 'list-stable-sort!:iota10-quotient2))
-
-(or (equal? (let ((v (vector)))
-              (vector-sort! > v)
-              v)
-            '#())
-    (fail 'vector-sort!:empty-vector))
-
-(or (equal? (let ((v (vector 987)))
-              (vector-sort! > (vector 987))
-              v)
-            '#(987))
-    (fail 'vector-sort!:singleton))
-
-(or (equal? (let ((v (vector 987 654)))
-              (vector-sort! > v)
-              v)
-            '#(987 654))
-    (fail 'vector-sort!:doubleton))
-
-(or (equal? (let ((v (vector 9 8 6 3 0 4 2 5 7 1)))
-              (vector-sort! > v)
-              v)
-            '#(9 8 7 6 5 4 3 2 1 0))
-    (fail 'vector-sort!:iota10))
-
-(or (equal? (let ((v (vector)))
-              (vector-stable-sort! > v)
-              v)
-            '#())
-    (fail 'vector-stable-sort!:empty-vector))
-
-(or (equal? (let ((v (vector 987)))
-              (vector-stable-sort! > (vector 987))
-              v)
-            '#(987))
-    (fail 'vector-stable-sort!:singleton))
-
-(or (equal? (let ((v (vector 987 654)))
-              (vector-stable-sort! > v)
-              v)
-            '#(987 654))
-    (fail 'vector-stable-sort!:doubleton))
-
-(or (equal? (let ((v (vector 9 8 6 3 0 4 2 5 7 1)))
-              (vector-stable-sort! > v)
-              v)
-            '#(9 8 7 6 5 4 3 2 1 0))
-    (fail 'vector-stable-sort!:iota10))
-
-(or (equal? (let ((v (vector 9 8 6 3 0 4 2 5 7 1)))
-              (vector-stable-sort! (lambda (x y)
-                                     (> (quotient x 2)
-                                        (quotient y 2)))
-                                   v)
-              v)
-            '#(9 8 6 7 4 5 3 2 0 1))
-    (fail 'vector-stable-sort!:iota10-quotient2))
-
-(or (equal? (let ((v (vector)))
-              (vector-sort! > v 0)
-              v)
-            '#())
-    (fail 'vector-sort!:empty-vector:0))
-
-(or (equal? (let ((v (vector 987)))
-              (vector-sort! > (vector 987) 1)
-              v)
-            '#(987))
-    (fail 'vector-sort!:singleton:1))
-
-(or (equal? (let ((v (vector 987 654)))
-              (vector-sort! > v 1)
-              v)
-            '#(987 654))
-    (fail 'vector-sort!:doubleton:1))
-
-(or (equal? (let ((v (vector 9 8 6 3 0 4 2 5 7 1)))
-              (vector-sort! > v 3)
-              v)
-            '#(9 8 6 7 5 4 3 2 1 0))
-    (fail 'vector-sort!:iota10:3))
-
-(or (equal? (let ((v (vector)))
-              (vector-stable-sort! > v 0)
-              v)
-            '#())
-    (fail 'vector-stable-sort!:empty-vector:0))
-
-(or (equal? (let ((v (vector 987)))
-              (vector-stable-sort! > (vector 987) 1)
-              v)
-            '#(987))
-    (fail 'vector-stable-sort!:singleton:1))
-
-(or (equal? (let ((v (vector 987 654)))
-              (vector-stable-sort! < v 0 2)
-              v)
-            '#(654 987))
-    (fail 'vector-stable-sort!:doubleton:0:2))
-
-(or (equal? (let ((v (vector 9 8 6 3 0 4 2 5 7 1)))
-              (vector-stable-sort! > v 3)
-              v)
-            '#(9 8 6 7 5 4 3 2 1 0))
-    (fail 'vector-stable-sort!:iota10:3))
-
-(or (equal? (let ((v (vector 9 8 6 3 0 4 2 5 7 1)))
-              (vector-stable-sort! (lambda (x y)
-                                     (> (quotient x 2)
-                                        (quotient y 2)))
-                                   v
-                                   3)
-              v)
-            '#(9 8 6 7 4 5 3 2 0 1))
-    (fail 'vector-stable-sort!:iota10-quotient2:3))
-
-(or (equal? (let ((v (vector)))
-              (vector-sort! > v 0 0)
-              v)
-            '#())
-    (fail 'vector-sort!:empty-vector:0:0))
-
-(or (equal? (let ((v (vector 987)))
-              (vector-sort! > (vector 987) 1 1)
-              v)
-            '#(987))
-    (fail 'vector-sort!:singleton:1:1))
-
-(or (equal? (let ((v (vector 987 654)))
-              (vector-sort! > v 1 2)
-              v)
-            '#(987 654))
-    (fail 'vector-sort!:doubleton:1:2))
-
-(or (equal? (let ((v (vector 9 8 6 3 0 4 2 5 7 1)))
-              (vector-sort! > v 4 8)
-              v)
-            '#(9 8 6 3 5 4 2 0 7 1))
-    (fail 'vector-sort!:iota10:4:8))
-
-(or (equal? (let ((v (vector)))
-              (vector-stable-sort! > v 0 0)
-              v)
-            '#())
-    (fail 'vector-stable-sort!:empty-vector:0:0))
-
-(or (equal? (let ((v (vector 987)))
-              (vector-stable-sort! > (vector 987) 1 1)
-              v)
-            '#(987))
-    (fail 'vector-stable-sort!:singleton:1:1))
-
-(or (equal? (let ((v (vector 987 654)))
-              (vector-stable-sort! > v 1 2)
-              v)
-            '#(987 654))
-    (fail 'vector-stable-sort!:doubleton:1:2))
-
-(or (equal? (let ((v (vector 9 8 6 3 0 4 2 5 7 1)))
-              (vector-stable-sort! > v 2 6)
-              v)
-            '#(9 8 6 4 3 0 2 5 7 1))
-    (fail 'vector-stable-sort!:iota10:2:6))
-
-(or (equal? (let ((v (vector 9 8 6 3 0 4 2 5 7 1)))
-              (vector-stable-sort! (lambda (x y)
-                                     (> (quotient x 2)
-                                        (quotient y 2)))
-                                   v
-                                   1
-                                   8)
-              v)
-            '#(9 8 6 4 5 3 2 0 7 1))
-    (fail 'vector-stable-sort!:iota10-quotient2:1:8))
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-(or (equal? (list-merge > (list) (list))
-            '())
-    (fail 'list-merge:empty:empty))
-
-(or (equal? (list-merge > (list) (list 9 6 3 0))
-            '(9 6 3 0))
-    (fail 'list-merge:empty:nonempty))
-
-(or (equal? (list-merge > (list 9 7 5 3 1) (list))
-            '(9 7 5 3 1))
-    (fail 'list-merge:nonempty:empty))
-
-(or (equal? (list-merge > (list 9 7 5 3 1) (list 9 6 3 0))
-            '(9 9 7 6 5 3 3 1 0))
-    (fail 'list-merge:nonempty:nonempty))
-
-(or (equal? (list-merge! > (list) (list))
-            '())
-    (fail 'list-merge!:empty:empty))
-
-(or (equal? (list-merge! > (list) (list 9 6 3 0))
-            '(9 6 3 0))
-    (fail 'list-merge!:empty:nonempty))
-
-(or (equal? (list-merge! > (list 9 7 5 3 1) (list))
-            '(9 7 5 3 1))
-    (fail 'list-merge!:nonempty:empty))
-
-(or (equal? (list-merge! > (list 9 7 5 3 1) (list 9 6 3 0))
-            '(9 9 7 6 5 3 3 1 0))
-    (fail 'list-merge!:nonempty:nonempty))
-
-(or (equal? (vector-merge > (vector) (vector))
-            '#())
-    (fail 'vector-merge:empty:empty))
-
-(or (equal? (vector-merge > (vector) (vector 9 6 3 0))
-            '#(9 6 3 0))
-    (fail 'vector-merge:empty:nonempty))
-
-(or (equal? (vector-merge > (vector 9 7 5 3 1) (vector))
-            '#(9 7 5 3 1))
-    (fail 'vector-merge:nonempty:empty))
-
-(or (equal? (vector-merge > (vector 9 7 5 3 1) (vector 9 6 3 0))
-            '#(9 9 7 6 5 3 3 1 0))
-    (fail 'vector-merge:nonempty:nonempty))
-
-(or (equal? (let ((v (make-vector 12 #f)))
-              (vector-merge! > v (vector) (vector))
-              v)
-            '#(#f #f #f #f #f #f #f #f #f #f #f #f))
-    (fail 'vector-merge!:empty:empty))
-
-(or (equal? (let ((v (make-vector 12 #f)))
-              (vector-merge! > v (vector) (vector 9 6 3 0))
-              v)
-            '#( 9  6  3  0 #f #f #f #f #f #f #f #f))
-    (fail 'vector-merge!:empty:nonempty))
-
-(or (equal? (let ((v (make-vector 12 #f)))
-              (vector-merge! > v (vector 9 7 5 3 1) (vector))
-              v)
-            '#( 9  7  5  3  1 #f #f #f #f #f #f #f))
-    (fail 'vector-merge!:nonempty:empty))
-
-(or (equal? (let ((v (make-vector 12 #f)))
-              (vector-merge! > v (vector 9 7 5 3 1) (vector 9 6 3 0))
-              v)
-            '#( 9  9  7  6  5  3  3  1  0 #f #f #f))
-    (fail 'vector-merge!:nonempty:nonempty))
-
-(or (equal? (let ((v (make-vector 12 #f)))
-              (vector-merge! > v (vector) (vector) 0)
-              v)
-            '#(#f #f #f #f #f #f #f #f #f #f #f #f))
-    (fail 'vector-merge!:empty:empty:0))
-
-(or (equal? (let ((v (make-vector 12 #f)))
-              (vector-merge! > v (vector) (vector 9 6 3 0) 0)
-              v)
-            '#( 9  6  3  0 #f #f #f #f #f #f #f #f))
-    (fail 'vector-merge!:empty:nonempty:0))
-
-(or (equal? (let ((v (make-vector 12 #f)))
-              (vector-merge! > v (vector 9 7 5 3 1) (vector) 0)
-              v)
-            '#( 9  7  5  3  1 #f #f #f #f #f #f #f))
-    (fail 'vector-merge!:nonempty:empty:0))
-
-(or (equal? (let ((v (make-vector 12 #f)))
-              (vector-merge! > v (vector 9 7 5 3 1) (vector 9 6 3 0) 0)
-              v)
-            '#( 9  9  7  6  5  3  3  1  0 #f #f #f))
-    (fail 'vector-merge!:nonempty:nonempty:0))
-
-(or (equal? (let ((v (make-vector 12 #f)))
-              (vector-merge! > v (vector) (vector) 2)
-              v)
-            '#(#f #f #f #f #f #f #f #f #f #f #f #f))
-    (fail 'vector-merge!:empty:empty:2))
-
-(or (equal? (let ((v (make-vector 12 #f)))
-              (vector-merge! > v (vector) (vector 9 6 3 0) 2)
-              v)
-            '#(#f #f 9  6  3  0 #f #f #f #f #f #f))
-    (fail 'vector-merge!:empty:nonempty:2))
-
-(or (equal? (let ((v (make-vector 12 #f)))
-              (vector-merge! > v (vector 9 7 5 3 1) (vector) 2)
-              v)
-            '#(#f #f  9  7  5  3  1 #f #f #f #f #f))
-    (fail 'vector-merge!:nonempty:empty:2))
-
-(or (equal? (let ((v (make-vector 12 #f)))
-              (vector-merge! > v (vector 9 7 5 3 1) (vector 9 6 3 0) 2)
-              v)
-            '#(#f #f 9  9  7  6  5  3  3  1  0 #f))
-    (fail 'vector-merge!:nonempty:nonempty:2))
-
-(or (equal? (vector-merge > (vector) (vector) 0)
-            '#())
-    (fail 'vector-merge:empty:empty))
-
-(or (equal? (vector-merge > (vector) (vector 9 6 3 0) 0)
-            '#(9 6 3 0))
-    (fail 'vector-merge:empty:nonempty))
-
-(or (equal? (vector-merge > (vector 9 7 5 3 1) (vector) 2)
-            '#(5 3 1))
-    (fail 'vector-merge:nonempty:empty))
-
-(or (equal? (vector-merge > (vector 9 7 5 3 1) (vector 9 6 3 0) 2)
-            '#(9 6 5 3 3 1 0))
-    (fail 'vector-merge:nonempty:nonempty))
-
-(or (equal? (let ((v (make-vector 12 #f)))
-              (vector-merge! > v (vector) (vector) 2 0)
-              v)
-            '#(#f #f #f #f #f #f #f #f #f #f #f #f))
-    (fail 'vector-merge!:empty:empty:2))
-
-(or (equal? (let ((v (make-vector 12 #f)))
-              (vector-merge! > v (vector) (vector 9 6 3 0) 2 0)
-              v)
-            '#(#f #f 9  6  3  0 #f #f #f #f #f #f))
-    (fail 'vector-merge!:empty:nonempty:2))
-
-(or (equal? (let ((v (make-vector 12 #f)))
-              (vector-merge! > v (vector 9 7 5 3 1) (vector) 2 2)
-              v)
-            '#(#f #f 5  3  1 #f #f #f #f #f #f #f))
-    (fail 'vector-merge!:nonempty:empty:2))
-
-(or (equal? (let ((v (make-vector 12 #f)))
-              (vector-merge! > v (vector 9 7 5 3 1) (vector 9 6 3 0) 2 2)
-              v)
-            '#(#f #f  9   6  5  3  3  1  0 #f #f #f))
-    (fail 'vector-merge!:nonempty:nonempty:2))
-
-(or (equal? (vector-merge > (vector) (vector) 0 0)
-            '#())
-    (fail 'vector-merge:empty:empty))
-
-(or (equal? (vector-merge > (vector) (vector 9 6 3 0) 0 0)
-            '#(9 6 3 0))
-    (fail 'vector-merge:empty:nonempty))
-
-(or (equal? (vector-merge > (vector 9 7 5 3 1) (vector) 2 5)
-            '#(5 3 1))
-    (fail 'vector-merge:nonempty:empty))
-
-(or (equal? (vector-merge > (vector 9 7 5 3 1) (vector 9 6 3 0) 2 5)
-            '#(9 6 5 3 3 1 0))
-    (fail 'vector-merge:nonempty:nonempty))
-
-(or (equal? (let ((v (make-vector 12 #f)))
-              (vector-merge! > v (vector) (vector) 2 0 0)
-              v)
-            '#(#f #f #f #f #f #f #f #f #f #f #f #f))
-    (fail 'vector-merge!:empty:empty:2))
-
-(or (equal? (let ((v (make-vector 12 #f)))
-              (vector-merge! > v (vector) (vector 9 6 3 0) 2 0 0)
-              v)
-            '#(#f #f 9  6  3  0 #f #f #f #f #f #f))
-    (fail 'vector-merge!:empty:nonempty:2))
-
-(or (equal? (let ((v (make-vector 12 #f)))
-              (vector-merge! > v (vector 9 7 5 3 1) (vector) 2 2 5)
-              v)
-            '#(#f #f 5  3  1 #f #f #f #f #f #f #f))
-    (fail 'vector-merge!:nonempty:empty:2))
-
-(or (equal? (let ((v (make-vector 12 #f)))
-              (vector-merge! > v (vector 9 7 5 3 1) (vector 9 6 3 0) 2 2 5)
-              v)
-            '#(#f #f  9  6  5  3  3  1  0 #f #f #f))
-    (fail 'vector-merge!:nonempty:nonempty:2))
+(test-equal "list-merge:empty:empty"
+  '() (list-merge > (list) (list)))
+
+(test-equal "list-merge:empty:nonempty"
+  '(9 6 3 0)
+  (list-merge > (list) (list 9 6 3 0)))
+
+(test-equal "list-merge:nonempty:empty"
+  '(9 7 5 3 1)
+  (list-merge > (list 9 7 5 3 1) (list)))
+
+(test-equal "list-merge:nonempty:nonempty"
+  '(9 9 7 6 5 3 3 1 0)
+  (list-merge > (list 9 7 5 3 1) (list 9 6 3 0)))
+
+(test-equal "list-merge!:empty:empty"
+  '() (list-merge! > (list) (list)))
+
+(test-equal "list-merge!:empty:nonempty"
+  '(9 6 3 0)
+  (list-merge! > (list) (list 9 6 3 0)))
+
+(test-equal "list-merge!:nonempty:empty"
+  '(9 7 5 3 1)
+  (list-merge! > (list 9 7 5 3 1) (list)))
+
+(test-equal "list-merge!:nonempty:nonempty"
+  '(9 9 7 6 5 3 3 1 0)
+  (list-merge! > (list 9 7 5 3 1) (list 9 6 3 0)))
+
+(test-equal "vector-merge:empty:empty"
+  '#() (vector-merge > (vector) (vector)))
+
+(test-equal "vector-merge:empty:nonempty"
+  '#(9 6 3 0)
+  (vector-merge > (vector) (vector 9 6 3 0)))
+
+(test-equal "vector-merge:nonempty:empty"
+  '#(9 7 5 3 1)
+  (vector-merge > (vector 9 7 5 3 1) (vector)))
+
+(test-equal "vector-merge:nonempty:nonempty"
+  '#(9 9 7 6 5 3 3 1 0)
+  (vector-merge > (vector 9 7 5 3 1) (vector 9 6 3 0)))
+
+(test-equal "vector-merge!:empty:empty"
+  '#(#f #f #f #f #f #f #f #f #f #f #f #f)
+  (let ((v (make-vector 12 #f))) (vector-merge! > v (vector) (vector)) v))
+
+(test-equal "vector-merge!:empty:nonempty"
+  '#(9 6 3 0 #f #f #f #f #f #f #f #f)
+  (let ((v (make-vector 12 #f)))
+    (vector-merge! > v (vector) (vector 9 6 3 0)) v))
+
+(test-equal "vector-merge!:nonempty:empty"
+  '#(9 7 5 3 1 #f #f #f #f #f #f #f)
+  (let ((v (make-vector 12 #f)))
+    (vector-merge! > v (vector 9 7 5 3 1) (vector)) v))
+
+(test-equal "vector-merge!:nonempty:nonempty"
+  '#(9 9 7 6 5 3 3 1 0 #f #f #f)
+  (let ((v (make-vector 12 #f)))
+    (vector-merge! > v (vector 9 7 5 3 1) (vector 9 6 3 0))
+    v))
+
+(test-equal "vector-merge!:empty:empty:0"
+  '#(#f #f #f #f #f #f #f #f #f #f #f #f)
+  (let ((v (make-vector 12 #f))) (vector-merge! > v (vector) (vector) 0) v))
+
+(test-equal "vector-merge!:empty:nonempty:0"
+  '#(9 6 3 0 #f #f #f #f #f #f #f #f)
+  (let ((v (make-vector 12 #f)))
+    (vector-merge! > v (vector) (vector 9 6 3 0) 0) v))
+
+(test-equal "vector-merge!:nonempty:empty:0"
+  '#(9 7 5 3 1 #f #f #f #f #f #f #f)
+  (let ((v (make-vector 12 #f)))
+    (vector-merge! > v (vector 9 7 5 3 1) (vector) 0)
+    v))
+
+(test-equal "vector-merge!:nonempty:nonempty:0"
+  '#(9 9 7 6 5 3 3 1 0 #f #f #f)
+  (let ((v (make-vector 12 #f)))
+    (vector-merge! > v (vector 9 7 5 3 1) (vector 9 6 3 0) 0)
+    v))
+
+(test-equal "vector-merge!:empty:empty:2"
+  '#(#f #f #f #f #f #f #f #f #f #f #f #f)
+  (let ((v (make-vector 12 #f)))
+    (vector-merge! > v (vector) (vector) 2) v))
+
+(test-equal "vector-merge!:empty:nonempty:2"
+  '#(#f #f 9 6 3 0 #f #f #f #f #f #f)
+  (let ((v (make-vector 12 #f)))
+    (vector-merge! > v (vector) (vector 9 6 3 0) 2) v))
+
+(test-equal "vector-merge!:nonempty:empty:2"
+  '#(#f #f 9 7 5 3 1 #f #f #f #f #f)
+  (let ((v (make-vector 12 #f)))
+    (vector-merge! > v (vector 9 7 5 3 1) (vector) 2)
+    v))
+
+(test-equal "vector-merge!:nonempty:nonempty:2"
+  '#(#f #f 9 9 7 6 5 3 3 1 0 #f)
+  (let ((v (make-vector 12 #f)))
+    (vector-merge! > v (vector 9 7 5 3 1) (vector 9 6 3 0) 2)
+    v))
+
+(test-equal "vector-merge:empty:empty"
+  '#() (vector-merge > (vector) (vector) 0))
+
+(test-equal "vector-merge:empty:nonempty"
+  '#(9 6 3 0)
+  (vector-merge > (vector) (vector 9 6 3 0) 0))
+
+(test-equal "vector-merge:nonempty:empty"
+  '#(5 3 1)
+  (vector-merge > (vector 9 7 5 3 1) (vector) 2))
+
+(test-equal "vector-merge:nonempty:nonempty"
+  '#(9 6 5 3 3 1 0)
+  (vector-merge > (vector 9 7 5 3 1) (vector 9 6 3 0) 2))
+
+(test-equal "vector-merge!:empty:empty:2"
+  '#(#f #f #f #f #f #f #f #f #f #f #f #f)
+  (let ((v (make-vector 12 #f))) (vector-merge! > v (vector) (vector) 2 0) v))
+
+(test-equal "vector-merge!:empty:nonempty:2"
+  '#(#f #f 9 6 3 0 #f #f #f #f #f #f)
+  (let ((v (make-vector 12 #f)))
+    (vector-merge! > v (vector) (vector 9 6 3 0) 2 0)
+    v))
+
+(test-equal "vector-merge!:nonempty:empty:2"
+  '#(#f #f 5 3 1 #f #f #f #f #f #f #f)
+  (let ((v (make-vector 12 #f)))
+    (vector-merge! > v (vector 9 7 5 3 1) (vector) 2 2)
+    v))
+
+(test-equal "vector-merge!:nonempty:nonempty:2"
+  '#(#f #f 9 6 5 3 3 1 0 #f #f #f)
+  (let ((v (make-vector 12 #f)))
+    (vector-merge! > v (vector 9 7 5 3 1) (vector 9 6 3 0) 2 2)
+    v))
+
+(test-equal "vector-merge:empty:empty"
+  '#() (vector-merge > (vector) (vector) 0 0))
+
+(test-equal "vector-merge:empty:nonempty"
+  '#(9 6 3 0)
+  (vector-merge > (vector) (vector 9 6 3 0) 0 0))
+
+(test-equal "vector-merge:nonempty:empty"
+  '#(5 3 1)
+  (vector-merge > (vector 9 7 5 3 1) (vector) 2 5))
+
+(test-equal "vector-merge:nonempty:nonempty"
+  '#(9 6 5 3 3 1 0)
+  (vector-merge > (vector 9 7 5 3 1) (vector 9 6 3 0) 2 5))
+
+(test-equal "vector-merge!:empty:empty:2"
+  '#(#f #f #f #f #f #f #f #f #f #f #f #f)
+  (let ((v (make-vector 12 #f))) (vector-merge! > v (vector) (vector) 2 0 0) v))
+
+(test-equal "vector-merge!:empty:nonempty:2"
+  '#(#f #f 9 6 3 0 #f #f #f #f #f #f)
+  (let ((v (make-vector 12 #f)))
+    (vector-merge! > v (vector) (vector 9 6 3 0) 2 0 0)
+    v))
+
+(test-equal "vector-merge!:nonempty:empty:2"
+  '#(#f #f 5 3 1 #f #f #f #f #f #f #f)
+  (let ((v (make-vector 12 #f)))
+    (vector-merge! > v (vector 9 7 5 3 1) (vector) 2 2 5)
+    v))
+
+(test-equal "vector-merge!:nonempty:nonempty:2"
+  '#(#f #f 9 6 5 3 3 1 0 #f #f #f)
+  (let ((v (make-vector 12 #f)))
+    (vector-merge! > v (vector 9 7 5 3 1) (vector 9 6 3 0) 2 2 5)
+    v))
 
 ;;; Some tests are duplicated to make the pattern easier to discern.
 
-(or (equal? (vector-merge > (vector) (vector) 0 0)
-            '#())
-    (fail 'vector-merge:empty:empty))
+(test-equal "vector-merge:empty:empty"
+  '#() (vector-merge > (vector) (vector) 0 0))
 
-(or (equal? (vector-merge > (vector) (vector 9 6 3 0) 0 0)
-            '#(9 6 3 0))
-    (fail 'vector-merge:empty:nonempty))
+(test-equal "vector-merge:empty:nonempty"
+  '#(9 6 3 0)
+  (vector-merge > (vector) (vector 9 6 3 0) 0 0))
 
-(or (equal? (vector-merge > (vector 9 7 5 3 1) (vector) 2 4)
-            '#(5 3))
-    (fail 'vector-merge:nonempty:empty))
+(test-equal "vector-merge:nonempty:empty"
+  '#(5 3)
+  (vector-merge > (vector 9 7 5 3 1) (vector) 2 4))
 
-(or (equal? (vector-merge > (vector 9 7 5 3 1) (vector 9 6 3 0) 2 4)
-            '#(9 6 5 3 3 0))
-    (fail 'vector-merge:nonempty:nonempty))
+(test-equal "vector-merge:nonempty:nonempty"
+  '#(9 6 5 3 3 0)
+  (vector-merge > (vector 9 7 5 3 1) (vector 9 6 3 0) 2 4))
 
-(or (equal? (let ((v (make-vector 12 #f)))
-              (vector-merge! > v (vector) (vector) 2 0 0)
-              v)
-            '#(#f #f #f #f #f #f #f #f #f #f #f #f))
-    (fail 'vector-merge!:empty:empty:2))
+(test-equal "vector-merge!:empty:empty:2"
+  '#(#f #f #f #f #f #f #f #f #f #f #f #f)
+  (let ((v (make-vector 12 #f)))
+    (vector-merge! > v (vector) (vector) 2 0 0) v))
 
-(or (equal? (let ((v (make-vector 12 #f)))
-              (vector-merge! > v (vector) (vector 9 6 3 0) 2 0 0)
-              v)
-            '#(#f #f 9  6  3  0 #f #f #f #f #f #f))
-    (fail 'vector-merge!:empty:nonempty:2))
+(test-equal "vector-merge!:empty:nonempty:2"
+  '#(#f #f 9 6 3 0 #f #f #f #f #f #f)
+  (let ((v (make-vector 12 #f)))
+    (vector-merge! > v (vector) (vector 9 6 3 0) 2 0 0)
+    v))
 
-(or (equal? (let ((v (make-vector 12 #f)))
-              (vector-merge! > v (vector 9 7 5 3 1) (vector) 2 2 4)
-              v)
-            '#(#f #f 5  3 #f #f #f #f #f #f #f #f))
-    (fail 'vector-merge!:nonempty:empty:2))
+(test-equal "vector-merge!:nonempty:empty:2"
+  '#(#f #f 5 3 #f #f #f #f #f #f #f #f)
+  (let ((v (make-vector 12 #f)))
+    (vector-merge! > v (vector 9 7 5 3 1) (vector) 2 2 4)
+    v))
 
-(or (equal? (let ((v (make-vector 12 #f)))
-              (vector-merge! > v (vector 9 7 5 3 1) (vector 9 6 3 0) 2 2 4)
-              v)
-            '#(#f #f  9  6  5  3  3  0 #f #f #f #f))
-    (fail 'vector-merge!:nonempty:nonempty:2))
+(test-equal "vector-merge!:nonempty:nonempty:2"
+  '#(#f #f 9 6 5 3 3 0 #f #f #f #f)
+  (let ((v (make-vector 12 #f)))
+    (vector-merge! > v (vector 9 7 5 3 1) (vector 9 6 3 0) 2 2 4)
+    v))
 
-(or (equal? (vector-merge > (vector) (vector) 0 0 0)
-            '#())
-    (fail 'vector-merge:empty:empty))
+(test-equal "vector-merge:empty:empty"
+  '#()
+  (vector-merge > (vector) (vector) 0 0 0))
 
-(or (equal? (vector-merge > (vector) (vector 9 6 3 0) 0 0 0)
-            '#(9 6 3 0))
-    (fail 'vector-merge:empty:nonempty))
+(test-equal "vector-merge:empty:nonempty"
+  '#(9 6 3 0)
+  (vector-merge > (vector) (vector 9 6 3 0) 0 0 0))
 
-(or (equal? (vector-merge > (vector 9 7 5 3 1) (vector) 2 4 0)
-            '#(5 3))
-    (fail 'vector-merge:nonempty:empty))
+(test-equal "vector-merge:nonempty:empty"
+  '#(5 3)
+  (vector-merge > (vector 9 7 5 3 1) (vector) 2 4 0))
 
-(or (equal? (vector-merge > (vector 9 7 5 3 1) (vector 9 6 3 0) 2 4 0)
-            '#(9 6 5 3 3 0))
-    (fail 'vector-merge:nonempty:nonempty))
+(test-equal "vector-merge:nonempty:nonempty"
+  '#(9 6 5 3 3 0)
+  (vector-merge > (vector 9 7 5 3 1) (vector 9 6 3 0) 2 4 0))
 
-(or (equal? (let ((v (make-vector 12 #f)))
-              (vector-merge! > v (vector) (vector) 2 0 0 0)
-              v)
-            '#(#f #f #f #f #f #f #f #f #f #f #f #f))
-    (fail 'vector-merge!:empty:empty:2))
+(test-equal "vector-merge!:empty:empty:2"
+  '#(#f #f #f #f #f #f #f #f #f #f #f #f)
+  (let ((v (make-vector 12 #f)))
+    (vector-merge! > v (vector) (vector) 2 0 0 0) v))
 
-(or (equal? (let ((v (make-vector 12 #f)))
-              (vector-merge! > v (vector) (vector 9 6 3 0) 2 0 0 0)
-              v)
-            '#(#f #f  9  6  3  0 #f #f #f #f #f #f))
-    (fail 'vector-merge!:empty:nonempty:2))
+(test-equal "vector-merge!:empty:nonempty:2"
+  '#(#f #f 9 6 3 0 #f #f #f #f #f #f)
+  (let ((v (make-vector 12 #f)))
+    (vector-merge! > v (vector) (vector 9 6 3 0) 2 0 0 0)
+    v))
 
-(or (equal? (let ((v (make-vector 12 #f)))
-              (vector-merge! > v (vector 9 7 5 3 1) (vector) 2 2 4 0)
-              v)
-            '#(#f #f  5  3 #f #f #f #f #f #f #f #f))
-    (fail 'vector-merge!:nonempty:empty:2))
+(test-equal "vector-merge!:nonempty:empty:2"
+  '#(#f #f 5 3 #f #f #f #f #f #f #f #f)
+  (let ((v (make-vector 12 #f)))
+    (vector-merge! > v (vector 9 7 5 3 1) (vector) 2 2 4 0)
+    v))
 
-(or (equal? (let ((v (make-vector 12 #f)))
-              (vector-merge! > v (vector 9 7 5 3 1) (vector 9 6 3 0) 2 2 4 0)
-              v)
-            '#(#f #f  9  6  5  3  3  0 #f #f #f #f))
-    (fail 'vector-merge!:nonempty:nonempty:2))
+(test-equal "vector-merge!:nonempty:nonempty:2"
+  '#(#f #f 9 6 5 3 3 0 #f #f #f #f)
+  (let ((v (make-vector 12 #f)))
+    (vector-merge! > v (vector 9 7 5 3 1) (vector 9 6 3 0) 2 2 4 0)
+    v))
 
-(or (equal? (vector-merge > (vector) (vector) 0 0 0)
-            '#())
-    (fail 'vector-merge:empty:empty))
+(test-equal "vector-merge:empty:empty"
+  '#()
+  (vector-merge > (vector) (vector) 0 0 0))
 
-(or (equal? (vector-merge > (vector) (vector 9 6 3 0) 0 0 1)
-            '#(6 3 0))
-    (fail 'vector-merge:empty:nonempty))
+(test-equal "vector-merge:empty:nonempty"
+  '#(6 3 0)
+  (vector-merge > (vector) (vector 9 6 3 0) 0 0 1))
 
-(or (equal? (vector-merge > (vector 9 7 5 3 1) (vector) 2 4 0)
-            '#(5 3))
-    (fail 'vector-merge:nonempty:empty))
+(test-equal "vector-merge:nonempty:empty"
+  '#(5 3)
+  (vector-merge > (vector 9 7 5 3 1) (vector) 2 4 0))
 
-(or (equal? (vector-merge > (vector 9 7 5 3 1) (vector 9 6 3 0) 2 4 1)
-            '#(6 5 3 3 0))
-    (fail 'vector-merge:nonempty:nonempty))
+(test-equal "vector-merge:nonempty:nonempty"
+  '#(6 5 3 3 0)
+  (vector-merge > (vector 9 7 5 3 1) (vector 9 6 3 0) 2 4 1))
 
-(or (equal? (let ((v (make-vector 12 #f)))
-              (vector-merge! > v (vector) (vector) 2 0 0 0)
-              v)
-            '#(#f #f #f #f #f #f #f #f #f #f #f #f))
-    (fail 'vector-merge!:empty:empty:2))
+(test-equal "vector-merge!:empty:empty:2"
+  '#(#f #f #f #f #f #f #f #f #f #f #f #f)
+  (let ((v (make-vector 12 #f)))
+    (vector-merge! > v (vector) (vector) 2 0 0 0) v))
 
-(or (equal? (let ((v (make-vector 12 #f)))
-              (vector-merge! > v (vector) (vector 9 6 3 0) 2 0 0 1)
-              v)
-            '#(#f #f  6  3  0 #f #f #f #f #f #f #f))
-    (fail 'vector-merge!:empty:nonempty:2))
+(test-equal "vector-merge!:empty:nonempty:2"
+  '#(#f #f 6 3 0 #f #f #f #f #f #f #f)
+  (let ((v (make-vector 12 #f)))
+    (vector-merge! > v (vector) (vector 9 6 3 0) 2 0 0 1)
+    v))
 
-(or (equal? (let ((v (make-vector 12 #f)))
-              (vector-merge! > v (vector 9 7 5 3 1) (vector) 2 2 4 0)
-              v)
-            '#(#f #f  5  3 #f #f #f #f #f #f #f #f))
-    (fail 'vector-merge!:nonempty:empty:2))
+(test-equal "vector-merge!:nonempty:empty:2"
+  '#(#f #f 5 3 #f #f #f #f #f #f #f #f)
+  (let ((v (make-vector 12 #f)))
+    (vector-merge! > v (vector 9 7 5 3 1) (vector) 2 2 4 0)
+    v))
 
-(or (equal? (let ((v (make-vector 12 #f)))
-              (vector-merge! > v (vector 9 7 5 3 1) (vector 9 6 3 0) 2 2 4 1)
-              v)
-            '#(#f #f  6  5  3  3  0 #f #f #f #f #f))
-    (fail 'vector-merge!:nonempty:nonempty:2))
+(test-equal "vector-merge!:nonempty:nonempty:2"
+  '#(#f #f 6 5 3 3 0 #f #f #f #f #f)
+  (let ((v (make-vector 12 #f)))
+    (vector-merge! > v (vector 9 7 5 3 1) (vector 9 6 3 0) 2 2 4 1)
+    v))
 
-(or (equal? (vector-merge > (vector) (vector) 0 0 0 0)
-            '#())
-    (fail 'vector-merge:empty:empty))
+(test-equal "vector-merge:empty:empty"
+  '#()
+  (vector-merge > (vector) (vector) 0 0 0 0))
 
-(or (equal? (vector-merge > (vector) (vector 9 6 3 0) 0 0 1 4)
-            '#(6 3 0))
-    (fail 'vector-merge:empty:nonempty))
+(test-equal "vector-merge:empty:nonempty"
+  '#(6 3 0)
+  (vector-merge > (vector) (vector 9 6 3 0) 0 0 1 4))
 
-(or (equal? (vector-merge > (vector 9 7 5 3 1) (vector) 2 4 0 0)
-            '#(5 3))
-    (fail 'vector-merge:nonempty:empty))
+(test-equal "vector-merge:nonempty:empty"
+  '#(5 3)
+  (vector-merge > (vector 9 7 5 3 1) (vector) 2 4 0 0))
 
-(or (equal? (vector-merge > (vector 9 7 5 3 1) (vector 9 6 3 0) 2 4 1 4)
-            '#(6 5 3 3 0))
-    (fail 'vector-merge:nonempty:nonempty))
+(test-equal "vector-merge:nonempty:nonempty"
+  '#(6 5 3 3 0)
+  (vector-merge > (vector 9 7 5 3 1) (vector 9 6 3 0) 2 4 1 4))
 
-(or (equal? (let ((v (make-vector 12 #f)))
-              (vector-merge! > v (vector) (vector) 2 0 0 0 0)
-              v)
-            '#(#f #f #f #f #f #f #f #f #f #f #f #f))
-    (fail 'vector-merge!:empty:empty:2))
+(test-equal "vector-merge!:empty:empty:2"
+  '#(#f #f #f #f #f #f #f #f #f #f #f #f)
+  (let ((v (make-vector 12 #f)))
+    (vector-merge! > v (vector) (vector) 2 0 0 0 0) v))
 
-(or (equal? (let ((v (make-vector 12 #f)))
-              (vector-merge! > v (vector) (vector 9 6 3 0) 2 0 0 1 4)
-              v)
-            '#(#f #f  6  3  0 #f #f #f #f #f #f #f))
-    (fail 'vector-merge!:empty:nonempty:2))
+(test-equal "vector-merge!:empty:nonempty:2"
+  '#(#f #f 6 3 0 #f #f #f #f #f #f #f)
+  (let ((v (make-vector 12 #f)))
+    (vector-merge! > v (vector) (vector 9 6 3 0) 2 0 0 1 4)
+    v))
 
-(or (equal? (let ((v (make-vector 12 #f)))
-              (vector-merge! > v (vector 9 7 5 3 1) (vector) 2 2 4 0 0)
-              v)
-            '#(#f #f  5  3 #f #f #f #f #f #f #f #f))
-    (fail 'vector-merge!:nonempty:empty:2))
+(test-equal "vector-merge!:nonempty:empty:2"
+  '#(#f #f 5 3 #f #f #f #f #f #f #f #f)
+  (let ((v (make-vector 12 #f)))
+    (vector-merge! > v (vector 9 7 5 3 1) (vector) 2 2 4 0 0)
+    v))
 
-(or (equal? (let ((v (make-vector 12 #f)))
-              (vector-merge! > v (vector 9 7 5 3 1) (vector 9 6 3 0) 2 2 4 1 4)
-              v)
-            '#(#f #f  6  5  3  3  0 #f #f #f #f #f))
-    (fail 'vector-merge!:nonempty:nonempty:2))
+(test-equal "vector-merge!:nonempty:nonempty:2"
+  '#(#f #f 6 5 3 3 0 #f #f #f #f #f)
+  (let ((v (make-vector 12 #f)))
+    (vector-merge! > v (vector 9 7 5 3 1) (vector 9 6 3 0) 2 2 4 1 4)
+    v))
 
-(or (equal? (vector-merge > (vector) (vector) 0 0 0 0)
-            '#())
-    (fail 'vector-merge:empty:empty))
+(test-equal "vector-merge:empty:empty"
+  '#()
+  (vector-merge > (vector) (vector) 0 0 0 0))
 
-(or (equal? (vector-merge > (vector) (vector 9 6 3 0) 0 0 1 2)
-            '#(6))
-    (fail 'vector-merge:empty:nonempty))
+(test-equal "vector-merge:empty:nonempty"
+  '#(6)
+  (vector-merge > (vector) (vector 9 6 3 0) 0 0 1 2))
 
-(or (equal? (vector-merge > (vector 9 7 5 3 1) (vector) 2 4 0 0)
-            '#(5 3))
-    (fail 'vector-merge:nonempty:empty))
+(test-equal "vector-merge:nonempty:empty"
+  '#(5 3)
+  (vector-merge > (vector 9 7 5 3 1) (vector) 2 4 0 0))
 
-(or (equal? (vector-merge > (vector 9 7 5 3 1) (vector 9 6 3 0) 2 4 1 2)
-            '#(6 5 3))
-    (fail 'vector-merge:nonempty:nonempty))
+(test-equal "vector-merge:nonempty:nonempty"
+  '#(6 5 3)
+  (vector-merge > (vector 9 7 5 3 1) (vector 9 6 3 0) 2 4 1 2))
 
-(or (equal? (let ((v (make-vector 12 #f)))
-              (vector-merge! > v (vector) (vector) 2 0 0 0 0)
-              v)
-            '#(#f #f #f #f #f #f #f #f #f #f #f #f))
-    (fail 'vector-merge!:empty:empty:2))
+(test-equal "vector-merge!:empty:empty:2"
+  '#(#f #f #f #f #f #f #f #f #f #f #f #f)
+  (let ((v (make-vector 12 #f)))
+    (vector-merge! > v (vector) (vector) 2 0 0 0 0) v))
 
-(or (equal? (let ((v (make-vector 12 #f)))
-              (vector-merge! > v (vector) (vector 9 6 3 0) 2 0 0 1 2)
-              v)
-            '#(#f #f  6 #f #f #f #f #f #f #f #f #f))
-    (fail 'vector-merge!:empty:nonempty:2))
+(test-equal "vector-merge!:empty:nonempty:2"
+  '#(#f #f 6 #f #f #f #f #f #f #f #f #f)
+  (let ((v (make-vector 12 #f)))
+    (vector-merge! > v (vector) (vector 9 6 3 0) 2 0 0 1 2)
+    v))
 
-(or (equal? (let ((v (make-vector 12 #f)))
-              (vector-merge! > v (vector 9 7 5 3 1) (vector) 2 2 4 0 0)
-              v)
-            '#(#f #f  5  3 #f #f #f #f #f #f #f #f))
-    (fail 'vector-merge!:nonempty:empty:2))
+(test-equal "vector-merge!:nonempty:empty:2"
+  '#(#f #f 5 3 #f #f #f #f #f #f #f #f)
+  (let ((v (make-vector 12 #f)))
+    (vector-merge! > v (vector 9 7 5 3 1) (vector) 2 2 4 0 0)
+    v))
 
-(or (equal? (let ((v (make-vector 12 #f)))
-              (vector-merge! > v (vector 9 7 5 3 1) (vector 9 6 3 0) 2 2 4 1 2)
-              v)
-            '#(#f #f  6  5  3 #f #f #f #f #f #f #f))
-    (fail 'vector-merge!:nonempty:nonempty:2))
+(test-equal "vector-merge!:nonempty:nonempty:2"
+  '#(#f #f 6 5 3 #f #f #f #f #f #f #f)
+  (let ((v (make-vector 12 #f)))
+    (vector-merge! > v (vector 9 7 5 3 1) (vector 9 6 3 0) 2 2 4 1 2)
+    v))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(or (equal? (list-delete-neighbor-dups char=? (list))
-            '())
-    (fail 'list-delete-neighbor-dups:empty))
+(test-equal "list-delete-neighbor-dups:empty"
+  '()
+  (list-delete-neighbor-dups char=? (list)))
 
-(or (equal? (list-delete-neighbor-dups char=? (list #\a))
-            '(#\a))
-    (fail 'list-delete-neighbor-dups:singleton))
+(test-equal "list-delete-neighbor-dups:singleton"
+  '(#\a)
+  (list-delete-neighbor-dups char=? (list #\a)))
 
-(or (equal? (list-delete-neighbor-dups char=? (list #\a #\a #\a #\b #\b #\a))
-            '(#\a #\b #\a))
-    (fail 'list-delete-neighbor-dups:nonempty))
+(test-equal "list-delete-neighbor-dups:nonempty"
+  '(#\a #\b #\a)
+  (list-delete-neighbor-dups char=? (list #\a #\a #\a #\b #\b #\a)))
 
-(or (equal? (list-delete-neighbor-dups! char=? (list))
-            '())
-    (fail 'list-delete-neighbor-dups!:empty))
+(test-equal "list-delete-neighbor-dups!:empty"
+  '()
+  (list-delete-neighbor-dups! char=? (list)))
 
-(or (equal? (list-delete-neighbor-dups! char=? (list #\a))
-            '(#\a))
-    (fail 'list-delete-neighbor-dups!:singleton))
+(test-equal "list-delete-neighbor-dups!:singleton"
+  '(#\a)
+  (list-delete-neighbor-dups! char=? (list #\a)))
 
-(or (equal? (list-delete-neighbor-dups! char=? (list #\a #\a #\a #\b #\b #\a))
-            '(#\a #\b #\a))
-    (fail 'list-delete-neighbor-dups!:nonempty))
+(test-equal "list-delete-neighbor-dups!:nonempty"
+  '(#\a #\b #\a)
+  (list-delete-neighbor-dups! char=? (list #\a #\a #\a #\b #\b #\a)))
 
-(or (equal? (let ((v (vector)))
-              (vector-delete-neighbor-dups char=? v))
-            '#())
-    (fail 'vector-delete-neighbor-dups:empty))
+(test-equal "vector-delete-neighbor-dups:empty"
+  '#()
+  (let ((v (vector))) (vector-delete-neighbor-dups char=? v)))
 
-(or (equal? (let ((v (vector #\a)))
-              (vector-delete-neighbor-dups char=? v))
-            '#(#\a))
-    (fail 'vector-delete-neighbor-dups:singleton))
+(test-equal "vector-delete-neighbor-dups:singleton"
+  '#(#\a)
+  (let ((v (vector #\a))) (vector-delete-neighbor-dups char=? v)))
 
-(or (equal? (let ((v (vector #\a #\a #\a #\b #\b #\a)))
-              (vector-delete-neighbor-dups char=? v))
-            '#(#\a #\b #\a))
-    (fail 'vector-delete-neighbor-dups:nonempty))
+(test-equal "vector-delete-neighbor-dups:nonempty"
+  '#(#\a #\b #\a)
+  (let ((v (vector #\a #\a #\a #\b #\b #\a)))
+    (vector-delete-neighbor-dups char=? v)))
 
-(or (equal? (let ((v (vector)))
-              (list (vector-delete-neighbor-dups! char=? v) v))
-            '(0 #()))
-    (fail 'vector-delete-neighbor-dups!:empty))
+(test-equal "vector-delete-neighbor-dups!:empty"
+  '(0 #())
+  (let ((v (vector)))
+    (list (vector-delete-neighbor-dups! char=? v) v)))
 
-(or (equal? (let ((v (vector #\a)))
-              (list (vector-delete-neighbor-dups! char=? v) v))
-            '(1 #(#\a)))
-    (fail 'vector-delete-neighbor-dups!:singleton))
+(test-equal "vector-delete-neighbor-dups!:singleton"
+  '(1 #(#\a))
+  (let ((v (vector #\a)))
+    (list (vector-delete-neighbor-dups! char=? v) v)))
 
-(or (equal? (let ((v (vector #\a #\a #\a #\b #\b #\a)))
-              (list (vector-delete-neighbor-dups! char=? v) v))
-            '(3 #(#\a #\b #\a #\b #\b #\a)))
-    (fail 'vector-delete-neighbor-dups!:nonempty))
+(test-equal "vector-delete-neighbor-dups!:nonempty"
+  '(3 #(#\a #\b #\a #\b #\b #\a))
+  (let ((v (vector #\a #\a #\a #\b #\b #\a)))
+    (list (vector-delete-neighbor-dups! char=? v) v)))
 
-(or (equal? (let ((v (vector)))
-              (vector-delete-neighbor-dups char=? v 0))
-            '#())
-    (fail 'vector-delete-neighbor-dups:empty:0))
+(test-equal "vector-delete-neighbor-dups:empty:0"
+  '#()
+  (let ((v (vector)))
+    (vector-delete-neighbor-dups char=? v 0)))
 
-(or (equal? (let ((v (vector #\a)))
-              (vector-delete-neighbor-dups char=? v 0))
-            '#(#\a))
-    (fail 'vector-delete-neighbor-dups:singleton:0))
+(test-equal "vector-delete-neighbor-dups:singleton:0"
+  '#(#\a)
+  (let ((v (vector #\a)))
+    (vector-delete-neighbor-dups char=? v 0)))
 
-(or (equal? (let ((v (vector #\a #\a #\a #\b #\b #\a)))
-              (vector-delete-neighbor-dups char=? v 0))
-            '#(#\a #\b #\a))
-    (fail 'vector-delete-neighbor-dups:nonempty:0))
+(test-equal "vector-delete-neighbor-dups:nonempty:0"
+  '#(#\a #\b #\a)
+  (let ((v (vector #\a #\a #\a #\b #\b #\a)))
+    (vector-delete-neighbor-dups char=? v 0)))
 
-(or (equal? (let ((v (vector)))
-              (list (vector-delete-neighbor-dups! char=? v 0) v))
-            '(0 #()))
-    (fail 'vector-delete-neighbor-dups!:empty:0))
+(test-equal "vector-delete-neighbor-dups!:empty:0"
+  '(0 #())
+  (let ((v (vector)))
+    (list (vector-delete-neighbor-dups! char=? v 0) v)))
 
-(or (equal? (let ((v (vector #\a)))
-              (list (vector-delete-neighbor-dups! char=? v 0) v))
-            '(1 #(#\a)))
-    (fail 'vector-delete-neighbor-dups!:singleton:0))
+(test-equal "vector-delete-neighbor-dups!:singleton:0"
+  '(1 #(#\a))
+  (let ((v (vector #\a)))
+    (list (vector-delete-neighbor-dups! char=? v 0) v)))
 
-(or (equal? (let ((v (vector #\a #\a #\a #\b #\b #\a)))
-              (list (vector-delete-neighbor-dups! char=? v 0) v))
-            '(3 #(#\a #\b #\a #\b #\b #\a)))
-    (fail 'vector-delete-neighbor-dups!:nonempty:0))
+(test-equal "vector-delete-neighbor-dups!:nonempty:0"
+  '(3 #(#\a #\b #\a #\b #\b #\a))
+  (let ((v (vector #\a #\a #\a #\b #\b #\a)))
+    (list (vector-delete-neighbor-dups! char=? v 0) v)))
 
-(or (equal? (let ((v (vector)))
-              (vector-delete-neighbor-dups char=? v 0))
-            '#())
-    (fail 'vector-delete-neighbor-dups:empty:0))
+(test-equal "vector-delete-neighbor-dups:empty:0"
+  '#()
+  (let ((v (vector)))
+    (vector-delete-neighbor-dups char=? v 0)))
 
-(or (equal? (let ((v (vector #\a)))
-              (vector-delete-neighbor-dups char=? v 1))
-            '#())
-    (fail 'vector-delete-neighbor-dups:singleton:1))
+(test-equal "vector-delete-neighbor-dups:singleton:1"
+  '#()
+  (let ((v (vector #\a)))
+    (vector-delete-neighbor-dups char=? v 1)))
 
-(or (equal? (let ((v (vector #\a #\a #\a #\b #\b #\a)))
-              (vector-delete-neighbor-dups char=? v 3))
-            '#(#\b #\a))
-    (fail 'vector-delete-neighbor-dups:nonempty:3))
+(test-equal "vector-delete-neighbor-dups:nonempty:3"
+  '#(#\b #\a)
+  (let ((v (vector #\a #\a #\a #\b #\b #\a)))
+    (vector-delete-neighbor-dups char=? v 3)))
 
-(or (equal? (let ((v (vector)))
-              (list (vector-delete-neighbor-dups! char=? v 0) v))
-            '(0 #()))
-    (fail 'vector-delete-neighbor-dups!:empty:0))
+(test-equal "vector-delete-neighbor-dups!:empty:0"
+  '(0 #())
+  (let ((v (vector)))
+    (list (vector-delete-neighbor-dups! char=? v 0) v)))
 
-(or (equal? (let ((v (vector #\a)))
-              (list (vector-delete-neighbor-dups! char=? v 1) v))
-            '(1 #(#\a)))
-    (fail 'vector-delete-neighbor-dups!:singleton:1))
+(test-equal "vector-delete-neighbor-dups!:singleton:1"
+  '(1 #(#\a))
+  (let ((v (vector #\a)))
+    (list (vector-delete-neighbor-dups! char=? v 1) v)))
 
-(or (equal? (let ((v (vector #\a #\a #\a #\b #\b #\a)))
-              (list (vector-delete-neighbor-dups! char=? v 3) v))
-            '(5 #(#\a #\a #\a #\b #\a #\a)))
-    (fail 'vector-delete-neighbor-dups!:nonempty:3))
+(test-equal "vector-delete-neighbor-dups!:nonempty:3"
+  '(5 #(#\a #\a #\a #\b #\a #\a))
+  (let ((v (vector #\a #\a #\a #\b #\b #\a)))
+    (list (vector-delete-neighbor-dups! char=? v 3) v)))
 
-(or (equal? (let ((v (vector)))
-              (vector-delete-neighbor-dups char=? v 0 0))
-            '#())
-    (fail 'vector-delete-neighbor-dups:empty:0:0))
+(test-equal "vector-delete-neighbor-dups:empty:0:0"
+  '#()
+  (let ((v (vector)))
+    (vector-delete-neighbor-dups char=? v 0 0)))
 
-(or (equal? (let ((v (vector #\a)))
-              (vector-delete-neighbor-dups char=? v 1 1))
-            '#())
-    (fail 'vector-delete-neighbor-dups:singleton:1:1))
+(test-equal "vector-delete-neighbor-dups:singleton:1:1"
+  '#()
+  (let ((v (vector #\a)))
+    (vector-delete-neighbor-dups char=? v 1 1)))
 
-(or (equal? (let ((v (vector #\a #\a #\a #\b #\b #\a)))
-              (vector-delete-neighbor-dups char=? v 3 5))
-            '#(#\b))
-    (fail 'vector-delete-neighbor-dups:nonempty:3:5))
+(test-equal "vector-delete-neighbor-dups:nonempty:3:5"
+  '#(#\b)
+  (let ((v (vector #\a #\a #\a #\b #\b #\a)))
+    (vector-delete-neighbor-dups char=? v 3 5)))
 
-(or (equal? (let ((v (vector)))
-              (list (vector-delete-neighbor-dups! char=? v 0 0) v))
-            '(0 #()))
-    (fail 'vector-delete-neighbor-dups!:empty:0:0))
+(test-equal "vector-delete-neighbor-dups!:empty:0:0"
+  '(0 #())
+  (let ((v (vector)))
+    (list (vector-delete-neighbor-dups! char=? v 0 0) v)))
 
-(or (equal? (let ((v (vector #\a)))
-              (list (vector-delete-neighbor-dups! char=? v 0 1) v))
-            '(1 #(#\a)))
-    (fail 'vector-delete-neighbor-dups!:singleton:0:1))
+(test-equal "vector-delete-neighbor-dups!:singleton:0:1"
+  '(1 #(#\a))
+  (let ((v (vector #\a)))
+    (list (vector-delete-neighbor-dups! char=? v 0 1) v)))
 
-(or (equal? (let ((v (vector #\a)))
-              (list (vector-delete-neighbor-dups! char=? v 1 1) v))
-            '(1 #(#\a)))
-    (fail 'vector-delete-neighbor-dups!:singleton:1:1))
+(test-equal "vector-delete-neighbor-dups!:singleton:1:1"
+  '(1 #(#\a))
+  (let ((v (vector #\a)))
+    (list (vector-delete-neighbor-dups! char=? v 1 1) v)))
 
-(or (equal? (let ((v (vector #\a #\a #\a #\b #\b #\a)))
-              (list (vector-delete-neighbor-dups! char=? v 3 5) v))
-            '(4 #(#\a #\a #\a #\b #\b #\a)))
-    (fail 'vector-delete-neighbor-dups!:nonempty:3:5))
+(test-equal "vector-delete-neighbor-dups!:nonempty:3:5"
+  '(4 #(#\a #\a #\a #\b #\b #\a))
+  (let ((v (vector #\a #\a #\a #\b #\b #\a)))
+    (list (vector-delete-neighbor-dups! char=? v 3 5) v)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(or (equal? (vector-find-median < (vector) "knil")
-            "knil")
-    (fail 'vector-find-median:empty))
+(test-equal "vector-find-median:empty"
+  "knil"
+  (vector-find-median < (vector) "knil"))
 
-(or (equal? (vector-find-median < (vector 17) "knil")
-            17)
-    (fail 'vector-find-median:singleton))
+(test-equal "vector-find-median:singleton"
+  17
+  (vector-find-median < (vector 17) "knil"))
 
-(or (equal? (vector-find-median < (vector 18 1 12 14 12 5 18 2) "knil")
-            12)
-    (fail 'vector-find-median:8same))
+(test-equal "vector-find-median:8same"
+  12
+  (vector-find-median < (vector 18 1 12 14 12 5 18 2) "knil"))
 
-(or (equal? (vector-find-median < (vector 18 1 11 14 12 5 18 2) "knil")
-            23/2)
-    (fail 'vector-find-median:8diff))
+(test-equal "vector-find-median:8diff"
+  23/2
+  (vector-find-median < (vector 18 1 11 14 12 5 18 2) "knil"))
 
-(or (equal? (vector-find-median < (vector 18 1 12 14 12 5 18 2) "knil" list)
-            (list 12 12))
-    (fail 'vector-find-median:8samelist))
+(test-equal "vector-find-median:8samelist"
+  (list 12 12)
+  (vector-find-median < (vector 18 1 12 14 12 5 18 2) "knil" list))
 
-(or (equal? (vector-find-median < (vector 18 1 11 14 12 5 18 2) "knil" list)
-            (list 11 12))
-    (fail 'vector-find-median:8difflist))
+(test-equal "vector-find-median:8difflist"
+  (list 11 12)
+  (vector-find-median < (vector 18 1 11 14 12 5 18 2) "knil" list))
 
-(or (equal? (vector-find-median < (vector 7 6 9 3 1 18 15 7 8) "knil")
-            7)
-    (fail 'vector-find-median:9))
+(test-equal "vector-find-median:9"
+  7
+  (vector-find-median < (vector 7 6 9 3 1 18 15 7 8) "knil"))
 
-(or (equal? (vector-find-median < (vector 7 6 9 3 1 18 15 7 8) "knil" list)
-            7)
-    (fail 'vector-find-median:9list))
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-(or (equal? (let ((v (vector 19)))
-              (vector-select! < v 0))
-            19)
-    (fail 'vector-select!:singleton:0))
-
-(or (equal? (let ((v (vector 8 22 19 19 13 9 21 13 3 23)))
-              (vector-select! < v 0))
-            3)
-    (fail 'vector-select!:ten:0))
-
-(or (equal? (let ((v (vector 8 22 19 19 13 9 21 13 3 23)))
-              (vector-select! < v 2))
-            9)
-    (fail 'vector-select!:ten:2))
-
-(or (equal? (let ((v (vector 8 22 19 19 13 9 21 13 3 23)))
-              (vector-select! < v 8))
-            22)
-    (fail 'vector-select!:ten:8))
-
-(or (equal? (let ((v (vector 8 22 19 19 13 9 21 13 3 23)))
-              (vector-select! < v 9))
-            23)
-    (fail 'vector-select!:ten:9))
-
-(or (equal? (let ((v (vector 19)))
-              (vector-select! < v 0 0))
-            19)
-    (fail 'vector-select!:singleton:0:0))
-
-(or (equal? (let ((v (vector 8 22 19 19 13 9 21 13 3 23)))
-              (vector-select! < v 0 0))
-            3)
-    (fail 'vector-select!:ten:0:0))
-
-(or (equal? (let ((v (vector 8 22 19 19 13 9 21 13 3 23)))
-              (vector-select! < v 2 0))
-            9)
-    (fail 'vector-select!:ten:2:0))
-
-(or (equal? (let ((v (vector 8 22 19 19 13 9 21 13 3 23)))
-              (vector-select! < v 8 0))
-            22)
-    (fail 'vector-select!:ten:8:0))
-
-(or (equal? (let ((v (vector 8 22 19 19 13 9 21 13 3 23)))
-              (vector-select! < v 9 0))
-            23)
-    (fail 'vector-select!:ten:9:0))
-
-(or (equal? (let ((v (vector 19)))
-              (vector-select! < v 0 0 1))
-            19)
-    (fail 'vector-select!:singleton:0:0:1))
-
-(or (equal? (let ((v (vector 8 22 19 19 13 9 21 13 3 23)))
-              (vector-select! < v 0 0 10))
-            3)
-    (fail 'vector-select!:ten:0:0:10))
-
-(or (equal? (let ((v (vector 8 22 19 19 13 9 21 13 3 23)))
-              (vector-select! < v 2 0 10))
-            9)
-    (fail 'vector-select!:ten:2:0:10))
-
-(or (equal? (let ((v (vector 8 22 19 19 13 9 21 13 3 23)))
-              (vector-select! < v 8 0 10))
-            22)
-    (fail 'vector-select!:ten:8:0:10))
-
-(or (equal? (let ((v (vector 8 22 19 19 13 9 21 13 3 23)))
-              (vector-select! < v 9 0 10))
-            23)
-    (fail 'vector-select!:ten:9:0:10))
-
-(or (equal? (let ((v (vector 8 22 19 19 13 9 21 13 3 23)))
-              (vector-select! < v 0 4 10))
-            3)
-    (fail 'vector-select!:ten:0:4:10))
-
-(or (equal? (let ((v (vector 8 22 19 19 13 9 21 13 3 23)))
-              (vector-select! < v 2 4 10))
-            13)
-    (fail 'vector-select!:ten:2:4:10))
-
-(or (equal? (let ((v (vector 8 22 19 19 13 9 21 13 3 23)))
-              (vector-select! < v 4 4 10))
-            21)
-    (fail 'vector-select!:ten:4:4:10))
-
-(or (equal? (let ((v (vector 8 22 19 19 13 9 21 13 3 23)))
-              (vector-select! < v 5 4 10))
-            23)
-    (fail 'vector-select!:ten:5:4:10))
-
-(or (equal? (let ((v (vector 8 22 19 19 13 9 21 13 3 23)))
-              (vector-select! < v 0 4 10))
-            3)
-    (fail 'vector-select!:ten:0:4:10))
-
-(or (equal? (let ((v (vector 8 22 19 19 13 9 21 13 3 23)))
-              (vector-select! < v 2 4 10))
-            13)
-    (fail 'vector-select!:ten:2:4:10))
-
-(or (equal? (let ((v (vector 8 22 19 19 13 9 21 13 3 23)))
-              (vector-select! < v 3 4 10))
-            13)
-    (fail 'vector-select!:ten:3:4:10))
-
-(or (equal? (let ((v (vector 8 22 19 19 13 9 21 13 3 23)))
-              (vector-select! < v 4 4 10))
-            21)
-    (fail 'vector-select!:ten:4:4:10))
-
-(or (equal? (let ((v (vector 8 22 19 19 13 9 21 13 3 23)))
-              (vector-select! < v 5 4 10))
-            23)
-    (fail 'vector-select!:ten:9:4:10))
-
-(or (equal? (let ((v (vector 8 22 19 19 13 9 21 13 3 23)))
-              (vector-select! < v 0 4 8))
-            9)
-    (fail 'vector-select!:ten:0:4:8))
-
-(or (equal? (let ((v (vector 8 22 19 19 13 9 21 13 3 23)))
-              (vector-select! < v 1 4 8))
-            13)
-    (fail 'vector-select!:ten:1:4:8))
-
-(or (equal? (let ((v (vector 8 22 19 19 13 9 21 13 3 23)))
-              (vector-select! < v 2 4 8))
-            13)
-    (fail 'vector-select!:ten:2:4:8))
-
-(or (equal? (let ((v (vector 8 22 19 19 13 9 21 13 3 23)))
-              (vector-select! < v 3 4 8))
-            21)
-    (fail 'vector-select!:ten:3:4:8))
+(test-equal "vector-find-median:9list"
+  7
+  (vector-find-median < (vector 7 6 9 3 1 18 15 7 8) "knil" list))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(or (equal? (let ((v (vector)))
-              (vector-separate! < v 0)
-              (vector-sort < (r7rs-vector-copy v 0 0)))
-            '#())
-    (fail 'vector-separate!:empty:0))
+(test-equal "vector-select!:singleton:0"
+  19
+  (let ((v (vector 19)))
+    (vector-select! < v 0)))
 
-(or (equal? (let ((v (vector 19)))
-              (vector-separate! < v 0)
-              (vector-sort < (r7rs-vector-copy v 0 0)))
-            '#())
-    (fail 'vector-separate!:singleton:0))
+(test-equal "vector-select!:ten:0"
+  3
+  (let ((v (vector 8 22 19 19 13 9 21 13 3 23)))
+    (vector-select! < v 0)))
 
-(or (equal? (let ((v (vector 19)))
-              (vector-separate! < v 1)
-              (vector-sort < (r7rs-vector-copy v 0 1)))
-            '#(19))
-    (fail 'vector-separate!:singleton:1))
+(test-equal "vector-select!:ten:2"
+  9
+  (let ((v (vector 8 22 19 19 13 9 21 13 3 23)))
+    (vector-select! < v 2)))
 
-(or (equal? (let ((v (vector 8 22 19 19 13 9 21 13 3 23)))
-              (vector-separate! < v 0)
-              (vector-sort < (r7rs-vector-copy v 0 0)))
-            '#())
-    (fail 'vector-separate!:ten:0))
+(test-equal "vector-select!:ten:8"
+  22
+  (let ((v (vector 8 22 19 19 13 9 21 13 3 23)))
+    (vector-select! < v 8)))
 
-(or (equal? (let ((v (vector 8 22 19 19 13 9 21 13 3 23)))
-              (vector-separate! < v 3)
-              (vector-sort < (r7rs-vector-copy v 0 3)))
-            '#(3 8 9))
-    (fail 'vector-separate!:ten:3))
+(test-equal "vector-select!:ten:9"
+  23
+  (let ((v (vector 8 22 19 19 13 9 21 13 3 23)))
+    (vector-select! < v 9)))
 
-(or (equal? (let ((v (vector)))
-              (vector-separate! < v 0 0)
-              (vector-sort < (r7rs-vector-copy v 0 0)))
-            '#())
-    (fail 'vector-separate!:empty:0:0))
+(test-equal "vector-select!:singleton:0:0"
+  19
+  (let ((v (vector 19)))
+    (vector-select! < v 0 0)))
 
-(or (equal? (let ((v (vector 19)))
-              (vector-separate! < v 0 0)
-              (vector-sort < (r7rs-vector-copy v 0 0)))
-            '#())
-    (fail 'vector-separate!:singleton:0:0))
+(test-equal "vector-select!:ten:0:0"
+  3
+  (let ((v (vector 8 22 19 19 13 9 21 13 3 23)))
+    (vector-select! < v 0 0)))
 
-(or (equal? (let ((v (vector 19)))
-              (vector-separate! < v 1 0)
-              (vector-sort < (r7rs-vector-copy v 0 1)))
-            '#(19))
-    (fail 'vector-separate!:singleton:1:0))
+(test-equal "vector-select!:ten:2:0"
+  9
+  (let ((v (vector 8 22 19 19 13 9 21 13 3 23)))
+    (vector-select! < v 2 0)))
 
-(or (equal? (let ((v (vector 8 22 19 19 13 9 21 13 3 23)))
-              (vector-separate! < v 0 0)
-              (vector-sort < (r7rs-vector-copy v 0 0)))
-            '#())
-    (fail 'vector-separate!:ten:0:0))
+(test-equal "vector-select!:ten:8:0"
+  22
+  (let ((v (vector 8 22 19 19 13 9 21 13 3 23)))
+    (vector-select! < v 8 0)))
 
-(or (equal? (let ((v (vector 8 22 19 19 13 9 21 13 3 23)))
-              (vector-separate! < v 3 0)
-              (vector-sort < (r7rs-vector-copy v 0 3)))
-            '#(3 8 9))
-    (fail 'vector-separate!:ten:3:0))
+(test-equal "vector-select!:ten:9:0"
+  23
+  (let ((v (vector 8 22 19 19 13 9 21 13 3 23)))
+    (vector-select! < v 9 0)))
 
-(or (equal? (let ((v (vector 19)))
-              (vector-separate! < v 0 1)
-              (vector-sort < (r7rs-vector-copy v 1 1)))
-            '#())
-    (fail 'vector-separate!:singleton:0:1))
+(test-equal "vector-select!:singleton:0:0:1"
+  19
+  (let ((v (vector 19)))
+    (vector-select! < v 0 0 1)))
 
-(or (equal? (let ((v (vector 8 22 19 19 13 9 21 13 3 23)))
-              (vector-separate! < v 0 2)
-              (vector-sort < (r7rs-vector-copy v 2 2)))
-            '#())
-    (fail 'vector-separate!:ten:0:2))
+(test-equal "vector-select!:ten:0:0:10"
+  3
+  (let ((v (vector 8 22 19 19 13 9 21 13 3 23)))
+    (vector-select! < v 0 0 10)))
 
-(or (equal? (let ((v (vector 8 22 19 19 13 9 21 13 3 23)))
-              (vector-separate! < v 3 2)
-              (vector-sort < (r7rs-vector-copy v 2 5)))
-            '#(3 9 13))
-    (fail 'vector-separate!:ten:3:2))
+(test-equal "vector-select!:ten:2:0:10"
+  9
+  (let ((v (vector 8 22 19 19 13 9 21 13 3 23)))
+    (vector-select! < v 2 0 10)))
 
-(or (equal? (let ((v (vector)))
-              (vector-separate! < v 0 0 0)
-              (vector-sort < (r7rs-vector-copy v 0 0)))
-            '#())
-    (fail 'vector-separate!:empty:0:0:0))
+(test-equal "vector-select!:ten:8:0:10"
+  22
+  (let ((v (vector 8 22 19 19 13 9 21 13 3 23)))
+    (vector-select! < v 8 0 10)))
 
-(or (equal? (let ((v (vector 19)))
-              (vector-separate! < v 0 1 1)
-              (vector-sort < (r7rs-vector-copy v 1 1)))
-            '#())
-    (fail 'vector-separate!:singleton:0:1:1))
+(test-equal "vector-select!:ten:9:0:10"
+  23
+  (let ((v (vector 8 22 19 19 13 9 21 13 3 23)))
+    (vector-select! < v 9 0 10)))
 
-(or (equal? (let ((v (vector 8 22 19 19 13 9 21 13 3 23)))
-              (vector-separate! < v 0 2 8)
-              (vector-sort < (r7rs-vector-copy v 2 2)))
-            '#())
-    (fail 'vector-separate!:ten:0:2:8))
+(test-equal "vector-select!:ten:0:4:10"
+  3
+  (let ((v (vector 8 22 19 19 13 9 21 13 3 23)))
+    (vector-select! < v 0 4 10)))
 
-(or (equal? (let ((v (vector 8 22 19 19 13 9 21 13 3 23)))
-              (vector-separate! < v 3 2 8)
-              (vector-sort < (r7rs-vector-copy v 2 5)))
-            '#(9 13 13))
-    (fail 'vector-separate!:ten:3:2:8))
+(test-equal "vector-select!:ten:2:4:10"
+  13
+  (let ((v (vector 8 22 19 19 13 9 21 13 3 23)))
+    (vector-select! < v 2 4 10)))
+
+(test-equal "vector-select!:ten:4:4:10"
+  21
+  (let ((v (vector 8 22 19 19 13 9 21 13 3 23)))
+    (vector-select! < v 4 4 10)))
+
+(test-equal "vector-select!:ten:5:4:10"
+  23
+  (let ((v (vector 8 22 19 19 13 9 21 13 3 23)))
+    (vector-select! < v 5 4 10)))
+
+(test-equal "vector-select!:ten:0:4:10"
+  3
+  (let ((v (vector 8 22 19 19 13 9 21 13 3 23)))
+    (vector-select! < v 0 4 10)))
+
+(test-equal "vector-select!:ten:2:4:10"
+  13
+  (let ((v (vector 8 22 19 19 13 9 21 13 3 23)))
+    (vector-select! < v 2 4 10)))
+
+(test-equal "vector-select!:ten:3:4:10"
+  13
+  (let ((v (vector 8 22 19 19 13 9 21 13 3 23)))
+    (vector-select! < v 3 4 10)))
+
+(test-equal "vector-select!:ten:4:4:10"
+  21
+  (let ((v (vector 8 22 19 19 13 9 21 13 3 23)))
+    (vector-select! < v 4 4 10)))
+
+(test-equal "vector-select!:ten:9:4:10"
+  23
+  (let ((v (vector 8 22 19 19 13 9 21 13 3 23)))
+    (vector-select! < v 5 4 10)))
+
+(test-equal "vector-select!:ten:0:4:8"
+  9
+  (let ((v (vector 8 22 19 19 13 9 21 13 3 23)))
+    (vector-select! < v 0 4 8)))
+
+(test-equal "vector-select!:ten:1:4:8"
+  13
+  (let ((v (vector 8 22 19 19 13 9 21 13 3 23)))
+    (vector-select! < v 1 4 8)))
+
+(test-equal "vector-select!:ten:2:4:8"
+  13
+  (let ((v (vector 8 22 19 19 13 9 21 13 3 23)))
+    (vector-select! < v 2 4 8)))
+
+(test-equal "vector-select!:ten:3:4:8"
+  21
+  (let ((v (vector 8 22 19 19 13 9 21 13 3 23)))
+    (vector-select! < v 3 4 8)))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(test-equal "vector-separate!:empty:0"
+  '#()
+  (let ((v (vector)))
+    (vector-separate! < v 0)
+    (vector-sort < (r7rs-vector-copy v 0 0))))
+
+(test-equal "vector-separate!:singleton:0"
+  '#()
+  (let ((v (vector 19)))
+    (vector-separate! < v 0)
+    (vector-sort < (r7rs-vector-copy v 0 0))))
+
+(test-equal "vector-separate!:singleton:1"
+  '#(19)
+  (let ((v (vector 19)))
+    (vector-separate! < v 1)
+    (vector-sort < (r7rs-vector-copy v 0 1))))
+
+(test-equal "vector-separate!:ten:0"
+  '#()
+  (let ((v (vector 8 22 19 19 13 9 21 13 3 23)))
+    (vector-separate! < v 0)
+    (vector-sort < (r7rs-vector-copy v 0 0))))
+
+(test-equal "vector-separate!:ten:3"
+  '#(3 8 9)
+  (let ((v (vector 8 22 19 19 13 9 21 13 3 23)))
+    (vector-separate! < v 3)
+    (vector-sort < (r7rs-vector-copy v 0 3))))
+
+(test-equal "vector-separate!:empty:0:0"
+  '#()
+  (let ((v (vector)))
+    (vector-separate! < v 0 0)
+    (vector-sort < (r7rs-vector-copy v 0 0))))
+
+(test-equal "vector-separate!:singleton:0:0"
+  '#()
+  (let ((v (vector 19)))
+    (vector-separate! < v 0 0)
+    (vector-sort < (r7rs-vector-copy v 0 0))))
+
+(test-equal "vector-separate!:singleton:1:0"
+  '#(19)
+  (let ((v (vector 19)))
+    (vector-separate! < v 1 0)
+    (vector-sort < (r7rs-vector-copy v 0 1))))
+
+(test-equal "vector-separate!:ten:0:0"
+  '#()
+  (let ((v (vector 8 22 19 19 13 9 21 13 3 23)))
+    (vector-separate! < v 0 0)
+    (vector-sort < (r7rs-vector-copy v 0 0))))
+
+(test-equal "vector-separate!:ten:3:0"
+  '#(3 8 9)
+  (let ((v (vector 8 22 19 19 13 9 21 13 3 23)))
+    (vector-separate! < v 3 0)
+    (vector-sort < (r7rs-vector-copy v 0 3))))
+
+(test-equal "vector-separate!:singleton:0:1"
+  '#()
+  (let ((v (vector 19)))
+    (vector-separate! < v 0 1)
+    (vector-sort < (r7rs-vector-copy v 1 1))))
+
+(test-equal "vector-separate!:ten:0:2"
+  '#()
+  (let ((v (vector 8 22 19 19 13 9 21 13 3 23)))
+    (vector-separate! < v 0 2)
+    (vector-sort < (r7rs-vector-copy v 2 2))))
+
+(test-equal "vector-separate!:ten:3:2"
+  '#(3 9 13)
+  (let ((v (vector 8 22 19 19 13 9 21 13 3 23)))
+    (vector-separate! < v 3 2)
+    (vector-sort < (r7rs-vector-copy v 2 5))))
+
+(test-equal "vector-separate!:empty:0:0:0"
+  '#()
+  (let ((v (vector)))
+    (vector-separate! < v 0 0 0)
+    (vector-sort < (r7rs-vector-copy v 0 0))))
+
+(test-equal "vector-separate!:singleton:0:1:1"
+  '#()
+  (let ((v (vector 19)))
+    (vector-separate! < v 0 1 1)
+    (vector-sort < (r7rs-vector-copy v 1 1))))
+
+(test-equal "vector-separate!:ten:0:2:8"
+  '#()
+  (let ((v (vector 8 22 19 19 13 9 21 13 3 23)))
+    (vector-separate! < v 0 2 8)
+    (vector-sort < (r7rs-vector-copy v 2 2))))
+
+(test-equal "vector-separate!:ten:3:2:8"
+  '#(9 13 13)
+  (let ((v (vector 8 22 19 19 13 9 21 13 3 23)))
+    (vector-separate! < v 3 2 8)
+    (vector-sort < (r7rs-vector-copy v 2 5))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;
@@ -1521,10 +1191,22 @@
              (all-sorts-okay? (- m 1) n)))
       #t))
 
-(define (test-all-sorts m n)
-  (or (all-sorts-okay? m n)
-      (fail (list 'test-all-sorts m n))))
+(test-eqv #t (all-sorts-okay? 3 0))
+(test-eqv #t (all-sorts-okay? 5 1))
+(test-eqv #t (all-sorts-okay? 10 2))
+(test-eqv #t (all-sorts-okay? 10 3))
+(test-eqv #t (all-sorts-okay? 10 4))
+(test-eqv #t (all-sorts-okay? 20 5))
+(test-eqv #t (all-sorts-okay? 20 10))
+(test-eqv #t (all-sorts-okay? 10 20))
+(test-eqv #t (all-sorts-okay? 10 30))
+(test-eqv #t (all-sorts-okay? 10 40))
+(test-eqv #t (all-sorts-okay? 10 50))
+(test-eqv #t (all-sorts-okay? 10 99))
+(test-eqv #t (all-sorts-okay? 10 100))
+(test-eqv #t (all-sorts-okay? 10 101))
+(test-eqv #t (all-sorts-okay? 10 499))
+(test-eqv #t (all-sorts-okay? 10 500))
+(test-eqv #t (all-sorts-okay? 10 501))
 
-(for-each test-all-sorts
-          '( 3  5 10 10 10 20 20 10 10 10 10 10  10  10  10  10  10)
-          '( 0  1  2  3  4  5 10 20 30 40 50 99 100 101 499 500 501))
+(test-end "srfi-132")
