@@ -1,43 +1,42 @@
 ;; Copyright 2015 John Cowan
+;; Copyright 2020 Lassi Kortela
 ;; SPDX-License-Identifier: MIT
-
-;;;; Chicken-specific tests for titlecase library
-
-;;; Note: The strings embed Unicode characters using the
-;;; Chicken-specific lexical syntax "\u1234" rather than the R7RS
-;;; syntax "\x1234;"
-
-;; (use utf8)  ; Chicken
 
 (test-begin "titlecase")
 
+(define uchar integer->char)
+(define (ustring . xs)
+  (apply string-append
+         (map (lambda (x) (if (string? x) x (string (integer->char x))))
+              xs)))
+
 (test-begin "predicate")
-(test-assert (char-title-case? #\u01C5))
-(test-assert (char-title-case? #\u1FFC))
+(test-assert (char-title-case? (uchar #x01C5)))
+(test-assert (char-title-case? (uchar #x1FFC)))
 (test-assert (not (char-title-case? #\Z)))
 (test-assert (not (char-title-case? #\z)))
 (test-end "predicate")
 
 (test-begin "char")
-(test-equal #\u01C5 (char-titlecase #\u01C4))
-(test-equal #\u01C5 (char-titlecase #\u01C6))
+(test-equal (uchar #x01C5) (char-titlecase (uchar #x01C4)))
+(test-equal (uchar #x01C5) (char-titlecase (uchar #x01C6)))
 (test-equal #\Z (char-titlecase #\Z))
 (test-equal #\Z (char-titlecase #\z))
 (test-end "char")
 
 (test-begin "string")
-(test-equal "\u01C5" (string-titlecase "\u01C5"))
-(test-equal "\u01C5" (string-titlecase "\u01C4"))
-(test-equal "Ss" (string-titlecase "\u00DF"))
-(test-equal "Xi\u0307" (string-titlecase "x\u0130"))
-(test-equal "\u1F88" (string-titlecase "\u1F80"))
-(test-equal "\u1F88" (string-titlecase "\u1F88"))
-(define Floo "\uFB02oo")
-(define Floo-bar "\uFB02oo bar")
-(define Baffle "Ba\uFB04e")
-(define LJUBLJANA "\u01C7ub\u01C7ana")
-(define Ljubljana "\u01C8ub\u01C9ana")
-(define ljubljana "\u01C9ub\u01C9ana")
+(test-equal (ustring #x01C5) (string-titlecase (ustring #x01C5)))
+(test-equal (ustring #x01C5) (string-titlecase (ustring #x01C4)))
+(test-equal "Ss" (string-titlecase (ustring #x00DF)))
+(test-equal (ustring "Xi" #x0307) (string-titlecase (ustring "x" #x0130)))
+(test-equal (ustring #x1F88) (string-titlecase (ustring #x1F80)))
+(test-equal (ustring #x1F88) (string-titlecase (ustring #x1F88)))
+(define Floo (ustring #xFB02 "oo"))
+(define Floo-bar (ustring #xFB02 "oo bar"))
+(define Baffle (ustring "Ba" #xFB04 "e"))
+(define LJUBLJANA (ustring #x01C7 "ub" #x01C7 "ana"))
+(define Ljubljana (ustring #x01C8 "ub" #x01C9 "ana"))
+(define ljubljana (ustring #x01C9 "ub" #x01C9 "ana"))
 (test-equal "Bar Baz" (string-titlecase "bAr baZ"))
 (test-equal "Floo" (string-titlecase "floo"))
 (test-equal "Floo" (string-titlecase "FLOO"))
