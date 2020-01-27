@@ -80,6 +80,7 @@
                                  (scheme char)
                                  (scheme write)
                                  (chibi)
+                                 (srfi 27)
                                  (srfi 64) ;; snow-chibi install '(srfi 64)'
                                  (srfi ,srfi-number))
                          ,@prelude
@@ -91,6 +92,7 @@
                        `((import (scheme base)
                                  (scheme char)
                                  (scheme write)
+                                 (srfi 27)
                                  (srfi 64)
                                  (srfi ,srfi-number))
                          ,@prelude
@@ -100,6 +102,7 @@
   (let ((basename (string-append (number->string srfi-number) ".scm")))
     (write-source-file "guile" basename
                        `((import (guile)
+                                 (srfi :27)
                                  (srfi :64)
                                  (srfi ,(string->symbol
                                          (string-append
@@ -112,6 +115,8 @@
     (write-source-file "kawa" basename
                        `((import (kawa base) ; base includes SRFI 64
                                  (srfi ,srfi-number))
+                         (define (random-integer limit)
+                           ((java.util.Random):nextInt limit))
                          ,@prelude
                          ,@(read-source-file basename)))))
 
