@@ -58,7 +58,7 @@
 
 (define (srfi-dependencies srfi-number)
   (case srfi-number
-    ((13) '(14))
+    ((13 130) '(14))
     (else '())))
 
 ;;
@@ -153,7 +153,7 @@
 
 ;;
 
-(define all-srfis '(13 60 69 132 151 175))
+(define all-srfis '(13 60 69 130 132 151 175))
 
 (for-each write-chibi-test all-srfis)
 (for-each write-gauche-test all-srfis)
