@@ -1,3 +1,6 @@
+;; Copyright 2019 John Cowan
+;; SPDX-License-Identifier: MIT
+
 ;;;; Shared tests
 ;;; Hvector = homogeneous vector
 
@@ -161,4 +164,3 @@
 (test-assert (c128? 1.0))
 (test-not (c128? 1))
 (test-assert (c128? 1.0+2.0i))
-
