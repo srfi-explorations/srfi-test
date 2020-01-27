@@ -97,6 +97,16 @@
                                          '(27 64)
                                          (srfi-dependencies srfi-number)
                                          (list srfi-number))))
+                         (define (arity-error? e)
+                           (and (error-object? e)
+                                (let ((m (error-object-message e)))
+                                  (or (string=? m "not enough args")
+                                      (string=? m "too many args")))))
+                         (define-syntax test-arity-error
+                           (syntax-rules ()
+                             ((_ test-expr)
+                              (guard (_ (arity-error? #t))
+                                (lambda () test-expr)))))
                          (define (call-with-false-on-error proc)
                            (guard (_ (else #f)) (proc)))
                          ,@prelude
