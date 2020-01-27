@@ -6,9 +6,8 @@
 
 (define uchar integer->char)
 (define (ustring . xs)
-  (apply string-append
-         (map (lambda (x) (if (string? x) x (string (integer->char x))))
-              xs)))
+  (apply string-append (map (lambda (x) (if (string? x) x (string (uchar x))))
+                            xs)))
 
 (test-begin "predicate")
 (test-assert (char-title-case? (uchar #x01C5)))
