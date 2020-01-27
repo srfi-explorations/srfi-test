@@ -126,7 +126,8 @@
                        `((import (kawa base) ; base includes SRFI 64
                                  (srfi ,srfi-number))
                          (define (random-integer limit)
-                           ((java.util.Random):nextInt limit))
+                           (let ((source (java.util.Random)))
+                             (source:nextInt limit)))
                          (define (call-with-false-on-error proc)
                            (guard (_ (else #f)) (proc)))
                          ,@prelude
