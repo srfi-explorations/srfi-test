@@ -37,7 +37,8 @@
 (test-assert
     (char-set= (string->char-set "eiaou2468013579999")
                (char-set-unfold null? car cdr '(#\a #\e #\i #\o #\u #\u #\u)
-                                char-set:digit)))
+                                (char-set-intersection
+                                 char-set:digit char-set:ascii))))
 
 (test-assert
     (char-set= (string->char-set "eiaou246801357999")
