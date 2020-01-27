@@ -1,7 +1,7 @@
 ;; Copyright 2016, 2018 John Cowan
 ;; SPDX-License-Identifier: MIT
 
-(test-begin "vectors")
+(test-begin "srfi-133")
 
 (test-begin "basics")
 (define v (make-vector 3 3))
@@ -198,4 +198,4 @@
 (test-equal '#(#\a #\b) (string->vector "abc" 0 2))
 (test-end "conversion")
 
-(test-end "vectors")
+(test-end "srfi-133")
