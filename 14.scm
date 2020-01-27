@@ -1,5 +1,5 @@
-;;; This is a regression testing suite for the SRFI-14 char-set library.
-;;; Olin Shivers
+;; Copyright 2000 Olin Shivers
+;; SPDX-License-Identifier: MIT
 
 (let-syntax ((test (syntax-rules ()
                      ((test form ...)
