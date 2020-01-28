@@ -75,8 +75,12 @@
                   (if (less? x y) (cons x xs) (cons y (insert x ys))))))))
 
     (define (written x)
-      (call-with-port (open-output-string)
-                      (lambda (out) (write x out) (get-output-string out))))
+      (cond-expand
+        (r7rs
+         (call-with-port (open-output-string)
+                         (lambda (out) (write x out) (get-output-string out))))
+        (else
+         (call-with-output-string (lambda (out) (write x out))))))
 
     (define (symbol<? a b) (string<? (symbol->string a) (symbol->string b)))
 
@@ -111,6 +115,29 @@
                                              #f)))))
                          (define (call-with-false-on-error proc)
                            (guard (_ (else #f)) (proc)))
+                         ,@prelude
+                         ,@(read-source-file basename)))))
+
+(define (write-chicken-test srfi-number)
+  (let ((basename (string-append (number->string srfi-number) ".scm")))
+    (write-source-file "chicken" basename
+                       `((import
+                           (chicken base)
+                           (chicken port)
+                           ,@(map (lambda (n) `(srfi ,n))
+                                  (append
+                                   ;; chicken-install srfi-64
+                                   '(64)
+                                   (srfi-dependencies srfi-number)
+                                   (list srfi-number))))
+                         (import (rename
+                                  (only (chicken random)
+                                        pseudo-random-integer)
+                                  (pseudo-random-integer random-integer)))
+                         (define (call-with-false-on-error proc)
+                           (call-with-current-continuation
+                            (lambda (return)
+                              (handle-exceptions _ (return #f) (proc)))))
                          ,@prelude
                          ,@(read-source-file basename)))))
 
@@ -168,6 +195,7 @@
 (define all-srfis '(13 14 60 69 129 130 132 133 151 160 175))
 
 (for-each write-chibi-test all-srfis)
+(for-each write-chicken-test all-srfis)
 (for-each write-gauche-test all-srfis)
 (for-each write-guile-test all-srfis)
 (for-each write-kawa-test all-srfis)
