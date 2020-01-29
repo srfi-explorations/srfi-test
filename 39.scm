@@ -4,7 +4,6 @@
 (test-begin "srfi-39")
 
 (let ((counter (make-parameter 123)))
-  (test-eq counter counter)
   (test-eqv 123 (counter))
   (parameterize ((counter (+ 1 (counter))))
     (test-eqv 124 (counter))
