@@ -1,9 +1,5 @@
-(define-library (srfi 2 test)
-  (export run-tests)
-  (import (chibi) (srfi 2) (chibi test))
-  (begin
-    (define (run-tests)
-      (test-begin "srfi-2: and-let*")
+(test-begin "srfi-2")
+
       (test 1 (and-let* () 1))
       (test 2 (and-let* () 1 2))
       (test #t (and-let* () ))
@@ -42,4 +38,5 @@
           (let ((x #f)) (and-let* (x (y (- x 1)) ((positive? y))) (/ x y))))
       (test 3/2
           (let ((x 3)) (and-let* (x (y (- x 1)) ((positive? y))) (/ x y))))
-      (test-end))))
+
+(test-end "srfi-2")
