@@ -1,6 +1,8 @@
 ;; Copyright 2015 Alex Shinn
 ;; SPDX-License-Identifier: MIT
 
+(test-begin "srfi-16")
+
 (define plus
   (case-lambda
     (() 0)
@@ -28,8 +30,6 @@
       (lambda () (apply print args))
       (lambda () (current-output-port old-out)))
     (get-output-string out)))
-
-(test-begin "srfi-16")
 
 (test-eqv 0 (plus))
 (test-eqv 1 (plus 1))
