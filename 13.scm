@@ -578,12 +578,8 @@
          (= end 3)
          (equal? rest '(fnord)))))
 
-(test-equal "string-parse-start+end"
-  #t
-  (call-with-false-on-error
-   (lambda ()
-     (string-parse-start+end #t "foo" '(1 4))
-     #t)))
+(test-error "string-parse-start+end" #t
+            (string-parse-start+end #t "foo" '(1 4)))
 
 (test-equal "string-parse-start+end"
   #t
@@ -601,11 +597,7 @@
 
 (test-assert "check-substring-spec" (check-substring-spec #t "foo" 1 3))
 
-(test-assert "check-substring-spec"
-  (call-with-false-on-error
-   (lambda ()
-     (check-substring-spec #t "foo" 1 4)
-     #t)))
+(test-error "check-substring-spec" #t (check-substring-spec #t "foo" 1 4))
 
 (test-assert "substring-spec-ok?" (substring-spec-ok? "foo" 1 3))
 
@@ -673,7 +665,8 @@
                                          " (exp: " (written expected-i)
                                          ", act: " (written i)
                                          "), case: " (written test-case))
-              (lp new-i (+ step 1) (cdr steps))))))))))
+                expected-i i)
+              (lp new-i (+ step 1) (cdr steps)))))))))
  kmp-cases)
 
 ; FIXME!  Implement tests for these:
