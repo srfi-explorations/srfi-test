@@ -28,7 +28,8 @@
 (test-equal 2 (let ((x 1)) (and-let* ( ((begin x)) ((positive? x))) (+ x 1))))
 (test-equal #f (let ((x 0)) (and-let* (x ((positive? x))) (+ x 1))))
 (test-equal #f (let ((x #f)) (and-let* (x ((positive? x))) (+ x 1))))
-(test-equal #f (let ((x #f)) (and-let* ( ((begin x)) ((positive? x))) (+ x 1))))
+(test-equal #f
+  (let ((x #f)) (and-let* ( ((begin x)) ((positive? x))) (+ x 1))))
 
 (test-equal #f
   (let ((x 1)) (and-let* (x (y (- x 1)) ((positive? y))) (/ x y))))
