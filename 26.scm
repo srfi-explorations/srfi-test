@@ -1,5 +1,4 @@
 ;; Copyright 2002 Sebastian Egner
-;; Copyright 2015 Alex Shinn
 ;; SPDX-License-Identifier: MIT
 
 (test-begin "srfi-26")
@@ -44,14 +43,5 @@
          (map (cute + (begin (set! a (+ a 1)) a) <>)
               '(1 2))
          a))
-
-(let ((x 'orig))
-  (let ((f (cute list x)))
-    (set! x 'wrong)
-    (test-equal '(orig) (f))))
-(let ((x 'wrong))
-  (let ((f (cut list x)))
-    (set! x 'right)
-    (test-equal '(right) (f))))
 
 (test-end "srfi-26")
