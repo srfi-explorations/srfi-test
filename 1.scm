@@ -1,9 +1,4 @@
-(define-library (srfi 1 test)
-  (export run-tests)
-  (import (chibi) (chibi test) (srfi 1))
-  (begin
-    (define (run-tests)
-      (test-begin "srfi-1: list library")
+      (test-begin "srfi-1")
 
       ;; srfi-1 examples
       ;; http://srfi.schemers.org/srfi-1/srfi-1.html
@@ -192,4 +187,4 @@
         ;;(test '*unspecified* (set-car! (f) 3))
         (test-error (set-car! (g) 3)))
 
-      (test-end))))
+      (test-end "srfi-1")
