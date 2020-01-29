@@ -3,7 +3,6 @@
 
 (test-begin "srfi-26")
 
-;; The test cases are taken from the SRFI-26 test program by Sebastian Egner.
 (test-equal "cut list" '() ((cut list)))
 (test-equal "cut list <...>" '() ((cut list <...>)))
 (test-equal "cut list 1" '(1) ((cut list 1)))
