@@ -26,13 +26,13 @@
 
       (test-begin "srfi-16")
 
-      (test 0 (plus))
-      (test 1 (plus 1))
-      (test 6 (plus 1 2 3))
+      (test-eqv 0 (plus))
+      (test-eqv 1 (plus 1))
+      (test-eqv 6 (plus 1 2 3))
       (test-error ((case-lambda ((a) a) ((a b) (* a b))) 1 2 3))
 
-      (test "" (print-to-string))
-      (test "hi" (print-to-string 'hi))
-      (test "hi there world" (print-to-string 'hi 'there 'world))
+      (test-equal "" (print-to-string))
+      (test-equal "hi" (print-to-string 'hi))
+      (test-equal "hi there world" (print-to-string 'hi 'there 'world))
 
       (test-end "srfi-16")
