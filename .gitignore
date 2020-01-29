@@ -1,5 +1,6 @@
 *.log
 /chibi
+/chicken
 /gauche
 /guile
 /kawa
