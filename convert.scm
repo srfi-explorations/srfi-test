@@ -78,7 +78,8 @@
       (cond-expand
         (r7rs
          (call-with-port (open-output-string)
-                         (lambda (out) (write x out) (get-output-string out))))
+                         (lambda (out) (write x out)
+                                 (get-output-string out))))
         (else
          (call-with-output-string (lambda (out) (write x out))))))
 
