@@ -3,10 +3,10 @@
       (let ((x 'orig))
         (let ((f (cute list x)))
           (set! x 'wrong)
-          (test '(orig) (f))))
+          (test-equal '(orig) (f))))
       (let ((x 'wrong))
         (let ((f (cut list x)))
           (set! x 'right)
-          (test '(right) (f))))
+          (test-equal '(right) (f))))
 
 (test-end "srfi-26")
