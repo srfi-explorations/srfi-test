@@ -1,10 +1,5 @@
-(define-library (srfi 16 test)
-  (export run-tests)
-  (import (chibi) (chibi test) (srfi 16))
-  (begin
-    (define (run-tests)
       (define plus
-        (case-lambda 
+        (case-lambda
          (() 0)
          ((x) x)
          ((x y) (+ x y))
@@ -29,7 +24,7 @@
             (lambda () (current-output-port old-out)))
           (get-output-string out)))
 
-      (test-begin "srfi-16: case-lambda")
+      (test-begin "srfi-16")
 
       (test 0 (plus))
       (test 1 (plus 1))
@@ -40,4 +35,4 @@
       (test "hi" (print-to-string 'hi))
       (test "hi there world" (print-to-string 'hi 'there 'world))
 
-      (test-end))))
+      (test-end "srfi-16")
