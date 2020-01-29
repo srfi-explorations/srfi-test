@@ -9,7 +9,14 @@
   (gambit (import (gambit)))
   (r7rs (import (scheme base) (scheme file) (scheme read) (scheme write))))
 
+;; Chibi currently cannot refer to an identifier in the same
+;; cond-expand where it was imported.
+(cond-expand (chibi (import (only (chibi filesystem) create-directory*)))
+             (else))
+
 (cond-expand
+  (chibi
+   (define ensure-directory-exists create-directory*))
   (chicken
    (import (rename (only (chicken file) create-directory)
                    (create-directory ensure-directory-exists))))
