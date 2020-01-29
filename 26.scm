@@ -15,7 +15,8 @@
 (test-equal "cut list 1 <...>" '(1 2) ((cut list 1 <...>) 2))
 (test-equal "cut list 1 <...>" '(1 2 3 4) ((cut list 1 <...>) 2 3 4))
 (test-equal "cut list 1 <> 3 <>" '(1 2 3 4) ((cut list 1 <> 3 <>) 2 4))
-(test-equal "cut list 1 <> 3 <...>" '(1 2 3 4 5 6) ((cut list 1 <> 3 <...>) 2 4 5 6))
+(test-equal "cut list 1 <> 3 <...>"
+  '(1 2 3 4 5 6) ((cut list 1 <> 3 <...>) 2 4 5 6))
 (test-equal "cut (eval order)" '(ok)
        (let* ([x 'wrong] [y (cut list x)]) (set! x 'ok) (y)))
 (test-equal "cut (eval order)" 2
@@ -34,7 +35,8 @@
 (test-equal "cute list 1 <...>" '(1 2) ((cute list 1 <...>) 2))
 (test-equal "cute list 1 <...>" '(1 2 3 4) ((cute list 1 <...>) 2 3 4))
 (test-equal "cute list 1 <> 3 <>" '(1 2 3 4) ((cute list 1 <> 3 <>) 2 4))
-(test-equal "cute list 1 <> 3 <...>" '(1 2 3 4 5 6) ((cute list 1 <> 3 <...>) 2 4 5 6))
+(test-equal "cute list 1 <> 3 <...>"
+  '(1 2 3 4 5 6) ((cute list 1 <> 3 <...>) 2 4 5 6))
 (test-equal "cute (eval order)" '(ok)
        (let* ([x 'ok] [y (cute list x)]) (set! x 'wrong) (y)))
 (test-equal "cute (eval order)" 1
