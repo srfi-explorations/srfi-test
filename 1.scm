@@ -182,9 +182,5 @@
 (test-equal #t (lset= eq? '(d c b i o u) (lset-xor eq? '(a b c d e) '(a e i o u))))
 (test-equal '() (lset-xor eq?))
 (test-equal '(a b c d e) (lset-xor eq? '(a b c d e)))
-(let ((f (lambda () (list 'not-a-constant-list)))
-      (g (lambda () '(constant-list))))
-  ;;(test '*unspecified* (set-car! (f) 3))
-  (test-error (set-car! (g) 3)))
 
 (test-end "srfi-1")
