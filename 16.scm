@@ -1,3 +1,6 @@
+;; Copyright 2015 Alex Shinn
+;; SPDX-License-Identifier: MIT
+
 (define plus
   (case-lambda
     (() 0)
