@@ -1,4 +1,4 @@
-;; Copyright 2019 Lassi Kortela
+;; Copyright 2020 Lassi Kortela
 ;; SPDX-License-Identifier: MIT
 
 ;;; Convert the generic tests to work with the quirks of particular
