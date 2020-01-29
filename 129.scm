@@ -2,7 +2,7 @@
 ;; Copyright 2020 Lassi Kortela
 ;; SPDX-License-Identifier: MIT
 
-(test-begin "titlecase")
+(test-begin "srfi-129")
 
 (define uchar integer->char)
 (define (ustring . xs)
@@ -49,4 +49,4 @@
 (test-equal Ljubljana (string-titlecase ljubljana))
 (test-end "string")
 
-(test-end "titlecase")
+(test-end "srfi-129")
