@@ -1,3 +1,7 @@
+;; Copyright 2002 Sebastian Egner
+;; Copyright 2015 Alex Shinn
+;; SPDX-License-Identifier: MIT
+
 (test-begin "srfi-26")
 
 ;; The test cases are taken from the SRFI-26 test program by Sebastian Egner.
