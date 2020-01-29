@@ -5,6 +5,7 @@
     ((x y) (+ x y))
     ((x y z) (+ (+ x y) z))
     (args (apply + args))))
+
 (define print
   (case-lambda
     (()
@@ -15,6 +16,7 @@
      (display arg)
      (display " ")
      (apply print args))))
+
 (define (print-to-string . args)
   (let ((out (open-output-string))
         (old-out (current-output-port)))
