@@ -1,4 +1,5 @@
-;; TODO: License. From Gauche. Written by Shiro Kawai?
+;; Copyright 2011 Shiro Kawai
+;; SPDX-License-Identifier: MIT
 
 ;; TODO: There are more tests for procedure sin this SRFI in Gauche's
 ;; test/numbers.scm.
