@@ -1,3 +1,7 @@
+;; Copyright 1998, 1999 Olin Shivers
+;; Copyright 2012, 2014, 2015 Alex Shinn
+;; SPDX-License-Identifier: MIT
+
 (test-begin "srfi-1")
 
 ;; srfi-1 examples
