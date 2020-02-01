@@ -35,6 +35,8 @@
                    (create-directory ensure-directory-exists)))))
 
 (cond-expand
+  (chicken
+   (import (only (chicken pretty-print) pretty-print)))
   (gambit
    (define (pretty-print x)
      (pp x (current-output-port))))
