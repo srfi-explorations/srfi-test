@@ -1,5 +1,5 @@
-;; Copyright 2015, 2016 Alex Shinn
-;; SPDX-License-Identifier: BSD-3-Clause
+;; Copyright 2010, 2012 Alex Shinn
+;; SPDX-License-Identifier: MIT
 
 (test-begin "srfi-69")
 
