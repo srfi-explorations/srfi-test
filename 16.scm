@@ -1,4 +1,5 @@
-;; Copyright 2015 Alex Shinn
+;; Copyright 2000 Lars T Hansen
+;; Copyright 2012 Alex Shinn
 ;; SPDX-License-Identifier: MIT
 
 (test-begin "srfi-16")
