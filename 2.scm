@@ -1,3 +1,7 @@
+;; Copyright 1999 Oleg Kiselyov
+;; Copyright 2012 Alex Shinn
+;; SPDX-License-Identifier: MIT
+
 (test-begin "srfi-2")
 
 (test-equal 1 (and-let* () 1))
