@@ -2,7 +2,8 @@
 
 ## The tests are
 
-* Written in SRFI 64 syntax _(A Scheme API for test suites)_.
+* Written in [SRFI 64](https://srfi.schemers.org/srfi-64/) syntax _(A
+  Scheme API for test suites)_.
 * Available under the MIT License, like the SRFIs themselves.
 
 ## Test sources
