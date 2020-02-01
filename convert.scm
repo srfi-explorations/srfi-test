@@ -7,6 +7,7 @@
 (cond-expand
   (chicken)
   (gambit (import (gambit)))
+  (guile)
   (r7rs (import (scheme base) (scheme file) (scheme read) (scheme write))))
 
 ;; Chibi currently cannot refer to an identifier in the same
@@ -25,7 +26,13 @@
      (or (file-exists? path) (create-directory path))))
   (gauche
    (import (rename (only (file util) create-directory*)
-                   (create-directory* ensure-directory-exists)))))
+                   (create-directory* ensure-directory-exists))))
+  (guile
+   (define (ensure-directory-exists path)
+     (or (file-exists? path) (mkdir path))))
+  (kawa
+   (import (rename (only (kawa base) create-directory)
+                   (create-directory ensure-directory-exists)))))
 
 (cond-expand
   (gambit
@@ -35,6 +42,11 @@
    (import (only (gauche base) pprint))
    (define (pretty-print x)
      (pprint x)))
+  (guile
+   (use-modules (ice-9 pretty-print)))
+  (kawa
+   (import (rename (only (kawa pprint) pprint)
+                   (pprint pretty-print))))
   (else
    (define (pretty-print x)
      (write x)
