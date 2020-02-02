@@ -1,4 +1,6 @@
-;; TODO: License. From Chibi-Scheme. Written by Alex Shinn?
+;; Copyright 2001, 2002, 2011, 2012 Shiro Kawai
+;; Copyright 2016 Alex Shinn
+;; SPDX-License-Identifier: MIT
 
 (define (sc str c)
   (string-index->cursor str c))
@@ -9,8 +11,6 @@
 (define char-set:not-letter (char-set-complement char-set:letter))
 
 (test-begin "srfi-130")
-
-;; tests adapted from Gauche's SRFI 13 tests, via Chicken
 
 (test-equal "string-null?" #f (string-null? "abc"))
 (test-equal "string-null?" #t (string-null? ""))
