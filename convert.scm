@@ -47,8 +47,10 @@
   (guile
    (use-modules (ice-9 pretty-print)))
   (kawa
-   (import (rename (only (kawa pprint) pprint)
-                   (pprint pretty-print))))
+   (import (only (kawa pprint) pprint))
+   (define (pretty-print x)
+     (pprint x)
+     (newline)))
   (else
    (define (pretty-print x)
      (write x)
@@ -72,7 +74,6 @@
         (unless (null? forms)
           (unless first? (newline))
           (pretty-print (car forms))
-          (newline)
           (loop #f (cdr forms)))))))
 
 ;;
