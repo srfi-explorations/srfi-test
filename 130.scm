@@ -494,10 +494,8 @@
   (equal? '#() (string->vector/cursors "abc" 3)))
 (test-assert "string->vector/cursors"
   (equal? '#(#\b #\c) (string->vector/cursors "abc" 1 3)))
-(test-assert
-    "string->vector/cursors"
-  (equal?
-   '#(#\b #\c)
+(test-assert "string->vector/cursors"
+  (equal? '#(#\b #\c)
    (string->vector/cursors "abc" (string-index->cursor "abc" 1)
                            (string-index->cursor "abc" 3))))
 (test-assert "reverse-list->string" (equal? "" (reverse-list->string '())))
@@ -510,16 +508,14 @@
 (test-assert "string-join"
   (equal? "abcdef" (string-join '("" "ab" "cd" "" "e" "f" "") "")))
 (test-assert "string-join" (equal? "" (string-join '() "xyz")))
-(test-assert
-    "string-join"
+(test-assert "string-join"
   (equal? "xyzabxyzcdxyzxyzexyzfxyz"
           (string-join '("" "ab" "cd" "" "e" "f" "") "xyz")))
 (test-assert "string-join" (equal? "" (string-join '() "" 'infix)))
 (test-assert "string-join"
   (equal? "abcdef" (string-join '("" "ab" "cd" "" "e" "f" "") "" 'infix)))
 (test-assert "string-join" (equal? "" (string-join '() "xyz" 'infix)))
-(test-assert
-    "string-join"
+(test-assert "string-join"
   (equal? "xyzabxyzcdxyzxyzexyzfxyz"
           (string-join '("" "ab" "cd" "" "e" "f" "") "xyz" 'infix)))
 (test-assert "string-join"
@@ -538,16 +534,14 @@
 (test-assert "string-join"
   (equal? "abcdef" (string-join '("" "ab" "cd" "" "e" "f" "") "" 'suffix)))
 (test-assert "string-join" (equal? "" (string-join '() "xyz" 'suffix)))
-(test-assert
-    "string-join"
+(test-assert "string-join"
   (equal? "xyzabxyzcdxyzxyzexyzfxyzxyz"
           (string-join '("" "ab" "cd" "" "e" "f" "") "xyz" 'suffix)))
 (test-assert "string-join" (equal? "" (string-join '() "" 'prefix)))
 (test-assert "string-join"
   (equal? "abcdef" (string-join '("" "ab" "cd" "" "e" "f" "") "" 'prefix)))
 (test-assert "string-join" (equal? "" (string-join '() "xyz" 'prefix)))
-(test-assert
-    "string-join"
+(test-assert "string-join"
   (equal? "xyzxyzabxyzcdxyzxyzexyzfxyz"
           (string-join '("" "ab" "cd" "" "e" "f" "") "xyz" 'prefix)))
 
@@ -563,10 +557,8 @@
 (test-assert "substring/cursors" (string=? "" (substring/cursors "abc" 0 0)))
 (test-assert "substring/cursors" (string=? "" (substring/cursors "abc" 3 3)))
 (test-assert "substring/cursors" (string=? ABC (substring/cursors ABC 0 3)))
-(test-assert
-    "substring/cursors"
-  (string=?
-   ABC
+(test-assert "substring/cursors"
+  (string=? ABC
    (substring/cursors ABC (string-index->cursor "abc" 0)
                       (string-index->cursor "abc" 3))))
 (test-assert "substring/cursors" (string=? "b" (substring/cursors "abc" 1 2)))
@@ -1414,34 +1406,26 @@
             (string-concatenate-reverse '("" "a" "bcd" "" "ef" "" ""))))
 (test-assert "string-concatenate-reverse"
   (string=? "huh?" (string-concatenate-reverse '() "huh?")))
-(test-assert
-    "string-concatenate-reverse"
+(test-assert "string-concatenate-reverse"
   (string=? "efbcdaxy"
             (string-concatenate-reverse '("" "a" "bcd" "" "ef" "" "") "xy")))
 (test-assert "string-concatenate-reverse"
   (string=? "huh" (string-concatenate-reverse '() "huh?" 3)))
-(test-assert
-    "string-concatenate-reverse"
+(test-assert "string-concatenate-reverse"
   (string=? "efbcdax"
             (string-concatenate-reverse '("" "a" "bcd" "" "ef" "" "") "x" 1)))
-(test-assert
-    "string-fold"
-  (=
-   8
-   (string-fold (lambda (c count) (if (char-whitespace? c) (+ count 1) count))
-                0 " ...a couple of spaces in this one... ")))
-(test-assert
-    "string-fold"
-  (=
-   7
-   (string-fold (lambda (c count) (if (char-whitespace? c) (+ count 1) count))
-                0 " ...a couple of spaces in this one... " 1)))
-(test-assert
-    "string-fold"
-  (=
-   6
-   (string-fold (lambda (c count) (if (char-whitespace? c) (+ count 1) count))
-                0 " ...a couple of spaces in this one... " 1 32)))
+(test-assert "string-fold"
+  (= 8 (string-fold (lambda (c count)
+                      (if (char-whitespace? c) (+ count 1) count))
+                    0 " ...a couple of spaces in this one... ")))
+(test-assert "string-fold"
+  (= 7 (string-fold (lambda (c count)
+                      (if (char-whitespace? c) (+ count 1) count))
+                    0 " ...a couple of spaces in this one... " 1)))
+(test-assert "string-fold"
+  (= 6 (string-fold (lambda (c count)
+                      (if (char-whitespace? c) (+ count 1) count))
+                    0 " ...a couple of spaces in this one... " 1 32)))
 (test-assert "string-fold-right"
   (equal? (string->list "abcdef") (string-fold-right cons '() "abcdef")))
 (test-assert "string-fold-right"
@@ -1449,21 +1433,21 @@
 (test-assert "string-fold-right"
   (equal? (string->list "cde") (string-fold-right cons '() "abcdef" 2 5)))
 (test-assert "string-fold"
-  (string=?
-   "aabraacaadaabraa"
-   (let* ((s "abracadabra")
-          (ans-len
-           (string-fold (lambda (c sum) (+ sum (if (char=? c #\a) 2 1)))
-                        0 s))
-          (ans (make-string ans-len)))
-     (string-fold
-      (lambda (c i)
-        (let ((i (if (char=? c #\a)
-                     (begin (string-set! ans i #\a) (+ i 1))
-                     i)))
-          (string-set! ans i c) (+ i 1)))
-      0 s)
-     ans)))
+  (string=? "aabraacaadaabraa"
+            (let* ((s "abracadabra")
+                   (ans-len
+                    (string-fold (lambda (c sum)
+                                   (+ sum (if (char=? c #\a) 2 1)))
+                                 0 s))
+                   (ans (make-string ans-len)))
+              (string-fold (lambda (c i)
+                             (let ((i (if (char=? c #\a)
+                                          (begin (string-set! ans i #\a)
+                                                 (+ i 1))
+                                          i)))
+                               (string-set! ans i c) (+ i 1)))
+                           0 s)
+              ans)))
 (test-assert "string-for-each-cursor"
   (equal?
    '(101 100 99 98 97)
@@ -1502,19 +1486,16 @@
 (test-assert "string-split" (equal? '("a" "b" "c") (string-split "abc" "")))
 (test-assert "string-split"
   (equal? '("too" "" "much" "" "data") (string-split "too  much  data" " ")))
-(test-assert
-    "string-split"
+(test-assert "string-split"
   (equal? '("" "there" "ya" "go" "")
           (string-split "***there***ya***go***" "***")))
 (test-assert "string-split" (equal? '() (string-split "" "" 'infix)))
 (test-assert "string-split"
   (equal? '("a" "b" "c") (string-split "abc" "" 'infix)))
-(test-assert
-    "string-split"
+(test-assert "string-split"
   (equal? '("too" "" "much" "" "data")
           (string-split "too  much  data" " " 'infix)))
-(test-assert
-    "string-split"
+(test-assert "string-split"
   (equal? '("" "there" "ya" "go" "")
           (string-split "***there***ya***go***" "***" 'infix)))
 (test-assert "string-split"
@@ -1523,131 +1504,106 @@
             (string-split "" "" 'strict-infix))))
 (test-assert "string-split"
   (equal? '("a" "b" "c") (string-split "abc" "" 'strict-infix)))
-(test-assert
-    "string-split"
+(test-assert "string-split"
   (equal? '("too" "" "much" "" "data")
           (string-split "too  much  data" " " 'strict-infix)))
-(test-assert
-    "string-split"
+(test-assert "string-split"
   (equal? '("" "there" "ya" "go" "")
           (string-split "***there***ya***go***" "***" 'strict-infix)))
 (test-assert "string-split" (equal? '() (string-split "" "" 'prefix)))
 (test-assert "string-split"
   (equal? '("a" "b" "c") (string-split "abc" "" 'prefix)))
-(test-assert
-    "string-split"
+(test-assert "string-split"
   (equal? '("too" "" "much" "" "data")
           (string-split "too  much  data" " " 'prefix)))
-(test-assert
-    "string-split"
+(test-assert "string-split"
   (equal? '("there" "ya" "go" "")
           (string-split "***there***ya***go***" "***" 'prefix)))
 (test-assert "string-split" (equal? '() (string-split "" "" 'suffix)))
 (test-assert "string-split"
   (equal? '("a" "b" "c") (string-split "abc" "" 'suffix)))
-(test-assert
-    "string-split"
+(test-assert "string-split"
   (equal? '("too" "" "much" "" "data")
           (string-split "too  much  data" " " 'suffix)))
-(test-assert
-    "string-split"
+(test-assert "string-split"
   (equal? '("" "there" "ya" "go")
           (string-split "***there***ya***go***" "***" 'suffix)))
 (test-assert "string-split" (equal? '() (string-split "" "" 'infix #f)))
 (test-assert "string-split"
   (equal? '("a" "b" "c") (string-split "abc" "" 'infix #f)))
-(test-assert
-    "string-split"
+(test-assert "string-split"
   (equal? '("too" "" "much" "" "data")
           (string-split "too  much  data" " " 'infix #f)))
-(test-assert
-    "string-split"
+(test-assert "string-split"
   (equal? '("" "there" "ya" "go" "")
           (string-split "***there***ya***go***" "***" 'infix #f)))
-(test-assert
-    "string-split"
+(test-assert "string-split"
   (equal? 'error
           (guard (exn (else 'error)) (string-split "" "" 'strict-infix #f))))
 (test-assert "string-split"
   (equal? '("a" "b" "c") (string-split "abc" "" 'strict-infix #f)))
-(test-assert
-    "string-split"
+(test-assert "string-split"
   (equal? '("too" "" "much" "" "data")
           (string-split "too  much  data" " " 'strict-infix #f)))
-(test-assert
-    "string-split"
+(test-assert "string-split"
   (equal? '("" "there" "ya" "go" "")
           (string-split "***there***ya***go***" "***" 'strict-infix #f)))
 (test-assert "string-split" (equal? '() (string-split "" "" 'prefix #f)))
 (test-assert "string-split"
   (equal? '("a" "b" "c") (string-split "abc" "" 'prefix #f)))
-(test-assert
-    "string-split"
+(test-assert "string-split"
   (equal? '("too" "" "much" "" "data")
           (string-split "too  much  data" " " 'prefix #f)))
-(test-assert
-    "string-split"
+(test-assert "string-split"
   (equal? '("there" "ya" "go" "")
           (string-split "***there***ya***go***" "***" 'prefix #f)))
 (test-assert "string-split" (equal? '() (string-split "" "" 'suffix #f)))
 (test-assert "string-split"
   (equal? '("a" "b" "c") (string-split "abc" "" 'suffix #f)))
-(test-assert
-    "string-split"
+(test-assert "string-split"
   (equal? '("too" "" "much" "" "data")
           (string-split "too  much  data" " " 'suffix #f)))
-(test-assert
-    "string-split"
+(test-assert "string-split"
   (equal? '("" "there" "ya" "go")
           (string-split "***there***ya***go***" "***" 'suffix #f)))
-(test-assert
-    "string-split"
+(test-assert "string-split"
   (equal? 'error
           (guard (exn (else 'error)) (string-split "" "" 'strict-infix 3))))
 (test-assert "string-split"
   (equal? '("a" "b" "c") (string-split "abc" "" 'strict-infix 3)))
-(test-assert
-    "string-split"
+(test-assert "string-split"
   (equal? '("too" "" "much" " data")
           (string-split "too  much  data" " " 'strict-infix 3)))
-(test-assert
-    "string-split"
+(test-assert "string-split"
   (equal? '("" "there" "ya" "go***")
           (string-split "***there***ya***go***" "***" 'strict-infix 3)))
 (test-assert "string-split" (equal? '() (string-split "" "" 'prefix 3)))
 (test-assert "string-split"
   (equal? '("a" "b" "c") (string-split "abc" "" 'prefix 3)))
-(test-assert
-    "string-split"
+(test-assert "string-split"
   (equal? '("too" "" "much" " data")
           (string-split "too  much  data" " " 'prefix 3)))
-(test-assert
-    "string-split"
+(test-assert "string-split"
   (equal? '("there" "ya" "go***")
           (string-split "***there***ya***go***" "***" 'prefix 3)))
 (test-assert "string-split" (equal? '() (string-split "" "" 'suffix 3)))
 (test-assert "string-split"
   (equal? '("a" "b" "c") (string-split "abc" "" 'suffix 3)))
-(test-assert
-    "string-split"
+(test-assert "string-split"
   (equal? '("too" "" "much" " data")
           (string-split "too  much  data" " " 'suffix 3)))
-(test-assert
-    "string-split"
+(test-assert "string-split"
   (equal? '("" "there" "ya" "go***")
           (string-split "***there***ya***go***" "***" 'suffix 3)))
-(test-assert
-    "string-split"
+(test-assert "string-split"
   (equal? 'error
           (guard (exn (else 'error)) (string-split "" "" 'strict-infix 3 0))))
 (test-assert "string-split"
   (equal? '("b" "c") (string-split "abc" "" 'strict-infix 3 1)))
-(test-assert
-    "string-split"
+(test-assert "string-split"
   (equal? '("oo" "" "much" " data")
           (string-split "too  much  data" " " 'strict-infix 3 1)))
-(test-assert
-    "string-split"
+(test-assert "string-split"
   (equal? '("**there" "ya" "go" "")
           (string-split "***there***ya***go***" "***" 'strict-infix 3 1)))
 (test-assert "string-split" (equal? '() (string-split "" "" 'prefix 3 0)))
