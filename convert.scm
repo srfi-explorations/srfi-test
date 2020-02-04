@@ -37,9 +37,7 @@
 (cond-expand
   (chicken
    (import (only (chicken pretty-print) pretty-print)))
-  (gambit
-   (define (pretty-print x)
-     (pp x (current-output-port))))
+  (gambit)  ;; A suitable pretty-print comes standard.
   (gauche
    (import (only (gauche base) pprint))
    (define (pretty-print x)
