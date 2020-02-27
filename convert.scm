@@ -117,10 +117,12 @@
                                  (scheme write)
                                  (scheme file)
                                  (chibi)
+                                 (rename (except (chibi test) test-equal)
+                                         (test test-equal))
                                  ,@(map (lambda (n) `(srfi ,n))
                                         (append
                                          ;; snow-chibi install '(srfi 64)'
-                                         '(27 64)
+                                         '(27)
                                          (srfi-dependencies srfi-number)
                                          (list srfi-number))))
                          (define (arity-error? e)
