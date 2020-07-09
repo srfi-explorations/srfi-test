@@ -38,6 +38,13 @@
 (test-eqv #f (ascii-space-or-tab? #\newline))
 (test-eqv #f (ascii-non-control? (integer->char #x0d)))
 
+(test-eqv #f (ascii-non-control? (integer->char #x00)))
+(test-eqv #f (ascii-non-control? (integer->char #x1f)))
+(test-eqv #t (ascii-non-control? (integer->char #x20)))
+(test-eqv #t (ascii-non-control? (integer->char #x7e)))
+(test-eqv #f (ascii-non-control? (integer->char #x7f)))
+(test-eqv #f (ascii-non-control? (integer->char #x80)))
+
 (let ((lowers "abcdefghijklmnopqrstuvwxyz")
       (uppers "ABCDEFGHIJKLMNOPQRSTUVWXYZ"))
   (let loop ((i 0))
