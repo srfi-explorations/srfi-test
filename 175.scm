@@ -70,7 +70,7 @@
            (test-eqv #t (ascii-non-control? cc))
            (test-eqv #f (ascii-other-graphic? cc))
            (test-eqv #f (ascii-control? cc))
-           (test-eqv #f (ascii-numeric? cc 10))
+           (test-eqv #f (ascii-numeric? cc))
            (test-eqv #f (ascii-whitespace? cc))
            (test-eqv #f (ascii-space-or-tab? cc)))
           ((ascii-control? cc)
@@ -180,9 +180,7 @@
     (or (= cc #x80) (and (<= (count-matching predicates cc) 1)
                          (check (+ cc 1))))))
 
-(define (decimal-numeric? x) (ascii-numeric? x 10))
-
-(test-eqv #t (union? ascii-alphanumeric? ascii-alphabetic? decimal-numeric?))
+(test-eqv #t (union? ascii-alphanumeric? ascii-alphabetic? ascii-numeric?))
 (test-eqv #t (union? ascii-alphabetic? ascii-upper-case? ascii-lower-case?))
 
 (test-eqv #t (subset? ascii-space-or-tab? ascii-whitespace?))
@@ -193,7 +191,7 @@
                       ascii-alphabetic? ascii-non-control?))
 (test-eqv #t (subset? ascii-alphabetic?
                       ascii-alphanumeric? ascii-non-control?))
-(test-eqv #t (subset? decimal-numeric?
+(test-eqv #t (subset? ascii-numeric?
                       ascii-alphanumeric? ascii-non-control?))
 (test-eqv #t (subset? ascii-alphanumeric? ascii-non-control?))
 
@@ -202,12 +200,12 @@
                         ascii-other-graphic?
                         ascii-upper-case?
                         ascii-lower-case?
-                        decimal-numeric?))
+                        ascii-numeric?))
 (test-eqv #t (disjoint? ascii-control?
                         ascii-other-graphic?
                         ascii-upper-case?
                         ascii-lower-case?
-                        decimal-numeric?))
+                        ascii-numeric?))
 
 (define (check-string-ci a b cmp)
   (test-eqv (= cmp 0) (ascii-string-ci=? a b))
