@@ -15,14 +15,12 @@
             (scheme process-context)
             (srfi 64))))
 
-(define test-prefix (with-input-from-file "test-prefix.txt" (lambda () (read-line))))
-
 ;;;
 ;;;  This is a test suite written in the notation of 
 ;;;  SRFI-64, A Scheme API for test suites
 ;;;
 
-(test-begin test-prefix)
+(test-begin "SRFI-64")
 
 ;;;
 ;;;  Ironically, in order to set up the meta-test environment,
@@ -945,7 +943,7 @@
 (test-end)
 |#
 
-(test-end test-prefix)
+(test-end "SRFI-64")
 
 ;;;
 
