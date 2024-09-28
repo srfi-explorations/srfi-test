@@ -215,7 +215,8 @@
 
 ;;
 
-(define all-srfis '(1 2 13 14 16 26 39 60 69 115 129 130 132 133 151 160 175))
+(define all-srfis
+  '(1 2 11 13 14 16 26 39 60 69 115 129 130 132 133 151 160 175))
 
 (for-each write-chibi-test all-srfis)
 (for-each write-chicken-test all-srfis)
