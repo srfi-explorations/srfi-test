@@ -2,25 +2,28 @@
   (guile
     (import (scheme base)
             (scheme file)
+            (scheme write)
             (scheme process-context)
             (srfi srfi-64)))
   (racket ; For some reason racket needs to be here
     (import (scheme base)
             (scheme file)
+            (scheme write)
             (scheme process-context)
             (srfi 64)))
   (else
     (import (scheme base)
             (scheme file)
+            (scheme write)
             (scheme process-context)
             (srfi 64))))
 
 ;;;
-;;;  This is a test suite written in the notation of 
+;;;  This is a test suite written in the notation of
 ;;;  SRFI-64, A Scheme API for test suites
 ;;;
 
-(test-begin "SRFI-64")
+(test-begin "srfi-64")
 
 ;;;
 ;;;  Ironically, in order to set up the meta-test environment,
@@ -29,7 +32,7 @@
 ;;;
 
 ;;;  The `prop-runner' invokes `thunk' in the context of a new
-;;;  test runner, and returns the indicated properties of the 
+;;;  test runner, and returns the indicated properties of the
 ;;;  last-executed test result.
 
 (define (prop-runner props thunk)
@@ -316,24 +319,20 @@
 (test-equal "4.1. Normal exit path"
             '(in 1 2 out)
             (let ((ex '()))
-              (define (do s)
-                (set! ex (cons s ex)))
               ;;
               (triv-runner
                 (lambda ()
                   (test-group-with-cleanup
                     "foo"
-                    (do 'in)
-                    (do 1)
-                    (do 2)
-                    (do 'out))))
+                    (set! ex (cons 'in ex))
+                    (set! ex (cons 1 ex))
+                    (set! ex (cons 2 ex))
+                    (set! ex (cons 'out ex)))))
               (reverse ex)))
 
 (test-equal "4.2. Exception exit path"
             '(in 1 out)
             (let ((ex '()))
-              (define (do s)
-                (set! ex (cons s ex)))
               ;;
               ;; the outer runner is to run the `test-error' in, to
               ;; catch the exception raised in the inner runner,
@@ -347,11 +346,11 @@
                       (lambda ()
                         (test-group-with-cleanup
                           "foo"
-                          (do 'in) (test-assert #t)
-                          (do 1)   (test-assert #t)
+                          (set! ex (cons 'in ex)) (test-assert #t)
+                          (set! ex (cons 1 ex))   (test-assert #t)
                           (choke)  (test-assert #t)
-                          (do 2)   (test-assert #t)
-                          (do 'out)))))))
+                          (set! ex (cons 2 ex))   (test-assert #t)
+                          (set! ex (cons 'out ex))))))))
               (reverse ex)))
 
 (test-end "4. Handling set-up and cleanup")
@@ -943,7 +942,7 @@
 (test-end)
 |#
 
-(test-end "SRFI-64")
+(test-end "srfi-64")
 
 ;;;
 
