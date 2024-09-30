@@ -5,3 +5,5 @@
 /gauche
 /guile
 /kawa
+/r7rs-libraries
+/r7rs-programs
