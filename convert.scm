@@ -107,22 +107,50 @@
 
     ))
 
+(define (r7rs-imports srfi-number)
+  ;; TODO: Customize based on srfi-number.
+  '((scheme base)
+    (scheme char)
+    (scheme write)
+    (scheme file)))
+
+(define (srfi-import-numbers srfi-number . extra-srfi-numbers)
+  (append (list srfi-number)
+          (srfi-dependencies srfi-number)
+          extra-srfi-numbers))
+
+(define (srfi-imports srfi-number . extra-srfi-numbers)
+  (map (lambda (n) `(srfi ,n))
+       (apply srfi-import-numbers srfi-number extra-srfi-numbers)))
+
 ;;
+
+(define (write-r7rs-test-library srfi-number)
+  (let ((scm-basename (string-append (number->string srfi-number) ".scm"))
+        (sld-basename (string-append (number->string srfi-number) ".sld")))
+    (write-source-file "r7rs-libraries/srfi-test" sld-basename
+                       `((define-library (srfi-test ,srfi-number)
+                           (export)
+                           (import ,@(r7rs-imports srfi-number)
+                                   ,@(srfi-imports srfi-number 64))
+                           (begin ,@prelude)
+                           (include ,(string-append "../../" scm-basename)))))))
+
+(define (write-r7rs-test-program srfi-number)
+  (let ((basename (string-append (number->string srfi-number) ".scm")))
+    (write-source-file "r7rs-programs" basename
+                       `((import ,@(r7rs-imports srfi-number)
+                                 ,@(srfi-imports srfi-number 64))
+                         ,@prelude
+                         ,@(read-source-file basename)))))
 
 (define (write-chibi-test srfi-number)
   (let ((basename (string-append (number->string srfi-number) ".scm")))
     (write-source-file "chibi" basename
-                       `((import (scheme base)
-                                 (scheme char)
-                                 (scheme write)
-                                 (scheme file)
+                       `((import ,@(r7rs-imports srfi-number)
                                  (chibi)
-                                 ,@(map (lambda (n) `(srfi ,n))
-                                        (append
-                                         ;; snow-chibi install '(srfi 64)'
-                                         '(27 64)
-                                         (srfi-dependencies srfi-number)
-                                         (list srfi-number))))
+                                 ;; snow-chibi install '(srfi 64)'
+                                 ,@(srfi-imports srfi-number 64))
                          (define (arity-error? e)
                            (and (error-object? e)
                                 (let ((m (error-object-message e)))
@@ -143,15 +171,9 @@
 (define (write-chicken-test srfi-number)
   (let ((basename (string-append (number->string srfi-number) ".scm")))
     (write-source-file "chicken" basename
-                       `((import
-                           (chicken base)
-                           (chicken port)
-                           ,@(map (lambda (n) `(srfi ,n))
-                                  (append
-                                   ;; chicken-install srfi-64
-                                   '(64)
-                                   (srfi-dependencies srfi-number)
-                                   (list srfi-number))))
+                       `((import (chicken base)
+                                 (chicken port)
+                                 ,@(srfi-imports srfi-number 64))
                          (import (rename
                                   (only (chicken random)
                                         pseudo-random-integer)
@@ -166,15 +188,8 @@
 (define (write-gauche-test srfi-number)
   (let ((basename (string-append (number->string srfi-number) ".scm")))
     (write-source-file "gauche" basename
-                       `((import
-                           (scheme base)
-                           (scheme char)
-                           (scheme write)
-                           (scheme file)
-                           ,@(map (lambda (n) `(srfi ,n))
-                                  (append '(27 64)
-                                          (srfi-dependencies srfi-number)
-                                          (list srfi-number))))
+                       `((import ,@(r7rs-imports srfi-number)
+                                 ,@(srfi-imports srfi-number 64))
                          (define (call-with-false-on-error proc)
                            (guard (_ (else #f)) (proc)))
                          ,@prelude
@@ -184,14 +199,12 @@
   (let ((basename (string-append (number->string srfi-number) ".scm")))
     (write-source-file "guile" basename
                        `((import
-                           (guile)
-                           ,@(map (lambda (n)
-                                    `(srfi ,(string->symbol
-                                             (string-append
-                                              ":" (number->string n)))))
-                                  (append '(27 64)
-                                          (srfi-dependencies srfi-number)
-                                          (list srfi-number))))
+                          (guile)
+                          ,@(map (lambda (n)
+                                   `(srfi ,(string->symbol
+                                            (string-append
+                                             ":" (number->string n)))))
+                                 (srfi-import-numbers srfi-number 64)))
                          (define (call-with-false-on-error proc)
                            (catch #t proc (lambda (return) (return #f))))
                          ,@prelude
@@ -201,10 +214,8 @@
   (let ((basename (string-append (number->string srfi-number) ".scm")))
     (write-source-file "kawa" basename
                        `((import
-                           (kawa base) ; base includes SRFI 64
-                           ,@(map (lambda (n) `(srfi ,n))
-                                  (append (srfi-dependencies srfi-number)
-                                          (list srfi-number))))
+                          (kawa base) ; base includes SRFI 64
+                          ,@(srfi-imports srfi-number 64))
                          (define (random-integer limit)
                            (let ((source (java.util.Random)))
                              (source:nextInt limit)))
@@ -218,6 +229,8 @@
 (define all-srfis
   '(1 2 11 13 14 16 26 39 60 69 115 129 130 132 133 151 160 175))
 
+(for-each write-r7rs-test-library all-srfis)
+(for-each write-r7rs-test-program all-srfis)
 (for-each write-chibi-test all-srfis)
 (for-each write-chicken-test all-srfis)
 (for-each write-gauche-test all-srfis)
