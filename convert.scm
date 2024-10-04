@@ -117,6 +117,7 @@
   '((scheme base)
     (scheme char)
     (scheme write)
+    (scheme process-context)
     (scheme file)))
 
 (define (srfi-import-numbers srfi-number . extra-srfi-numbers)
