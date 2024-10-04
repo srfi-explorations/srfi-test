@@ -1,23 +1,3 @@
-(cond-expand
-  (guile
-    (import (scheme base)
-            (scheme file)
-            (scheme write)
-            (scheme process-context)
-            (srfi srfi-64)))
-  (racket ; For some reason racket needs to be here
-    (import (scheme base)
-            (scheme file)
-            (scheme write)
-            (scheme process-context)
-            (srfi 64)))
-  (else
-    (import (scheme base)
-            (scheme file)
-            (scheme write)
-            (scheme process-context)
-            (srfi 64))))
-
 ;;;
 ;;;  This is a test suite written in the notation of
 ;;;  SRFI-64, A Scheme API for test suites
