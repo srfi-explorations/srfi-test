@@ -9,11 +9,9 @@
         (scheme read)
         (scheme write))
 
-#;(cond-expand
-  (chicken)
+(cond-expand
   (gambit (import (gambit)))
-  (guile)
-  (r7rs (import (scheme base) (scheme file) (scheme read) (scheme write))))
+  (else))
 
 ;; Chibi currently cannot refer to an identifier in the same
 ;; cond-expand where it was imported.
