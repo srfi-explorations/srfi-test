@@ -4,7 +4,12 @@
 ;;; Convert the generic tests to work with the quirks of particular
 ;;; Scheme implementations.
 
-(cond-expand
+(import (scheme base)
+        (scheme file)
+        (scheme read)
+        (scheme write))
+
+#;(cond-expand
   (chicken)
   (gambit (import (gambit)))
   (guile)
