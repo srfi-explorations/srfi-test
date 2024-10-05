@@ -91,7 +91,7 @@
 (test-equal #x8e73b0f7da0e6452c810f32b809079e5
     (arithmetic-shift #x8e73b0f7da0e6452c810f32b809079e562f8ead2522c6b7b -64))
 
-(test-not (bit-set? 64 1))
+(test-equal (bit-set? 64 1) #f)
 (test-assert (bit-set? 64 #x10000000000000000))
 
 (test-equal 3 (bitwise-merge 1 1 2))
