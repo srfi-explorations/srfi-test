@@ -210,19 +210,17 @@
          (string-titlecase! s 2 9)
          s))
 
-(test-equal "string-upcase" "SPEAK LOUDLY"
-       (string-upcase "speak loudly"))
-(test-equal "string-upcase" "PEAK"
-       (string-upcase "speak loudly" 1 5))
+;; Already in R7RS
+;(test-equal "string-upcase" "SPEAK LOUDLY" (string-upcase "speak loudly"))
+;(test-equal "string-upcase" "PEAK" (string-upcase "speak loudly" 1 5))
 (test-equal "string-upcase!" "sPEAK loudly"
        (let ((s (string-copy "speak loudly")))
          (string-upcase! s 1 5)
          s))
 
-(test-equal "string-downcase" "speak softly"
-       (string-downcase "SPEAK SOFTLY"))
-(test-equal "string-downcase" "peak"
-       (string-downcase "SPEAK SOFTLY" 1 5))
+;; Already in R7RS
+;(test-equal "string-downcase" "speak softly" (string-downcase "SPEAK SOFTLY"))
+;(test-equal "string-downcase" "peak" (string-downcase "SPEAK SOFTLY" 1 5))
 (test-equal "string-downcase!" "Speak SOFTLY"
        (let ((s (string-copy "SPEAK SOFTLY")))
          (string-downcase! s 1 5)
