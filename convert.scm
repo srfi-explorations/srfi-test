@@ -116,7 +116,8 @@
     (scheme char)
     (scheme write)
     (scheme process-context)
-    (scheme file)))
+    (scheme file)
+    (scheme cxr)))
 
 (define (srfi-import-numbers srfi-number . extra-srfi-numbers)
   (append (list srfi-number)
@@ -231,7 +232,7 @@
 ;;
 
 (define all-srfis
-  '(1 2 8 11 13 14 16 26 28 33 39 64 60 69 115 129 130 132 133 151 160 175))
+  '(1 2 8 11 13 14 16 19 26 28 33 39 64 60 69 115 129 130 132 133 151 160 175))
 
 (for-each write-r7rs-test-library all-srfis)
 (for-each write-r7rs-test-program all-srfis)
