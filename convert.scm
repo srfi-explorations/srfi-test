@@ -108,16 +108,34 @@
 
     (define (symbol<? a b) (string<? (symbol->string a) (symbol->string b)))
 
+    (define (call-with-false-on-error proc)
+                           (guard (_ (else #f)) (proc)))
+
     ))
 
 (define (r7rs-imports srfi-number)
-  ;; TODO: Customize based on srfi-number.
-  '((scheme base)
-    (scheme char)
-    (scheme write)
-    (scheme process-context)
-    (scheme file)
-    (scheme cxr)))
+  (cond
+    ((= srfi-number 13)
+     '((except (scheme base) string-copy string-map string-for-each string-fill! string-copy!
+               string->list)
+       (except (scheme char) string-upcase string-downcase)
+       (scheme write)
+       (scheme process-context)
+       (scheme file)
+       (scheme cxr)))
+    ((= srfi-number 39)
+     '((except (scheme base) make-parameter parameterize)
+       (scheme char)
+       (scheme write)
+       (scheme process-context)
+       (scheme file)
+       (scheme cxr)))
+    (else '((scheme base)
+            (scheme char)
+            (scheme write)
+            (scheme process-context)
+            (scheme file)
+            (scheme cxr)))))
 
 (define (srfi-import-numbers srfi-number . extra-srfi-numbers)
   (append (list srfi-number)
@@ -145,15 +163,12 @@
   (let ((basename (string-append (number->string srfi-number) ".scm")))
     (write-source-file "r7rs-programs" basename
                        ;; Do not double import SRFI-64, Foment throws error
-                       (if (= srfi-number 64)
                        `((import ,@(r7rs-imports srfi-number)
-                                 ,@(srfi-imports srfi-number))
+                                 ,@(if (= srfi-number 64)
+                                    (srfi-imports srfi-number 64)
+                                    (srfi-imports srfi-number 64)))
                          ,@prelude
-                         ,@(read-source-file basename))
-                       `((import ,@(r7rs-imports srfi-number)
-                                 ,@(srfi-imports srfi-number 64))
-                         ,@prelude
-                         ,@(read-source-file basename))))))
+                         ,@(read-source-file basename)))))
 
 (define (write-chibi-test srfi-number)
   (let ((basename (string-append (number->string srfi-number) ".scm")))
