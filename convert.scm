@@ -144,10 +144,16 @@
 (define (write-r7rs-test-program srfi-number)
   (let ((basename (string-append (number->string srfi-number) ".scm")))
     (write-source-file "r7rs-programs" basename
+                       ;; Do not double import SRFI-64, Foment throws error
+                       (if (= srfi-number 64)
+                       `((import ,@(r7rs-imports srfi-number)
+                                 ,@(srfi-imports srfi-number))
+                         ,@prelude
+                         ,@(read-source-file basename))
                        `((import ,@(r7rs-imports srfi-number)
                                  ,@(srfi-imports srfi-number 64))
                          ,@prelude
-                         ,@(read-source-file basename)))))
+                         ,@(read-source-file basename))))))
 
 (define (write-chibi-test srfi-number)
   (let ((basename (string-append (number->string srfi-number) ".scm")))
