@@ -165,7 +165,7 @@
                        ;; Do not double import SRFI-64, Foment throws error
                        `((import ,@(r7rs-imports srfi-number)
                                  ,@(if (= srfi-number 64)
-                                    (srfi-imports srfi-number 64)
+                                    (srfi-imports srfi-number)
                                     (srfi-imports srfi-number 64)))
                          ,@prelude
                          ,@(read-source-file basename)))))
