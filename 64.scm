@@ -141,8 +141,7 @@
   '(("a" "a") () () () () (2 0 0 0 0))
   (triv-runner (lambda () (test-assert "a" #t) (test-assert "a" #t))))
 
-(define (choke)
-  (vector-ref '#(1 2) 3))
+(define (choke) (error "Intentional test error"))
 
 (test-equal
 "1.1.4. One way to FAIL is to throw an error"
@@ -183,7 +182,7 @@
   (triv-runner
     (lambda ()
       ;; PASS
-      (test-error (vector-ref '#(1 2) 9)))))
+      (test-error (choke)))))
 
 (test-equal
   "2.1.2. Baseline test; FAIL with no optional args"
@@ -200,7 +199,7 @@
   (triv-runner
     (lambda ()
       ;; PASS
-      (test-error "a" #t (vector-ref '#(1 2) 9)))))
+      (test-error "a" #t (choke)))))
 
 (test-end "2.1. test-error")
 
@@ -686,7 +685,7 @@
                      (test-begin "a")
                      (test-assert #t)             ; pass
                      (test-assert #f)             ; fail
-                     (test-assert (vector-ref '#(3) 10))  ; fail with error
+                     (test-assert (choke))  ; fail with error
                      (test-end "a")))
                  (eq? (test-runner-factory) test-runner-null))))
 
