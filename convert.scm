@@ -116,9 +116,21 @@
 (define (r7rs-imports srfi-number)
   (cond
     ((= srfi-number 13)
-     '((except (scheme base) string-copy string-map string-for-each string-fill! string-copy!
+     '((except (scheme base)
+               string-copy
+               string-map
+               string-for-each
+               string-fill!
+               string-copy!
                string->list)
-       (scheme char)
+       (except (scheme char)
+               char-ci=?
+               char-ci<?
+               char-downcase
+               char-upcase
+               char-alphabetic?
+               string-downcase
+               string-upcase)
        (scheme inexact)
        (except (scheme char) string-upcase string-downcase)
        (scheme write)
