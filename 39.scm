@@ -19,7 +19,7 @@
              (counter)))
   (test-eqv 246 (counter)))
 
-(let ((fahrenheit->celsius (lambda (f) (* 5/9 (- f 32)))))
+(let ((fahrenheit->celsius (lambda (f) (* (/ 5 9) (- f 32)))))
   (define celsius (make-parameter 0 fahrenheit->celsius))
   (test-eqv (fahrenheit->celsius 0) (celsius))
   (celsius 40)
