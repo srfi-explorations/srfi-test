@@ -184,7 +184,8 @@
                                     (srfi-imports srfi-number)
                                     (srfi-imports srfi-number 64)))
                          ,@prelude
-                         ,@(read-source-file basename)))))
+                         ,@(read-source-file basename)
+                         (exit 0)))))
 
 (define (write-chibi-test srfi-number)
   (let ((basename (string-append (number->string srfi-number) ".scm")))
