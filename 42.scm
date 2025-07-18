@@ -1,4 +1,3 @@
-(import (scheme file))
 
 (test-begin "srfi-42")
 ; <PLAINTEXT>
