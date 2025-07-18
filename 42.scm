@@ -1,3 +1,5 @@
+(import (scheme file))
+
 (test-begin "srfi-42")
 ; <PLAINTEXT>
 ; Examples for Eager Comprehensions in [outer..inner|expr]-Convention
@@ -287,7 +289,7 @@
 
 (my-check 
  (begin
-   (let ((f (my-open-output-file "tmp1")))
+   (let ((f (open-output-file "tmp1")))
      (do-ec (:range n 10) (begin (write n f) (newline f)))
      (close-output-port f))
    (my-call-with-input-file "tmp1"
@@ -296,7 +298,7 @@
 
 (my-check 
  (begin
-   (let ((f (my-open-output-file "tmp1")))
+   (let ((f (open-output-file "tmp1")))
      (do-ec (:range n 10) (begin (write n f) (newline f)))
      (close-output-port f))
    (my-call-with-input-file "tmp1"                 
@@ -436,7 +438,7 @@
 
 (my-check 
  (begin
-   (let ((f (my-open-output-file "tmp1")))
+   (let ((f (open-output-file "tmp1")))
      (do-ec (:range n 10) (begin (write n f) (newline f)))
      (close-output-port f))
    (my-call-with-input-file "tmp1"                 
@@ -445,7 +447,7 @@
     
 (my-check 
  (begin
-   (let ((f (my-open-output-file "tmp1")))
+   (let ((f (open-output-file "tmp1")))
      (do-ec (:range n 10) (begin (write n f) (newline f)))
      (close-output-port f))
    (my-call-with-input-file "tmp1"                 
@@ -479,7 +481,7 @@
 
 (my-check 
  (begin
-   (let ((f (my-open-output-file "tmp1")))
+   (let ((f (open-output-file "tmp1")))
      (do-ec (:range n 10) (begin (write n f) (newline f)))
      (close-output-port f))
    (my-call-with-input-file "tmp1"
@@ -624,7 +626,7 @@
 
 (my-check
  (begin
-   (let ((f (my-open-output-file "tmp1")))
+   (let ((f (open-output-file "tmp1")))
      (do-ec (:range n 10) (begin (write n f) (newline f)))
      (close-output-port f))
    (read-lines "tmp1") )
