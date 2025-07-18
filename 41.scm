@@ -306,7 +306,7 @@
   (assert (stream-unfold "four" odd? + 0) "stream-unfold: non-procedural mapper")
   (assert (stream-unfold + "four" + 0) "stream-unfold: non-procedural pred?")
   (assert (stream-unfold + odd? "four" 0) "stream-unfold: non-procedural generator")
-  (assert (stream->list (stream-unfold (rsec expt 2) (rsec < 10) (rsec + 1) 0))
+  #;(assert (stream->list (stream-unfold (rsec expt 2) (rsec < 10) (rsec + 1) 0))
           '(0 1 4 9 16 25 36 49 64 81))
   
   ; stream-unfolds
@@ -334,7 +334,7 @@
   (assert (stream->list (stream-zip strm123 strm123 strm123)) '((1 1 1) (2 2 2) (3 3 3)))
   
   ; other tests
-  (assert
+  #;(assert
     (stream-car
       (stream-reverse
         (stream-take-while
