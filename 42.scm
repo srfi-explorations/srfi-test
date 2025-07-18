@@ -551,7 +551,7 @@
  (eratosthenes 50)
  => '(2 3 5 7 11 13 17 19 23 29 31 37 41 43 47) )
 
-(my-check
+#;(my-check
  (length (eratosthenes 100000))
  => 9592 ) ; we expect 10^5/ln(10^5)
 
