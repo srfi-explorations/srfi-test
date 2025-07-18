@@ -270,7 +270,7 @@
        (close-output-port port))
       (let ((x (rand n)))
         (do ((k 0 (+ k 1))) ((= k bytes-per-call))
-          (write-char (ascii->char (modulo x 256)) port)
+          (write-char (integer->char (modulo x 256)) port)
           (set! x (quotient x 256)))))))
 
 ; run some tests
