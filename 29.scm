@@ -1,3 +1,5 @@
+(import (srfi 28))
+
 (let ((translations
         '(((en) . ((time . "Its ~a, ~a.")
                    (goodbye . "Goodbye, ~a.")))
