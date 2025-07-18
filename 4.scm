@@ -1,3 +1,6 @@
+(import (scheme base)
+        (r6rs bytevectors))
+
 (define pinfty +inf.0)
 (define minfty -inf.0)
 (define nanval +nan.0)
