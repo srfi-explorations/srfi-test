@@ -728,7 +728,7 @@
                               (newline))
                             (begin
                               (display " OK")
-                              (newline)))))))
+                              (newline))))))
 
 (define-syntax pass-if-equal (syntax-rules ()
                                ((_ num what expr1 expr2) (pass-if num what (equal? expr1 expr2)))))
