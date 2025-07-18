@@ -625,6 +625,7 @@
 
 (my-check
  (begin
+   (if (file-exists? "tmp1") (delete-file "tmp1"))
    (let ((f (open-output-file "tmp1")))
      (do-ec (:range n 10) (begin (write n f) (newline f)))
      (close-output-port f))
