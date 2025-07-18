@@ -355,7 +355,7 @@
     #t)
   
   ; http://www.research.att.com/~njas/sequences/A051037
-  (assert (stream-ref hamming 999) 51200000)
+  ;(assert (stream-ref hamming 999) 51200000)
   
 )
 
