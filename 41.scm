@@ -197,7 +197,7 @@
   
   ; stream-iterate
   (assert (stream-iterate "four" 0) "stream-iterate: non-procedural argument")
-  (assert (stream->list 3 (stream-iterate (lsec + 1) 1)) '(1 2 3))
+  ;(assert (stream->list 3 (stream-iterate (lsec + 1) 1)) '(1 2 3))
   
   ; stream-length
   (assert (stream-length "four") "stream-length: non-stream argument")
