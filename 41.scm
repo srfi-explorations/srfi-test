@@ -33,8 +33,8 @@
 
 (define strm123 (stream 1 2 3))
 
-; uncomment next line only for testing
-(define (error s x) (string-append (symbol->string s) ": " x))
+; uncommenr next line only for testing
+;(define (error s x) (string-append (symbol->string s) ": " x))
 
 ; executing (unit-test) should produce no output
 (define (unit-test)
