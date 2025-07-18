@@ -606,7 +606,7 @@
  => (/ 40413742330349316707 12864093722915635200) )
 
 
-(define (read-line port) ; next line (incl. #\newline) of port
+#;(define (read-line port) ; next line (incl. #\newline) of port
   (let ((line
          (string-ec 
           (:until (:port c port read-char)
