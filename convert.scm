@@ -148,6 +148,7 @@
     (else '((scheme base)
             (scheme char)
             (scheme inexact)
+            (scheme read)
             (scheme write)
             (scheme process-context)
             (scheme file)
