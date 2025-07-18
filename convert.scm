@@ -145,6 +145,17 @@
        (scheme process-context)
        (scheme file)
        (scheme cxr)))
+    ((= srfi-number 44)
+     '((except (scheme base)
+               vector? make-vector vector map vector-copy vector-ref
+               vector-set! vector->list
+               list? make-list list list-ref list-set! list-copy
+               string? make-string string string-copy string-ref string->list
+               string-set!)
+       (prefix (only (scheme base) list-ref) r7rs:)
+       (srfi 8)
+       (srfi 44)
+       (srfi 64)))
     (else '((scheme base)
             (scheme char)
             (scheme inexact)
@@ -271,7 +282,7 @@
 ;;
 
 (define all-srfis
-  '(1 2 4 5 8 11 13 14 16 19 25 26 27 28 29 31 37 38 39 41 42 43 48 64 60 69
+  '(1 2 4 5 8 11 13 14 16 19 25 26 27 28 29 31 37 38 39 41 42 43 44 48 64 60 69
     115 129 130 132 133 151 160 175))
 
 (for-each write-r7rs-test-library all-srfis)
