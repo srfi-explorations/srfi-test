@@ -291,7 +291,7 @@
    (let ((f (open-output-file "tmp1")))
      (do-ec (:range n 10) (begin (write n f) (newline f)))
      (close-output-port f))
-   (my-call-with-input-file "tmp1"
+   (call-with-input-file "tmp1"
     (lambda (port) (list-ec (:port x port read) x)) ))
  => (list-ec (:range n 10) n) )
 
@@ -300,7 +300,7 @@
    (let ((f (open-output-file "tmp1")))
      (do-ec (:range n 10) (begin (write n f) (newline f)))
      (close-output-port f))
-   (my-call-with-input-file "tmp1"                 
+   (call-with-input-file "tmp1"                 
      (lambda (port) (list-ec (:port x port) x)) ))
  => (list-ec (:range n 10) n) )
 
@@ -440,7 +440,7 @@
    (let ((f (open-output-file "tmp1")))
      (do-ec (:range n 10) (begin (write n f) (newline f)))
      (close-output-port f))
-   (my-call-with-input-file "tmp1"                 
+   (call-with-input-file "tmp1"                 
      (lambda (port) (list-ec (: x port read) x)) ))
  => (list-ec (:range n 10) n) )
     
@@ -449,7 +449,7 @@
    (let ((f (open-output-file "tmp1")))
      (do-ec (:range n 10) (begin (write n f) (newline f)))
      (close-output-port f))
-   (my-call-with-input-file "tmp1"                 
+   (call-with-input-file "tmp1"                 
      (lambda (port) (list-ec (: x port) x)) ))
  => (list-ec (:range n 10) n) )
 
@@ -483,7 +483,7 @@
    (let ((f (open-output-file "tmp1")))
      (do-ec (:range n 10) (begin (write n f) (newline f)))
      (close-output-port f))
-   (my-call-with-input-file "tmp1"
+   (call-with-input-file "tmp1"
      (lambda (port) (list-ec (: x (index i) port) (list x i))) ))
  => '((0 0) (1 1) (2 2) (3 3) (4 4) (5 5) (6 6) (7 7) (8 8) (9 9)) )
 
@@ -618,7 +618,7 @@
         line )))
 
 (define (read-lines filename) ; list of all lines
-  (my-call-with-input-file 
+  (call-with-input-file
    filename
    (lambda (port)
      (list-ec (:port line port read-line) line) )))
