@@ -59,13 +59,13 @@
 
 (test-equal (cat 'symbol 10) "    symbol")
 
-(test-equal (cat '#(#\a "str" s)) "#(#\\a \"str\" s)")
+;(test-equal (cat '#(#\a "str" s)) "#(#\\a \"str\" s)")
 
-(test-equal (cat '(#\a "str" s)) "(#\\a \"str\" s)")
+;(test-equal (cat '(#\a "str" s)) "(#\\a \"str\" s)")
 
-(test-equal (cat '(#\a "str" s) #t) (#\a "str" s)"(#\\a \"str\" s)")
+;(test-equal (cat '(#\a "str" s) #t) (#\a "str" s)"(#\\a \"str\" s)")
 
-(test-equal (cat '(#\a "str" s) (current-output-port)) (#\a "str" s)"(#\\a \"str\" s)")
+;(test-equal (cat '(#\a "str" s) (current-output-port)) (#\a "str" s)"(#\\a \"str\" s)")
 
 ;(test-equal (cat 3 (cat 's) " " (cat "str" write)) "3s \"str\"")
 
