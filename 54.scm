@@ -50,7 +50,7 @@
 
 (test-equal (cat "string" 10 `(,string-titlecase) '(2 3)) "     Sting")
 
-(test-equal (cat "string" `(,string-reverse ,string-upcase) => "GNIRTS"
+(test-equal (cat "string" `(,string-reverse ,string-upcase)) "GNIRTS")
 
 (test-equal (cat #\a 10) "         a")
 
