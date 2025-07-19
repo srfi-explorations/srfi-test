@@ -1,3 +1,3 @@
-(test-begin "srfi-8")
+(test-begin "srfi-51")
 
-(test-end "srfi-8")
+(test-end "srfi-51")
