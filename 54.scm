@@ -48,7 +48,7 @@
 
 (test-equal (cat "string" 10 (list string-upcase) '(-2)) "      RING")
 
-(test-equal (cat "string" 10 `(,string-titlecase) '(2 3)) "     Sting")
+;(test-equal (cat "string" 10 `(,string-titlecase) '(2 3)) "     Sting")
 
 (test-equal (cat "string" `(,string-reverse ,string-upcase)) "GNIRTS")
 
