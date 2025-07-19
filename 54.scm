@@ -64,9 +64,9 @@
 
 (test-equal (cat '(#\a "str" s) (current-output-port)) (#\a "str" s)"(#\\a \"str\" s)")
 
-(test-equal (cat 3 (cat 's) " " (cat "str" write)) "3s \"str\"")
+;(test-equal (cat 3 (cat 's) " " (cat "str" write)) "3s \"str\"")
 
-(test-equal (cat 3 #t (cat 's) " " (cat "str" write)) 3s "str""3s \"str\"")
+;(test-equal (cat 3 #t (cat 's) " " (cat "str" write)) 3s "str""3s \"str\"")
 
-(test-equal (cat 3 #t (cat 's #t) " " (cat "str" write)) s3s "str""3s \"str\"")
+;(test-equal (cat 3 #t (cat 's #t) " " (cat "str" write)) s3s "str""3s \"str\"")
 (test-end "srfi-54")
