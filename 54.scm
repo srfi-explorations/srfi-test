@@ -1,5 +1,8 @@
 (test-begin "srfi-54")
 
+(define (string-reverse s) (list->string (reverse (string->list s))))
+
+
 (test-equal (cat 129.995 -10 2.) "130.00    ")
 
 (test-equal (cat 129.995 10 2.) "    130.00")
