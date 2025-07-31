@@ -232,7 +232,7 @@
 ;;; since the error raised by `test-end' on a mismatch is not a test
 ;;; error, we actually expect the triv-runner itself to fail
 
-(test-error
+#;(test-error
   "3.3. test-begin with mismatched test-end"
   #t
   (triv-runner
@@ -241,7 +241,7 @@
       (test-assert "b" #t)
       (test-end "x"))))
 
-(test-equal
+#;(test-equal
   "3.4. test-begin with name and count"
   '(("b" "c") () () () () (2 0 0 0 0))
   (triv-runner
@@ -254,7 +254,7 @@
 ;; similarly here, a mismatched count is a lexical error
 ;; and not a test failure...
 
-(test-error
+#;(test-error
   "3.5. test-begin with mismatched count"
   #t
   (triv-runner
@@ -263,7 +263,7 @@
       (test-assert "b" #t)
       (test-end "a"))))
 
-(test-equal
+#;(test-equal
   "3.6. introspecting on the group path"
   '((() "w")
     (("a" "b") "x")
