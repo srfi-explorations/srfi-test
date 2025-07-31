@@ -220,7 +220,7 @@
       (test-assert "b" #t)
       (test-end))))
 
-#;(test-equal
+(test-equal
   "3.2. test-begin with name-matching test-end"
   '(("b") () () () () (1 0 0 0 0))
   (triv-runner
