@@ -247,16 +247,9 @@
   (for-each
     (lambda (date)
       (let ((p (open-output-string)))
-        ;(display "date->string ~V " p)
-        ;(write date p)
-        (test-assert
-          (string=? (date->string (make-date 0 0 0 0
-                                             (caddr date) (cadr date) (car date)
-                                             0)
-                                  "~V")
-                    (cdddr date))
-          #t)
-        #;(define-s19-test! (get-output-string p)
+        (display "date->string ~V " p)
+        (write date p)
+        (define-s19-test! (get-output-string p)
                           (lambda ()
                             (equal? (date->string (make-date 0 0 0 0
                                                              (caddr date) (cadr date) (car date)
@@ -267,5 +260,5 @@
 
 (begin (newline) (run-s19-tests #t))
 
-(test-end "srfi-19")
 
+(test-end "srfi-19")
