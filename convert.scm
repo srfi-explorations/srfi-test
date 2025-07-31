@@ -120,7 +120,8 @@
        (scheme char)
        (scheme write)
        (scheme file)
-       (r6rs bytevectors)))
+       (rename (r6rs bytevectors)
+               (bytevector-copy! r6rs:bytevector-copy!)))
     ((= srfi-number 13)
      '((except (scheme base)
                string-copy
