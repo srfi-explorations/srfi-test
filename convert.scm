@@ -121,7 +121,8 @@
        (scheme write)
        (scheme file)
        (scheme process-context)
-       (prefix (r6rs bytevectors) r6rs:)))
+       (rename (r6rs bytevectors)
+               (bytevector-copy! r6rs:bytevector-copy!))))
     ((= srfi-number 13)
      '((except (scheme base)
                string-copy
