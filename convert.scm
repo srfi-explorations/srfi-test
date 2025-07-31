@@ -69,14 +69,16 @@
 
 (define (write-source-file dirname basename top-level-forms)
   (ensure-directory-exists dirname)
-  (with-output-to-file (string-append dirname "/" basename)
+  (when (file-exists? (string-append dirname "/" basename))
+    (delete-file (string-append dirname "/" basename)))
+  (with-output-to-file
+    (string-append dirname "/" basename)
     (lambda ()
       (let loop ((first? #t) (forms top-level-forms))
         (unless (null? forms)
           (unless first? (newline))
           (pretty-print (car forms))
           (loop #f (cdr forms)))))))
-
 ;;
 
 (define (srfi-dependencies srfi-number)
