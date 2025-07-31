@@ -1,4 +1,4 @@
-(import (scheme base)
+#;(import (scheme base)
         (rename (r6rs bytevectors)
                 (bytevector-copy! r6rs:bytevector-copy!)))
 
