@@ -266,4 +266,5 @@
 
 (begin (newline) (run-s19-tests #t))
 
+(test-end "srfi-19")
 
