@@ -14,6 +14,8 @@
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; unit tests
 
+(test-begin "srfi-41")
+
 (define-syntax assert
   (syntax-rules ()
     ((assert expr result)
@@ -383,3 +385,5 @@
 ;       (stream-from 0))
 ;     3))
 ; (times3 10000000)
+
+(test-begin "srfi-41")

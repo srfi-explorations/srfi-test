@@ -4,7 +4,7 @@
 ;; SPDX-License-Identifier: MIT
 ;; SPDX-FileCopyrightText: 2024 Antero Mejr <mail@antr.me>
 
-(test-begin "SRFI-44")
+(test-begin "srfi-44")
 
 (test-group "collection"
   (let ((col (collection 1 2 3)))
@@ -392,4 +392,4 @@
                  (collection= equal? am (alist-map eq? (cons 'a 2)
                                                    (cons 'a 3))))))
 
-(test-end)
+(test-end "srfi-44")
