@@ -2,6 +2,8 @@
         (rename (r6rs bytevectors)
                 (bytevector-copy! r6rs:bytevector-copy!)))
 
+(test-begin "srfi-4")
+
 (define pinfty +inf.0)
 (define minfty -inf.0)
 (define nanval +nan.0)
@@ -1226,3 +1228,4 @@
                                                4)))))))
 
 
+(test-end "srfi-4")
