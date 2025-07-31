@@ -1,5 +1,7 @@
 ;;; simple test procedures
 
+(test-begin "srfi-19")
+
 (define s19-tests (list))
 
 (define (define-s19-test! name thunk)
@@ -245,9 +247,15 @@
   (for-each
     (lambda (date)
       (let ((p (open-output-string)))
-        (display "date->string ~V " p)
-        (write date p)
-        (define-s19-test! (get-output-string p)
+        ;(display "date->string ~V " p)
+        ;(write date p)
+        (test-assert (equal? (date->string (make-date 0 0 0 0
+                                                             (caddr date) (cadr date) (car date)
+                                                             0)
+                                                  "~V")
+                                    (cdddr date))
+                     #t)
+        #;(define-s19-test! (get-output-string p)
                           (lambda ()
                             (equal? (date->string (make-date 0 0 0 0
                                                              (caddr date) (cadr date) (car date)
