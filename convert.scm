@@ -115,6 +115,12 @@
 
 (define (r7rs-imports srfi-number)
   (cond
+    ((= srfi-number 4)
+     '((scheme base)
+       (scheme char)
+       (scheme write)
+       (scheme file)
+       ))
     ((= srfi-number 13)
      '((except (scheme base)
                string-copy
