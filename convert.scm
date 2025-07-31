@@ -116,7 +116,9 @@
 (define (r7rs-imports srfi-number)
   (cond
     ((= srfi-number 4)
-     '((except (scheme base) bytevector-copy)
+     '((except (scheme base)
+               bytevector-copy
+               bytevectro-copy!)
        (scheme char)
        (scheme write)
        (scheme file)
