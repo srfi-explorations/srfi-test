@@ -118,7 +118,7 @@
     ((= srfi-number 4)
      '((except (scheme base)
                bytevector-copy
-               bytevectro-copy!)
+               bytevector-copy!)
        (scheme char)
        (scheme write)
        (scheme file)
