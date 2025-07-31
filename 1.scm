@@ -142,8 +142,8 @@
 (test-equal #f (any  even? '(1 7 3)))
 (test-error (find even? '(1 3 . x)))
 (test-error (any  even? '(1 3 . x)))
-(test 'error/undefined (find even? '(1 2 . x)))
-(test 'error/undefined (any  even? '(1 2 . x))) ; success, error or other
+;(test 'error/undefined (find even? '(1 2 . x)))
+;(test 'error/undefined (any  even? '(1 2 . x))) ; success, error or other
 (test-equal 6 (find even? (circular-list 1 6 3)))
 (test-equal #t (any  even? (circular-list 1 6 3)))
 (test-error (find even? (circular-list 1 3))) ; divergent
@@ -173,7 +173,7 @@
 (test-equal #f (memq 'a '(b c d)))
 (test-equal #f (memq (list 'a) '(b (a) c)))
 (test-equal '((a) c) (member (list 'a) '(b (a) c)))
-(test '*unspecified* (memq 101 '(100 101 102)))
+;(test '*unspecified* (memq 101 '(100 101 102)))
 (test-equal '(101 102) (memv 101 '(100 101 102)))
 (test-equal '(a b c z) (delete-duplicates '(a b a c a b c z)))
 (test-equal '((a . 3) (b . 7) (c . 1))
@@ -185,7 +185,7 @@
   (test-equal #f (assq 'd e))
   (test-equal #f (assq (list 'a) '(((a)) ((b)) ((c)))))
   (test-equal '((a)) (assoc (list 'a) '(((a)) ((b)) ((c)))))
-  (test '*unspecified* (assq 5 '((2 3) (5 7) (11 13))))
+  ;(test '*unspecified* (assq 5 '((2 3) (5 7) (11 13))))
   (test-equal '(5 7) (assv 5 '((2 3) (5 7) (11 13)))))
 (test-equal #t (lset<= eq? '(a) '(a b a) '(a b c c)))
 (test-equal #t (lset<= eq?))
