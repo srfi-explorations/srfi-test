@@ -1,5 +1,5 @@
 (import (scheme base)
-        (r6rs bytevectors))
+        (prefix (r6rs bytevectors) r6rs:))
 
 (define pinfty +inf.0)
 (define minfty -inf.0)
