@@ -1,6 +1,3 @@
-(import (scheme base)
-        (rename (r6rs bytevectors)
-                (bytevector-copy! r6rs:bytevector-copy!)))
 
 (test-begin "srfi-4")
 
