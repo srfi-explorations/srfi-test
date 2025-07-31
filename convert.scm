@@ -68,6 +68,9 @@
               (loop (cons form forms))))))))
 
 (define (write-source-file dirname basename top-level-forms)
+  (display "HERE: ")
+  (write (string-append dirname "/" basename))
+  (newline)
   (when (file-exists? (string-append dirname "/" basename))
     (delete-file (string-append dirname "/" basename)))
   (ensure-directory-exists dirname)
