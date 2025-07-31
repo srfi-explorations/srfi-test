@@ -1,5 +1,6 @@
 (import (scheme base)
-        (prefix (r6rs bytevectors) r6rs:))
+        (rename (r6rs bytevectors)
+                (bytevector-copy! r6rs:bytevector-copy!)))
 
 (define pinfty +inf.0)
 (define minfty -inf.0)
