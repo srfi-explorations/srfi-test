@@ -68,9 +68,9 @@
               (loop (cons form forms))))))))
 
 (define (write-source-file dirname basename top-level-forms)
-  (ensure-directory-exists dirname)
   (when (file-exists? (string-append dirname "/" basename))
     (delete-file (string-append dirname "/" basename)))
+  (ensure-directory-exists dirname)
   (with-output-to-file
     (string-append dirname "/" basename)
     (lambda ()
