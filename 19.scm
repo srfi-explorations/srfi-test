@@ -250,11 +250,11 @@
         ;(display "date->string ~V " p)
         ;(write date p)
         (test-assert
-          (equal? (string=? (date->string (make-date 0 0 0 0
-                                                     (caddr date) (cadr date) (car date)
-                                                     0)
-                                          "~V")
-                            (cdddr date)))
+          (string=? (date->string (make-date 0 0 0 0
+                                             (caddr date) (cadr date) (car date)
+                                             0)
+                                  "~V")
+                    (cdddr date))
           #t)
         #;(define-s19-test! (get-output-string p)
                           (lambda ()
