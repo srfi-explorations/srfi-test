@@ -120,7 +120,7 @@
        (scheme char)
        (scheme write)
        (scheme file)
-       ))
+       (r6rs bytevectors)))
     ((= srfi-number 13)
      '((except (scheme base)
                string-copy
