@@ -14,7 +14,7 @@
 (test-equal sorted-l2 '(4 5 6))
 (test-assert (sorted? sorted-l2))
 
-(define merged-l (merge sorted-l1 sorted-l2))
+(define merged-l (merge sorted-l1 sorted-l2 sorter))
 
 (test-equal merged-l '(1 2 3 4 5 6))
 
