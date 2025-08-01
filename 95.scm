@@ -6,13 +6,13 @@
 (define sorted-l1 (sort l1 sorter))
 
 (test-equal sorted-l1 '(1 2 3))
-(test-assert (sorted? sorted-l1))
+(test-assert (sorted? sorted-l1 sorter))
 
 (define l2 (list 4 6 5))
 (define sorted-l2 (sort l2 sorter))
 
 (test-equal sorted-l2 '(4 5 6))
-(test-assert (sorted? sorted-l2))
+(test-assert (sorted? sorted-l2 sorter))
 
 (define merged-l (merge sorted-l1 sorted-l2 sorter))
 
