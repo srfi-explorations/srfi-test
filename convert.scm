@@ -177,19 +177,6 @@
        (scheme process-context)
        (scheme file)
        (scheme cxr)))
-   ((= srfi-number 94)
-     '((except (scheme base)
-               quotient
-               remainder
-               modulo
-               abs)
-       (scheme char)
-       (scheme inexact)
-       (scheme read)
-       (scheme write)
-       (scheme process-context)
-       (scheme file)
-       (scheme cxr)))
     (else '((scheme base)
             (scheme char)
             (scheme inexact)
@@ -317,7 +304,7 @@
 
 (define all-srfis
   '(1 2 4 5 8 11 13 14 16 19 25 26 27 28 29 31 37 38 39 41 42 43 44 48 51 54 64
-    60 63 66 69 87 94 95 115 129 130 132 133 151 160 175))
+    60 63 66 69 87 95 115 129 130 132 133 151 160 175))
 
 (for-each write-r7rs-test-library all-srfis)
 (for-each write-r7rs-test-program all-srfis)
