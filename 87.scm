@@ -2,9 +2,9 @@
 
 (define (get-symbol) 'true)
 
-(case (get-symbol)
-  ((true) #t)
-  ((false) #f)
-  (else => (lambda (x) x)))
+(test-assert (case (get-symbol)
+               ((true) #t)
+               ((false) #f)
+               (else => (lambda (x) x))))
 
 (test-end "srfi-87")
