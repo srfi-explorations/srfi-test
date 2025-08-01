@@ -180,7 +180,9 @@
    ((= srfi-number 94)
      '((except (scheme base)
                quotient
-               remainder)
+               remainder
+               modulo
+               abs)
        (scheme char)
        (scheme inexact)
        (scheme read)
