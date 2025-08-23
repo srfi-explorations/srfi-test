@@ -128,63 +128,63 @@
                (rename (r6rs bytevectors)
                        (bytevector-copy! r6rs:bytevector-copy!)))))
     ((= srfi-number 13)
-     '((except (scheme base)
-               string-copy
-               string-map
-               string-for-each
-               string-fill!
-               string-copy!
-               string->list)
-       (except (scheme char)
-               char-ci=?
-               char-ci<?
-               char-downcase
-               char-upcase
-               char-alphabetic?
-               string-downcase
-               string-upcase)
-       (scheme inexact)
-       (except (scheme char) string-upcase string-downcase)
-       (scheme write)
-       (scheme process-context)
-       (scheme file)
-       (scheme cxr)))
+     '((import (except (scheme base)
+                       string-copy
+                       string-map
+                       string-for-each
+                       string-fill!
+                       string-copy!
+                       string->list)
+               (except (scheme char)
+                       char-ci=?
+                       char-ci<?
+                       char-downcase
+                       char-upcase
+                       char-alphabetic?
+                       string-downcase
+                       string-upcase)
+               (scheme inexact)
+               (except (scheme char) string-upcase string-downcase)
+               (scheme write)
+               (scheme process-context)
+               (scheme file)
+               (scheme cxr))))
     ((= srfi-number 39)
-     '((except (scheme base) make-parameter parameterize)
-       (scheme char)
-       (scheme inexact)
-       (scheme write)
-       (scheme process-context)
-       (scheme file)
-       (scheme cxr)))
+     '((import (except (scheme base) make-parameter parameterize)
+               (scheme char)
+               (scheme inexact)
+               (scheme write)
+               (scheme process-context)
+               (scheme file)
+               (scheme cxr))))
     ((= srfi-number 44)
-     '((except (scheme base)
-               vector? make-vector vector map vector-copy vector-ref
-               vector-set! vector->list
-               list? make-list list list-ref list-set! list-copy
-               string? make-string string string-copy string-ref string->list
-               string-set!)
-       (prefix (only (scheme base) list-ref) r7rs:)
-       (srfi 8)
-       (srfi 44)
-       (srfi 64)))
+     '((import (except (scheme base)
+                       vector? make-vector vector map vector-copy vector-ref
+                       vector-set! vector->list
+                       list? make-list list list-ref list-set! list-copy
+                       string? make-string string string-copy string-ref string->list
+                       string-set!)
+               (prefix (only (scheme base) list-ref) r7rs:)
+               (srfi 8)
+               (srfi 44)
+               (srfi 64))))
     ((= srfi-number 87)
-     '((except (scheme base) case)
-       (scheme char)
-       (scheme inexact)
-       (scheme read)
-       (scheme write)
-       (scheme process-context)
-       (scheme file)
-       (scheme cxr)))
-    (else '((scheme base)
-            (scheme char)
-            (scheme inexact)
-            (scheme read)
-            (scheme write)
-            (scheme process-context)
-            (scheme file)
-            (scheme cxr)))))
+     '((import (except (scheme base) case)
+               (scheme char)
+               (scheme inexact)
+               (scheme read)
+               (scheme write)
+               (scheme process-context)
+               (scheme file)
+               (scheme cxr))))
+    (else '((import (scheme base)
+                    (scheme char)
+                    (scheme inexact)
+                    (scheme read)
+                    (scheme write)
+                    (scheme process-context)
+                    (scheme file)
+                    (scheme cxr))))))
 
 (define (srfi-import-numbers srfi-number . extra-srfi-numbers)
   (append (list srfi-number)
