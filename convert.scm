@@ -136,7 +136,6 @@
              bytevector-sint-ref
              bytevector-sint-set!
              endianness)))
-             endianness)))
     ((= srfi-number 13)
      '((except (scheme base)
                string-copy
