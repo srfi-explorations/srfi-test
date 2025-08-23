@@ -128,6 +128,8 @@
        (only (r6rs bytevectors)
              native-endianness
              bytevector-s8-ref
+             bytevector-s8-set!
+             bytevector-u8-ref
              bytevector-u8-set!)))
     ((= srfi-number 13)
      '((except (scheme base)
