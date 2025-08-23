@@ -118,17 +118,15 @@
 (define (r7rs-imports srfi-number)
   (cond
     ((= srfi-number 4)
-     '((rename (scheme base)
-               (bytevector-copy r7rs:bytevector-copy)
-               (bytevector-copy! r7rs:bytevector-copy!))
-       (scheme char)
-       (scheme write)
-       (scheme file)
-       (scheme process-context)
-       (cond-expand
-         (ypsilon (scheme inexact))
-         (else (rename (r6rs bytevectors)
-                       (bytevector-copy! r6rs:bytevector-copy!))))))
+     '((import (rename (scheme base)
+                       (bytevector-copy r7rs:bytevector-copy)
+                       (bytevector-copy! r7rs:bytevector-copy!))
+               (scheme char)
+               (scheme write)
+               (scheme file)
+               (scheme process-context)
+               (rename (r6rs bytevectors)
+                       (bytevector-copy! r6rs:bytevector-copy!)))))
     ((= srfi-number 13)
      '((except (scheme base)
                string-copy
@@ -194,7 +192,7 @@
           extra-srfi-numbers))
 
 (define (srfi-imports srfi-number . extra-srfi-numbers)
-  (map (lambda (n) `(srfi ,n))
+  (map (lambda (n) `(import (srfi ,n)))
        (apply srfi-import-numbers srfi-number extra-srfi-numbers)))
 
 ;;
@@ -205,8 +203,8 @@
     (write-source-file "r7rs-libraries/srfi-test" sld-basename
                        `((define-library (srfi-test ,srfi-number)
                            (export)
-                           (import ,@(r7rs-imports srfi-number)
-                                   ,@(srfi-imports srfi-number 64))
+                           ,@(r7rs-imports srfi-number)
+                           ,@(srfi-imports srfi-number 64)
                            (begin ,@prelude)
                            (include ,(string-append "../../" scm-basename)))))))
 
@@ -214,10 +212,10 @@
   (let ((basename (string-append (number->string srfi-number) ".scm")))
     (write-source-file "r7rs-programs" basename
                        ;; Do not double import SRFI-64, Foment throws error
-                       `((import ,@(r7rs-imports srfi-number)
-                                 ,@(if (= srfi-number 64)
-                                    (srfi-imports srfi-number)
-                                    (srfi-imports srfi-number 64)))
+                       `(,@(r7rs-imports srfi-number)
+                         ,@(if (= srfi-number 64)
+                             (srfi-imports srfi-number)
+                             (srfi-imports srfi-number 64))
                          ,@prelude
                          ,@(read-source-file basename)
                          (exit 0)))))
@@ -225,10 +223,10 @@
 (define (write-chibi-test srfi-number)
   (let ((basename (string-append (number->string srfi-number) ".scm")))
     (write-source-file "chibi" basename
-                       `((import ,@(r7rs-imports srfi-number)
-                                 (chibi)
+                       `(,@(r7rs-imports srfi-number)
+                         (import (chibi))
                                  ;; snow-chibi install '(srfi 64)'
-                                 ,@(srfi-imports srfi-number 64))
+                         ,@(srfi-imports srfi-number 64)
                          (define (arity-error? e)
                            (and (error-object? e)
                                 (let ((m (error-object-message e)))
@@ -266,8 +264,8 @@
 (define (write-gauche-test srfi-number)
   (let ((basename (string-append (number->string srfi-number) ".scm")))
     (write-source-file "gauche" basename
-                       `((import ,@(r7rs-imports srfi-number)
-                                 ,@(srfi-imports srfi-number 64))
+                       `(,@(r7rs-imports srfi-number)
+                         ,@(srfi-imports srfi-number 64)
                          (define (call-with-false-on-error proc)
                            (guard (_ (else #f)) (proc)))
                          ,@prelude
