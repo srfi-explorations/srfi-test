@@ -130,7 +130,8 @@
     ((= srfi-number 5)
      '((except (scheme base)
                let)
-       (scheme write)))
+       (scheme write)
+       (scheme process-context)))
     ((= srfi-number 13)
      '((except (scheme base)
                string-copy
