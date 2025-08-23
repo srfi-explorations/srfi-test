@@ -132,6 +132,12 @@
                let)
        (scheme write)
        (scheme process-context)))
+    ((= srfi-number 11)
+     '((except (scheme base)
+               let-values
+               let*-values)
+       (scheme write)
+       (scheme process-context)))
     ((= srfi-number 13)
      '((except (scheme base)
                string-copy
