@@ -118,83 +118,73 @@
 (define (r7rs-imports srfi-number)
   (cond
     ((= srfi-number 4)
-     '((cond-expand
-         (ypsilon
-           (import (rename (scheme base)
-                           (bytevector-copy r7rs:bytevector-copy)
-                           (bytevector-copy! r7rs:bytevector-copy!))
-                   (scheme char)
-                   (scheme write)
-                   (scheme file)
-                   (scheme process-context)))
-         (else
-           (import (rename (scheme base)
-                           (bytevector-copy r7rs:bytevector-copy)
-                           (bytevector-copy! r7rs:bytevector-copy!))
-                   (scheme char)
-                   (scheme write)
-                   (scheme file)
-                   (scheme process-context)
-                   (rename (r6rs bytevectors)
-                           (bytevector-copy! r6rs:bytevector-copy!)))))))
+     '((rename (scheme base)
+               (bytevector-copy r7rs:bytevector-copy)
+               (bytevector-copy! r7rs:bytevector-copy!))
+       (scheme char)
+       (scheme write)
+       (scheme file)
+       (scheme process-context)
+       (rename (r6rs bytevectors)
+               (bytevector-copy! r6rs:bytevector-copy!))))
     ((= srfi-number 13)
-     '((import (except (scheme base)
-                       string-copy
-                       string-map
-                       string-for-each
-                       string-fill!
-                       string-copy!
-                       string->list)
-               (except (scheme char)
-                       char-ci=?
-                       char-ci<?
-                       char-downcase
-                       char-upcase
-                       char-alphabetic?
-                       string-downcase
-                       string-upcase)
-               (scheme inexact)
-               (except (scheme char) string-upcase string-downcase)
-               (scheme write)
-               (scheme process-context)
-               (scheme file)
-               (scheme cxr))))
+     '((except (scheme base)
+               string-copy
+               string-map
+               string-for-each
+               string-fill!
+               string-copy!
+               string->list)
+       (except (scheme char)
+               char-ci=?
+               char-ci<?
+               char-downcase
+               char-upcase
+               char-alphabetic?
+               string-downcase
+               string-upcase)
+       (scheme inexact)
+       (except (scheme char) string-upcase string-downcase)
+       (scheme write)
+       (scheme process-context)
+       (scheme file)
+       (scheme cxr)))
     ((= srfi-number 39)
-     '((import (except (scheme base) make-parameter parameterize)
-               (scheme char)
-               (scheme inexact)
-               (scheme write)
-               (scheme process-context)
-               (scheme file)
-               (scheme cxr))))
+     '((except (scheme base) make-parameter parameterize)
+       (scheme char)
+       (scheme inexact)
+       (scheme write)
+       (scheme process-context)
+       (scheme file)
+       (scheme cxr)))
     ((= srfi-number 44)
-     '((import (except (scheme base)
-                       vector? make-vector vector map vector-copy vector-ref
-                       vector-set! vector->list
-                       list? make-list list list-ref list-set! list-copy
-                       string? make-string string string-copy string-ref string->list
-                       string-set!)
-               (prefix (only (scheme base) list-ref) r7rs:)
-               (srfi 8)
-               (srfi 44)
-               (srfi 64))))
+     '((except (scheme base)
+               vector? make-vector vector map vector-copy vector-ref
+               vector-set! vector->list
+               list? make-list list list-ref list-set! list-copy
+               string? make-string string string-copy string-ref string->list
+               string-set!)
+       (prefix (only (scheme base) list-ref) r7rs:)
+       (srfi 8)
+       (srfi 44)
+       (srfi 64)))
     ((= srfi-number 87)
-     '((import (except (scheme base) case)
-               (scheme char)
-               (scheme inexact)
-               (scheme read)
-               (scheme write)
-               (scheme process-context)
-               (scheme file)
-               (scheme cxr))))
-    (else '((import (scheme base)
-                    (scheme char)
-                    (scheme inexact)
-                    (scheme read)
-                    (scheme write)
-                    (scheme process-context)
-                    (scheme file)
-                    (scheme cxr))))))
+     '((except (scheme base) case)
+       (scheme char)
+       (scheme inexact)
+       (scheme read)
+       (scheme write)
+       (scheme process-context)
+       (scheme file)
+       (scheme cxr)))
+    (else '((scheme base)
+            (scheme char)
+            (scheme inexact)
+            (scheme read)
+            (scheme write)
+            (scheme process-context)
+            (scheme file)
+            (scheme cxr)))))
 
 (define (srfi-import-numbers srfi-number . extra-srfi-numbers)
   (append (list srfi-number)
@@ -202,7 +192,7 @@
           extra-srfi-numbers))
 
 (define (srfi-imports srfi-number . extra-srfi-numbers)
-  (map (lambda (n) `(import (srfi ,n)))
+  (map (lambda (n) `(srfi ,n))
        (apply srfi-import-numbers srfi-number extra-srfi-numbers)))
 
 ;;
@@ -213,8 +203,8 @@
     (write-source-file "r7rs-libraries/srfi-test" sld-basename
                        `((define-library (srfi-test ,srfi-number)
                            (export)
-                           ,@(r7rs-imports srfi-number)
-                           ,@(srfi-imports srfi-number 64)
+                           (import ,@(r7rs-imports srfi-number)
+                                   ,@(srfi-imports srfi-number 64))
                            (begin ,@prelude)
                            (include ,(string-append "../../" scm-basename)))))))
 
@@ -222,10 +212,10 @@
   (let ((basename (string-append (number->string srfi-number) ".scm")))
     (write-source-file "r7rs-programs" basename
                        ;; Do not double import SRFI-64, Foment throws error
-                       `(,@(r7rs-imports srfi-number)
-                         ,@(if (= srfi-number 64)
-                             (srfi-imports srfi-number)
-                             (srfi-imports srfi-number 64))
+                       `((import ,@(r7rs-imports srfi-number)
+                                 ,@(if (= srfi-number 64)
+                                    (srfi-imports srfi-number)
+                                    (srfi-imports srfi-number 64)))
                          ,@prelude
                          ,@(read-source-file basename)
                          (exit 0)))))
@@ -233,10 +223,10 @@
 (define (write-chibi-test srfi-number)
   (let ((basename (string-append (number->string srfi-number) ".scm")))
     (write-source-file "chibi" basename
-                       `(,@(r7rs-imports srfi-number)
-                         (import (chibi))
+                       `((import ,@(r7rs-imports srfi-number)
+                                 (chibi)
                                  ;; snow-chibi install '(srfi 64)'
-                         ,@(srfi-imports srfi-number 64)
+                                 ,@(srfi-imports srfi-number 64))
                          (define (arity-error? e)
                            (and (error-object? e)
                                 (let ((m (error-object-message e)))
@@ -274,8 +264,8 @@
 (define (write-gauche-test srfi-number)
   (let ((basename (string-append (number->string srfi-number) ".scm")))
     (write-source-file "gauche" basename
-                       `(,@(r7rs-imports srfi-number)
-                         ,@(srfi-imports srfi-number 64)
+                       `((import ,@(r7rs-imports srfi-number)
+                                 ,@(srfi-imports srfi-number 64))
                          (define (call-with-false-on-error proc)
                            (guard (_ (else #f)) (proc)))
                          ,@prelude
