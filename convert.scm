@@ -126,7 +126,8 @@
        (scheme file)
        (scheme process-context)
        (only (r6rs bytevectors)
-             native-endianness)))
+             native-endianness
+             bytevector-s8-ref)))
     ((= srfi-number 13)
      '((except (scheme base)
                string-copy
