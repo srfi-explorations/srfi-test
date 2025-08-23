@@ -185,7 +185,7 @@
          (test 36 (bytevector->u8-list b) => '(127 127 127 127 127 127 127)))
 
        (let ((b (u8-list->bytevector '(1 2 3 4 5 6 7 8))))
-         (r6rs:bytevector-copy! b 0 b 3 4)
+         (bytevector-copy! b 0 b 3 4)
          (test 37 (bytevector->u8-list b) => '(1 2 3 1 2 3 4 8))
          (test 38 (bytevector=? b (bytevector-copy b)) => #t))
 
@@ -762,10 +762,10 @@
       (bytevector-fill! bv 255)
       bv))
 
-  (pass-if 126 "r6rs:bytevector-copy! overlapping"
+  (pass-if 126 "bytevector-copy! overlapping"
     ;; See <http://debbugs.gnu.org/10070>.
     (let ((b (u8-list->bytevector '(1 2 3 4 5 6 7 8))))
-      (r6rs:bytevector-copy! b 0 b 3 4)
+      (bytevector-copy! b 0 b 3 4)
       (bytevector->u8-list b)
       (bytevector=? b (u8-list->bytevector '(1 2 3 1 2 3 4 8))))))
 
