@@ -124,9 +124,7 @@
        (scheme char)
        (scheme write)
        (scheme file)
-       (scheme process-context)
-       (only (r6rs bytevectors)
-             native-endianness)))
+       (scheme process-context)))
     ((= srfi-number 13)
      '((except (scheme base)
                string-copy
