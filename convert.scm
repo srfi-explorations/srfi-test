@@ -126,7 +126,7 @@
        (scheme file)
        (scheme process-context)
        (cond-expand
-         (ypsilon (begin #t))
+         (ypsilon (scheme exact))
          (else (rename (r6rs bytevectors)
                        (bytevector-copy r6rs:bytevector-copy)
                        (bytevector-copy! r6rs:bytevector-copy!))))))
