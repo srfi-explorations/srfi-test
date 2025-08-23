@@ -117,16 +117,6 @@
 
 (define (r7rs-imports srfi-number)
   (cond
-    ((= srfi-number 4)
-     '((except (scheme base)
-               bytevector-copy
-               bytevector-copy!)
-       (scheme char)
-       (scheme write)
-       (scheme file)
-       (scheme process-context)
-       (rename (r6rs bytevectors)
-               (bytevector-copy! r6rs:bytevector-copy!))))
     ((= srfi-number 13)
      '((except (scheme base)
                string-copy
