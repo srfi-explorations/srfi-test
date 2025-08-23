@@ -120,7 +120,7 @@
     ((= srfi-number 4)
      '((rename (scheme base)
                (bytevector-copy r7rs:bytevector-copy)
-               (bytevector-copy! r7rs:bytevector-copy))
+               (bytevector-copy! r7rs:bytevector-copy!))
        (scheme char)
        (scheme write)
        (scheme file)
