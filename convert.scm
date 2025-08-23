@@ -131,6 +131,8 @@
              bytevector-s8-set!
              bytevector-u8-ref
              bytevector-u8-set!
+             bytevector-uint-ref
+             bytevector-uint-set!
              endianness)))
     ((= srfi-number 13)
      '((except (scheme base)
