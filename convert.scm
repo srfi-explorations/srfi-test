@@ -125,8 +125,8 @@
        (scheme write)
        (scheme file)
        (scheme process-context)
-       (only (r6rs bytevectors)
-             native-endianness)))
+       (rename (r6rs bytevectors)
+               (bytevector-copy! r6rs:bytevector-copy!))))
     ((= srfi-number 13)
      '((except (scheme base)
                string-copy
