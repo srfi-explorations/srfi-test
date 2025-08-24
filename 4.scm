@@ -717,7 +717,7 @@
                              (bytevector-s8-ref b2 0)
                              (bytevector-u8-ref b2 0)))))
 
-(pass-if 128 "bytevector-{u8,s8}-set!"
+(test-assert "bytevector-{u8,s8}-set!"
          (equal? '(-126 130 -10 246)
                  (let ((b (make-bytevector 16 127)))
 
@@ -729,7 +729,7 @@
                          (bytevector-s8-ref b 1)
                          (bytevector-u8-ref b 1)))))
 
-(pass-if 129 "bytevector->u8-list"
+(test-assert "bytevector->u8-list"
          (let ((lst '(1 2 3 128 150 255)))
            (equal? lst
                    (bytevector->u8-list
@@ -740,19 +740,19 @@
                                  lst)
                        b)))))
 
-(pass-if 130 "u8-list->bytevector"
+(test-assert "u8-list->bytevector"
          (let ((lst '(1 2 3 128 150 255)))
            (equal? lst
                    (bytevector->u8-list (u8-list->bytevector lst)))))
 
-(pass-if 131 "bytevector-uint-{ref,set!} [small]"
+(test-assert "bytevector-uint-{ref,set!} [small]"
          (let ((b (make-bytevector 15)))
            (bytevector-uint-set! b 0 #x1234
                                  (endianness little) 2)
            (equal? (bytevector-uint-ref b 0 (endianness big) 2)
                    #x3412)))
 
-(pass-if 132 "bytevector-uint-set! [large]"
+(test-assert "bytevector-uint-set! [large]"
          (let ((b (make-bytevector 16)))
            (bytevector-uint-set! b 0 (- (expt 2 128) 3)
                                  (endianness little) 16)
@@ -760,34 +760,34 @@
                    '(253 255 255 255 255 255 255 255
                      255 255 255 255 255 255 255 255))))
 
-(pass-if 133 "bytevector-uint-{ref,set!} [large]"
+(test-assert "bytevector-uint-{ref,set!} [large]"
          (let ((b (make-bytevector 120)))
            (bytevector-uint-set! b 0 (- (expt 2 128) 3)
                                  (endianness little) 16)
            (equal? (bytevector-uint-ref b 0 (endianness little) 16)
                    #xfffffffffffffffffffffffffffffffd)))
 
-(pass-if 134 "bytevector-sint-ref [small]"
+(test-assert "bytevector-sint-ref [small]"
          (let ((b (u8-list->bytevector '(#xff #xf0 #xff))))
            (= (bytevector-sint-ref b 0 (endianness big) 2)
               (bytevector-sint-ref b 1 (endianness little) 2)
               -16)))
 
-(pass-if 135 "bytevector-sint-ref [large]"
+(test-assert "bytevector-sint-ref [large]"
          (let ((b (make-bytevector 50)))
            (bytevector-uint-set! b 0 (- (expt 2 128) 3)
                                  (endianness little) 16)
            (equal? (bytevector-sint-ref b 0 (endianness little) 16)
                    -3)))
 
-(pass-if 136 "bytevector-sint-set! [small]"
+(test-assert "bytevector-sint-set! [small]"
          (let ((b (make-bytevector 3)))
            (bytevector-sint-set! b 0 -16 (endianness big) 2)
            (bytevector-sint-set! b 1 -16 (endianness little) 2)
            (equal? (bytevector->u8-list b)
                    '(#xff #xf0 #xff))))
 
-(pass-if 137 "equal?"
+(test-assert "equal?"
          (let ((bv1 (u8-list->bytevector (iota 123)))
                (bv2 (u8-list->bytevector (iota 123))))
            (equal? bv1 bv2)))
