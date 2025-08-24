@@ -653,7 +653,7 @@
               bytevector-ieee-double-ref bytevector-ieee-double-set! 3 'little)
             -0.2822580337524414)
 
-(test-end "1.2 ieee bytevector tests")
+(test-end "1.2 IEEE Bytevector Tests")
 
 
 (test-begin "2.2 General Operations")
