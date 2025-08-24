@@ -162,9 +162,9 @@
   (test-equal (bytevector->u8-list b) '(127 127 127 127 127 127 127)))
 
 (let ((b (u8-list->bytevector '(1 2 3 4 5 6 7 8))))
-  (bytevector-copy! b 0 b 3 4)
+  (r6rs:bytevector-copy! b 0 b 3 4)
   (test-equal (bytevector->u8-list b) '(1 2 3 1 2 3 4 8))
-  (test-equal (bytevector=? b (bytevector-copy b)) #t))
+  (test-equal (bytevector=? b (r6rs:bytevector-copy b)) #t))
 
 (let ((b (u8-list->bytevector '(1 2 3 255 1 2 1 2))))
   (test-equal (bytevector->sint-list b (endianness little) 2)
@@ -697,10 +697,10 @@
                (bytevector-fill! bv 255)
                bv))
 
-(test-assert "bytevector-copy! overlapping"
+(test-assert "r6rs:bytevector-copy! overlapping"
              ;; See <http://debbugs.gnu.org/10070>.
              (let ((b (u8-list->bytevector '(1 2 3 4 5 6 7 8))))
-               (bytevector-copy! b 0 b 3 4)
+               (r6rs:bytevector-copy! b 0 b 3 4)
                (bytevector->u8-list b)
                (bytevector=? b (u8-list->bytevector '(1 2 3 1 2 3 4 8)))))
 
