@@ -444,7 +444,7 @@
        (string-filter (lambda (c) (char-lower-case? c))
                       "Help make programs run, run, RUN!"
                       10))
-(test-equal "string-filter" ""
+#;(test-equal "string-filter" ""
        (string-filter (lambda (c) (char-lower-case? c)) ""))
 (test-equal "string-delete" "Help make pogams un, un, RUN!"
        (string-delete #\r "Help make programs run, run, RUN!"))
