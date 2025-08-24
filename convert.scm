@@ -118,14 +118,14 @@
 (define (r7rs-imports srfi-number)
   (cond
     ((= srfi-number 4)
-     '((except (scheme base)
-               bytevector-copy
-               bytevector-copy!)
+     '((scheme base)
        (scheme char)
        (scheme write)
        (scheme file)
        (scheme process-context)
-       (r6rs bytevectors)))
+       (except (r6rs bytevectors)
+               bytevector-copy
+               bytevector-copy!)))
     ((= srfi-number 5)
      '((except (scheme base)
                let)
