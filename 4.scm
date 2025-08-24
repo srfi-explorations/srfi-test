@@ -1117,7 +1117,7 @@
                     (= (string-length str)
                        (- (bytevector-length utf8) 2)))))
 
-(test-assert "utf8->string [replacement character]"
+(test-equal "utf8->string [replacement character]"
              '(104 105 65533)
              (map char->integer
                   (string->list (utf8->string (u8-list->bytevector '(104 105 239 191 189))))))
