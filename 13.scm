@@ -435,16 +435,16 @@
        (string-tokenize "Help make programs run, run, RUN!"
                         char-set:lower-case))
 
-#;(test-equal "string-filter" "rrrr"
+(test-equal "string-filter" "rrrr"
        (string-filter #\r "Help make programs run, run, RUN!"))
-#;(test-equal "string-filter" "HelpmakeprogramsrunrunRUN"
+(test-equal "string-filter" "HelpmakeprogramsrunrunRUN"
        (string-filter char-set:letter "Help make programs run, run, RUN!"))
 
-#;(test-equal "string-filter" "programsrunrun"
+(test-equal "string-filter" "programsrunrun"
        (string-filter (lambda (c) (char-lower-case? c))
                       "Help make programs run, run, RUN!"
                       10))
-#;(test-equal "string-filter" ""
+(test-equal "string-filter" ""
        (string-filter (lambda (c) (char-lower-case? c)) ""))
 (test-equal "string-delete" "Help make pogams un, un, RUN!"
        (string-delete #\r "Help make programs run, run, RUN!"))
