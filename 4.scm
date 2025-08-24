@@ -691,9 +691,7 @@
                   (not (bytevector=? (make-bytevector 20 7)
                                      (make-bytevector 20 0)))))
 
-;; This failed prior to Guile 2.0.12.
-;; See <http://bugs.gnu.org/19027>.
-(test-assert "bytevector-fill! with fill 255"
+(test-equal "bytevector-fill! with fill 255"
              (u8-list->bytevector '(255 255 255 255))
              (let ((bv (make-bytevector 4)))
                (bytevector-fill! bv 255)
