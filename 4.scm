@@ -53,25 +53,27 @@
 
         (test-equal (bytevector-length (make-bytevector 44)) 44)
 
-        (test-equal (let ((b1 (make-bytevector 16 -127))
+        (test-equal (let ((b1 (make-bytevector 16 127))
                           (b2 (make-bytevector 16 255)))
                       (list
                         (bytevector-s8-ref b1 0)
                         (bytevector-u8-ref b1 0)
                         (bytevector-s8-ref b2 0)
-                        (bytevector-u8-ref b2 0))) '(-127 129 -1 255))
+                        (bytevector-u8-ref b2 0)))
+                    '(127 129 -1 255))
 
-        (test-equal (let ((b (make-bytevector 16 -127)))
+        (test-equal (let ((b (make-bytevector 16 127)))
                       (bytevector-s8-set! b 0 -126)
                       (bytevector-u8-set! b 1 246)
                       (list
                         (bytevector-s8-ref b 0)
                         (bytevector-u8-ref b 0)
                         (bytevector-s8-ref b 1)
-                        (bytevector-u8-ref b 1))) '(-126 130 -10 246))
+                        (bytevector-u8-ref b 1)))
+                    '(-126 130 -10 246))
 
         (let ()
-          (define b (make-bytevector 16 -127))
+          (define b (make-bytevector 16 127))
           (bytevector-uint-set! b 0 (- (expt 2 128) 3) (endianness little) 16)
 
           (test-equal (bytevector-uint-ref b 0 (endianness little) 16)
@@ -771,8 +773,8 @@
 (with-test-prefix "2.3 Operations on Bytes and Octets"
 
                   (pass-if 127 "bytevector-{u8,s8}-ref"
-                           (equal? '(-127 129 -1 255)
-                                   (let ((b1 (make-bytevector 16 -127))
+                           (equal? '(127 129 -1 255)
+                                   (let ((b1 (make-bytevector 16 127))
                                          (b2 (make-bytevector 16 255)))
                                      (list (bytevector-s8-ref b1 0)
                                            (bytevector-u8-ref b1 0)
@@ -781,7 +783,7 @@
 
                   (pass-if 128 "bytevector-{u8,s8}-set!"
                            (equal? '(-126 130 -10 246)
-                                   (let ((b (make-bytevector 16 -127)))
+                                   (let ((b (make-bytevector 16 127)))
 
                                      (bytevector-s8-set! b 0 -126)
                                      (bytevector-u8-set! b 1 246)
