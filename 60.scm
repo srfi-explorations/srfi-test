@@ -25,12 +25,12 @@
                              (number->string s) ","
                              (number->string e) ")")
     r (number->string (rotate-bit-field n c s e) 2)))
-;(test-rotate-bit-field #b0100 3 4 0 "100") ; trivial path
-;(test-rotate-bit-field #b0100 3 0 4 "10")
-;(test-rotate-bit-field #b0100 -1 0 4 "10")
-;(test-rotate-bit-field #b0100 10 0 4 "1")
-;(test-rotate-bit-field #b110100100010000 -1 5 9 "110100010010000")
-;(test-rotate-bit-field #b110100100010000 1 5 9 "110100000110000")
+(test-rotate-bit-field #b0100 3 4 0 "100") ; trivial path
+(test-rotate-bit-field #b0100 3 0 4 "10")
+(test-rotate-bit-field #b0100 -1 0 4 "10")
+(test-rotate-bit-field #b0100 10 0 4 "1")
+(test-rotate-bit-field #b110100100010000 -1 5 9 "110100010010000")
+(test-rotate-bit-field #b110100100010000 1 5 9 "110100000110000")
 
 #;(define (test-reverse-bit-field n s e r)
   (test-equal (string-append "reverse-bit-field("
