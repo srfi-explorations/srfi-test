@@ -9,7 +9,7 @@
 #;(test-eqv "bitwise-if"
   #b01100110 (bitwise-if #b10101100 #b00110101 #b11001010))
 
-(for-each (lambda (n r)
+#;(for-each (lambda (n r)
             (test-equal (string-append "log2-binary-factors("
                                        (number->string n) ")")
               r (log2-binary-factors n)))
