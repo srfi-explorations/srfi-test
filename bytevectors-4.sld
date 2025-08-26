@@ -1,5 +1,5 @@
 (define-library
-  (4-bytevectors)
+  (bytevectors-4)
   (import (scheme base))
   (export endianness
           native-endianness
@@ -43,5 +43,5 @@
 
           string->utf8 string->utf16 string->utf32
           utf8->string utf16->string utf32->string)
-  (include "4-bytevector.scm"))
+  (include "bytevectors-4.scm"))
 

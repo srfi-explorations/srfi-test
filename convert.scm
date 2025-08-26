@@ -123,7 +123,7 @@
        (scheme write)
        (scheme file)
        (scheme process-context)
-       (4-bytevector)))
+       (bytevectors-4)))
     ((= srfi-number 5)
      '((except (scheme base)
                let)
