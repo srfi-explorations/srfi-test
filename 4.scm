@@ -472,6 +472,8 @@
         ((= i n))
         (bytevector-u8-set! b i fill)))))
 
+(define r6rs:bytevector-copy bytevector-copy)
+
 (define (r6rs:bytevector-copy! source source-start target target-start count)
   (if (>= source-start target-start)
     (do ((i 0 (+ i 1)))
