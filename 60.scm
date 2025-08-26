@@ -32,7 +32,7 @@
 (test-rotate-bit-field #b110100100010000 -1 5 9 "110100010010000")
 (test-rotate-bit-field #b110100100010000 1 5 9 "110100000110000")
 
-#;(define (test-reverse-bit-field n s e r)
+(define (test-reverse-bit-field n s e r)
   (test-equal (string-append "reverse-bit-field("
                              (number->string n 2) ","
                              (number->string s) ","
