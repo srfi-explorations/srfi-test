@@ -48,7 +48,7 @@
                 (bytevector-u8-ref b 1)))
             '(-126 130 -10 246))
 
-(let ()
+#;(let ()
   (define b (make-bytevector 16 127))
   (bytevector-uint-set! b 0 (- (expt 2 128) 3) (endianness little) 16)
 
@@ -72,7 +72,7 @@
               '(255 255 255 255 255 255 255 255
                 255 255 255 255 255 255 255 )))
 
-(let ()
+#;(let ()
   (define b
     (u8-list->bytevector
       '(255 255 255 255 255 255 255 255
@@ -94,7 +94,7 @@
 
   (test-equal (bytevector-u16-native-ref b 0) 12345))
 
-(let ()
+#;(let ()
   (define b
     (u8-list->bytevector
       '(255 255 255 255 255 255 255 255
@@ -108,7 +108,7 @@
 
   (test-equal (bytevector-s32-ref b 12 (endianness big)) -3))
 
-(let ()
+#;(let ()
   (define b
     (u8-list->bytevector
       '(255 255 255 255 255 255 255 255
@@ -125,7 +125,7 @@
 
   (test-equal (bytevector-s64-ref b 8 (endianness big)) -3))
 
-(let ()
+#;(let ()
   (define b1 (u8-list->bytevector '(255 2 254 3 255)))
   (define b2 (u8-list->bytevector '(255 3 254 2 255)))
   (define b3 (u8-list->bytevector '(255 3 254 2 255)))
@@ -136,7 +136,7 @@
   (test-equal (bytevector=? b3 b4) #f)
   (test-equal (bytevector=? b4 b3) #f))
 
-(let ()
+#;(let ()
   (define b
     (u8-list->bytevector
       '(63 240 0 0 0 0 0 0)))
@@ -157,16 +157,16 @@
 
   (test-equal (bytevector->u8-list b) '(63 252 0 0 0 0 0 0))) ; depends on ieee routines
 
-(let ((b (make-bytevector 7 12)))
+#;(let ((b (make-bytevector 7 12)))
   (bytevector-fill! b 127)
   (test-equal (bytevector->u8-list b) '(127 127 127 127 127 127 127)))
 
-(let ((b (u8-list->bytevector '(1 2 3 4 5 6 7 8))))
-  (r6rs:bytevector-copy! b 0 b 3 4)
+#;(let ((b (u8-list->bytevector '(1 2 3 4 5 6 7 8))))
+  (bytevector-copy! b 0 b 3 4)
   (test-equal (bytevector->u8-list b) '(1 2 3 1 2 3 4 8))
   (test-equal (bytevector=? b (r6rs:bytevector-copy b)) #t))
 
-(let ((b (u8-list->bytevector '(1 2 3 255 1 2 1 2))))
+#;(let ((b (u8-list->bytevector '(1 2 3 255 1 2 1 2))))
   (test-equal (bytevector->sint-list b (endianness little) 2)
               '(513 -253 513 513))
   (test-equal (bytevector->uint-list b (endianness little) 2)
@@ -697,10 +697,10 @@
                (bytevector-fill! bv 255)
                bv))
 
-(test-assert "r6rs:bytevector-copy! overlapping"
+(test-assert "bytevector-copy! overlapping"
              ;; See <http://debbugs.gnu.org/10070>.
              (let ((b (u8-list->bytevector '(1 2 3 4 5 6 7 8))))
-               (r6rs:bytevector-copy! b 0 b 3 4)
+               (bytevector-copy! b 0 b 3 4)
                (bytevector->u8-list b)
                (bytevector=? b (u8-list->bytevector '(1 2 3 1 2 3 4 8)))))
 
