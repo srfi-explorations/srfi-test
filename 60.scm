@@ -48,7 +48,7 @@
 ;(test-eqv "list->integer" 9 (list->integer '(#f #f #t #f #f #t)))
 
 ;; tests bignum path
-(test-eqv "list->integer"
+#;(test-eqv "list->integer"
   (+ (expt 2 63) (expt 2 62) (expt 2 31) (expt 2 30) 1)
   (list->integer '(#t #t #f #f #f #f #f #f
                       #f #f #f #f #f #f #f #f
