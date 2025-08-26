@@ -18,7 +18,7 @@
           '(-1 0  1  0  2  0  1  0  3  0   1   0   2   0   1   0   4
                0  1  0  2  0  1  0  3  0   1   0   2   0   1   0   4))
 
-#;(define (test-rotate-bit-field n c s e r)
+(define (test-rotate-bit-field n c s e r)
   (test-equal (string-append "rotate-bit-field("
                              (number->string n 2) ","
                              (number->string c) ","
