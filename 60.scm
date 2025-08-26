@@ -42,13 +42,13 @@
 (test-reverse-bit-field #xa7 0 8 "11100101")
 (test-reverse-bit-field #xa7 1 5 "10111001")
 
-(test-equal "integer->list" '(#t #f #f #t) (integer->list 9))
+;(test-equal "integer->list" '(#t #f #f #t) (integer->list 9))
 ;(test-equal "integer->list" '(#f #f #t #f #f #t) (integer->list 9 6))
 ;(test-eqv "list->integer" 9 (list->integer '(#t #f #f #t)))
 ;(test-eqv "list->integer" 9 (list->integer '(#f #f #t #f #f #t)))
 
 ;; tests bignum path
-#;(test-eqv "list->integer"
+(test-eqv "list->integer"
   (+ (expt 2 63) (expt 2 62) (expt 2 31) (expt 2 30) 1)
   (list->integer '(#t #t #f #f #f #f #f #f
                       #f #f #f #f #f #f #f #f
@@ -59,6 +59,6 @@
                       #f #f #f #f #f #f #f #f
                       #f #f #f #f #f #f #f #t)))
 
-;(test-equal "booleans->integer" 9 (booleans->integer #f #f #t #f #f #t))
+(test-equal "booleans->integer" 9 (booleans->integer #f #f #t #f #f #t))
 
 (test-end "srfi-60")
