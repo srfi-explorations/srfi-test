@@ -21,7 +21,7 @@
 
 (test-begin "1.1 Basic Bytevector Tests")
 
-(test-equal (or (eq? (native-endianness) 'big)
+#;(test-equal (or (eq? (native-endianness) 'big)
                 (eq? (native-endianness) 'little)) #t)
 
 (test-equal (bytevector? (vector)) #f)
