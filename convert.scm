@@ -122,6 +122,7 @@
        (scheme char)
        (scheme write)
        (scheme file)
+       (scheme inexact)
        (scheme process-context)))
     ((= srfi-number 5)
      '((except (scheme base)
