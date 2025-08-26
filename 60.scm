@@ -38,9 +38,9 @@
                              (number->string s) ","
                              (number->string e) ")")
     r (number->string (reverse-bit-field n s e) 2)))
-;(test-reverse-bit-field #xa7 8 0 "10100111")
-;(test-reverse-bit-field #xa7 0 8 "11100101")
-;(test-reverse-bit-field #xa7 1 5 "10111001")
+(test-reverse-bit-field #xa7 8 0 "10100111")
+(test-reverse-bit-field #xa7 0 8 "11100101")
+(test-reverse-bit-field #xa7 1 5 "10111001")
 
 ;(test-equal "integer->list" '(#t #f #f #t) (integer->list 9))
 ;(test-equal "integer->list" '(#f #f #t #f #f #t) (integer->list 9 6))
