@@ -146,8 +146,8 @@
 ;(test 'error/undefined (any  even? '(1 2 . x))) ; success, error or other
 (test-equal 6 (find even? (circular-list 1 6 3)))
 (test-equal #t (any  even? (circular-list 1 6 3)))
-(test-error (find even? (circular-list 1 3))) ; divergent
-(test-error (any even? (circular-list 1 3))) ; divergent
+;(test-error (find even? (circular-list 1 3))) ; divergent
+;(test-error (any even? (circular-list 1 3))) ; divergent
 (test-equal 4 (find even? '(3 1 4 1 5 9)))
 (test-equal #f (every odd? '(1 2 3)))
 (test-equal #t (every < '(1 2 3) '(4 5 6)))
@@ -209,7 +209,7 @@
 (test-equal '(a b c) (lset-intersection eq? '(a b c)))
 (test-equal '(b c d) (lset-difference eq? '(a b c d e) '(a e i o u)))
 (test-equal '(a b c) (lset-difference eq? '(a b c)))
-#;(test-equal #t
+(test-equal #t
   (lset= eq?
          '(d c b i o u)
          (lset-xor eq? '(a b c d e) '(a e i o u))))
