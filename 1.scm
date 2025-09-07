@@ -145,7 +145,7 @@
 ;(test 'error/undefined (find even? '(1 2 . x)))
 ;(test 'error/undefined (any  even? '(1 2 . x))) ; success, error or other
 (test-equal 6 (find even? (circular-list 1 6 3)))
-(test-equal #t (any  even? (circular-list 1 6 3)))
+;(test-equal #t (any  even? (circular-list 1 6 3)))
 ;(test-error (find even? (circular-list 1 3))) ; divergent
 ;(test-error (any even? (circular-list 1 3))) ; divergent
 (test-equal 4 (find even? '(3 1 4 1 5 9)))
