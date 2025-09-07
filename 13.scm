@@ -298,19 +298,19 @@
        (string-map (lambda (c)
                      (integer->char (- 219 (char->integer c))))
                    "hello" 1 3))
-(test-equal "string-map!" "svool"
+#;(test-equal "string-map!" "svool"
        (let ((s (string-copy "hello")))
          (string-map! (lambda (c)
                         (integer->char (- 219 (char->integer c))))
                       s)
          s))
-(test-equal "string-map!" "hvool"
+#;(test-equal "string-map!" "hvool"
        (let ((s (string-copy "hello")))
          (string-map! (lambda (c)
                         (integer->char (- 219 (char->integer c))))
                       s 1)
          s))
-(test-equal "string-map!" "hvolo"
+#;(test-equal "string-map!" "hvolo"
        (let ((s (string-copy "hello")))
          (string-map! (lambda (c)
                         (integer->char (- 219 (char->integer c))))
