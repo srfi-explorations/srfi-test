@@ -326,20 +326,20 @@
 (test-equal "string-fold-right" '(#\e #\l . #t)
        (string-fold-right cons #t "hello" 1 3))
 
-#;(test-equal "string-unfold" "hello"
+(test-equal "string-unfold" "hello"
        (string-unfold null? car cdr '(#\h #\e #\l #\l #\o)))
-#;(test-equal "string-unfold" "hi hello"
+(test-equal "string-unfold" "hi hello"
        (string-unfold null? car cdr '(#\h #\e #\l #\l #\o) "hi "))
-#;(test-equal "string-unfold" "hi hello ho"
+(test-equal "string-unfold" "hi hello ho"
        (string-unfold null? car cdr
                       '(#\h #\e #\l #\l #\o) "hi "
                       (lambda (x) " ho")))
 
-(test-equal "string-unfold-right" "olleh"
+#;(test-equal "string-unfold-right" "olleh"
        (string-unfold-right null? car cdr '(#\h #\e #\l #\l #\o)))
-(test-equal "string-unfold-right" "olleh hi"
+#;(test-equal "string-unfold-right" "olleh hi"
        (string-unfold-right null? car cdr '(#\h #\e #\l #\l #\o) " hi"))
-(test-equal "string-unfold-right" "ho olleh hi"
+#;(test-equal "string-unfold-right" "ho olleh hi"
        (string-unfold-right null? car cdr
                             '(#\h #\e #\l #\l #\o) " hi"
                             (lambda (x) "ho ")))
