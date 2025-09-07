@@ -255,3 +255,5 @@
              (char-set= i (->char-set "abcdefABCDEF"))))))
 
 (test-end "srfi-14")
+
+(exit 0)

@@ -43,11 +43,11 @@
 (test-equal "string-any" #f (string-any (lambda (x) (char-ci=? x #\a)) ""))
 (test-equal "string-any" (char->integer #\a)
        (string-any (lambda (x) (char->integer x)) "aAbA"))
-#;(test-equal "string-tabulate" "0123456789"
+(test-equal "string-tabulate" "0123456789"
        (string-tabulate (lambda (code)
                           (integer->char (+ code (char->integer #\0))))
                         10))
-#;(test-equal "string-tabulate" ""
+(test-equal "string-tabulate" ""
        (string-tabulate (lambda (code)
                           (integer->char (+ code (char->integer #\0))))
                         0))
