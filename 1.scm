@@ -151,8 +151,7 @@
 (test-equal 4 (find even? '(3 1 4 1 5 9)))
 (test-equal #f (every odd? '(1 2 3)))
 (test-equal #t (every < '(1 2 3) '(4 5 6)))
-(display "HERE: ")
-(newline)
+(display "HERE 154") (newline)
 ;(test-error (every odd? '(1 3 . x)))
 (test-equal '(-8 -5 0 0) (find-tail even? '(3 1 37 -8 -5 0 0)))
 (test-equal '#f (find-tail even? '(3 1 37 -5)))
@@ -198,6 +197,7 @@
 (test-equal #t (lset= eq?))
 (test-equal #t (lset= eq? '(a)))
 (test-equal #f (lset= = '(2 1) '(2 1 0)))
+(display "HERE 200") (newline)
 (test-equal #t (lset<= = '(2 1) '(2 1 0)))
 (test-equal #f (lset<= = '(2 1 0) '(2 1)))
 (test-equal '(u o i a b c d c e)
@@ -211,6 +211,7 @@
 (test-equal '(a b c) (lset-intersection eq? '(a b c)))
 (test-equal '(b c d) (lset-difference eq? '(a b c d e) '(a e i o u)))
 (test-equal '(a b c) (lset-difference eq? '(a b c)))
+(display "HERE 214") (newline)
 (test-equal #t
   (lset= eq?
          '(d c b i o u)
