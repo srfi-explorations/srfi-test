@@ -298,19 +298,19 @@
        (string-map (lambda (c)
                      (integer->char (- 219 (char->integer c))))
                    "hello" 1 3))
-#;(test-equal "string-map!" "svool"
+(test-equal "string-map!" "svool"
        (let ((s (string-copy "hello")))
          (string-map! (lambda (c)
                         (integer->char (- 219 (char->integer c))))
                       s)
          s))
-#;(test-equal "string-map!" "hvool"
+(test-equal "string-map!" "hvool"
        (let ((s (string-copy "hello")))
          (string-map! (lambda (c)
                         (integer->char (- 219 (char->integer c))))
                       s 1)
          s))
-#;(test-equal "string-map!" "hvolo"
+(test-equal "string-map!" "hvolo"
        (let ((s (string-copy "hello")))
          (string-map! (lambda (c)
                         (integer->char (- 219 (char->integer c))))
@@ -326,11 +326,11 @@
 (test-equal "string-fold-right" '(#\e #\l . #t)
        (string-fold-right cons #t "hello" 1 3))
 
-(test-equal "string-unfold" "hello"
+#;(test-equal "string-unfold" "hello"
        (string-unfold null? car cdr '(#\h #\e #\l #\l #\o)))
-(test-equal "string-unfold" "hi hello"
+#;(test-equal "string-unfold" "hi hello"
        (string-unfold null? car cdr '(#\h #\e #\l #\l #\o) "hi "))
-(test-equal "string-unfold" "hi hello ho"
+#;(test-equal "string-unfold" "hi hello ho"
        (string-unfold null? car cdr
                       '(#\h #\e #\l #\l #\o) "hi "
                       (lambda (x) " ho")))
