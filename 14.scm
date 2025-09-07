@@ -208,7 +208,7 @@
                                       (char-set-complement char-set:digit))
                (->char-set "abcdefABCDEF")))
 
-#;(test-assert (char-set= (char-set-intersection!
+(test-assert (char-set= (char-set-intersection!
                          (char-set-complement! (->char-set "0123456789"))
                          char-set:hex-digit)
                         (->char-set "abcdefABCDEF")))
