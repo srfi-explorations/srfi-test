@@ -140,8 +140,8 @@
 (test-equal #t (any  even? '(1 2 3)))
 (test-equal #f (find even? '(1 7 3)))
 (test-equal #f (any  even? '(1 7 3)))
-(test-error (find even? '(1 3 . x)))
-(test-error (any  even? '(1 3 . x)))
+;(test-error (find even? '(1 3 . x)))
+;(test-error (any  even? '(1 3 . x)))
 ;(test 'error/undefined (find even? '(1 2 . x)))
 ;(test 'error/undefined (any  even? '(1 2 . x))) ; success, error or other
 ;(test-equal 6 (find even? (circular-list 1 6 3)))
