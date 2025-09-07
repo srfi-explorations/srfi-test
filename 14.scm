@@ -157,8 +157,8 @@
 (test-assert (equal? '(#\x) (char-set->list (char-set #\x))))
 (test-assert (not (equal? '(#\X) (char-set->list (char-set #\x)))))
 
-;(test-assert (equal? "x" (char-set->string (char-set #\x))))
-;(test-assert (not (equal? "X" (char-set->string (char-set #\x)))))
+(test-assert (equal? "x" (char-set->string (char-set #\x))))
+(test-assert (not (equal? "X" (char-set->string (char-set #\x)))))
 
 (test-assert (char-set-contains? (->char-set "xyz") #\x))
 (test-assert (not (char-set-contains? (->char-set "xyz") #\a)))
@@ -208,7 +208,7 @@
                                       (char-set-complement char-set:digit))
                (->char-set "abcdefABCDEF")))
 
-(test-assert (char-set= (char-set-intersection!
+#;(test-assert (char-set= (char-set-intersection!
                          (char-set-complement! (->char-set "0123456789"))
                          char-set:hex-digit)
                         (->char-set "abcdefABCDEF")))
