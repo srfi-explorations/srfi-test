@@ -16,7 +16,7 @@
 
 (test-begin "srfi-41")
 
-(define-syntax assert
+#;(define-syntax assert
   (syntax-rules ()
     ((assert expr result)
       (if (not (equal? expr result))
@@ -32,6 +32,8 @@
             (display 'expr) (newline)
             (display "expected: ") (display result) (newline)
             (display "returned: ") (display ex?r) (newline))))))
+
+(define assert test-assert)
 
 (define strm123 (stream 1 2 3))
 
@@ -386,4 +388,4 @@
 ;     3))
 ; (times3 10000000)
 
-(test-begin "srfi-41")
+(test-end "srfi-41")
