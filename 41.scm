@@ -48,8 +48,8 @@
 (test-equal (stream-pair? "four") #f)
 
 ; stream-car
-;(test-equal (stream-car "four") "stream-car: non-stream")
-(test-equal (stream-car stream-null) "stream-car: null stream")
+(test-error (stream-car "four") "stream-car: non-stream")
+(test-error (stream-car stream-null) "stream-car: null stream")
 (test-equal (stream-car strm123) 1)
 
 ; stream-cdr
