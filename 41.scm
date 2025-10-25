@@ -33,7 +33,7 @@
             (display "expected: ") (display result) (newline)
             (display "returned: ") (display ex?r) (newline))))))
 
-(define assert test-assert)
+(define assert test-equal)
 
 (define strm123 (stream 1 2 3))
 
