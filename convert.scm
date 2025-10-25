@@ -176,6 +176,17 @@
        (srfi 8)
        (srfi 44)
        (srfi 64)))
+    ((= srfi-number 44)
+     '((except (scheme base)
+               vector? make-vector vector map vector-copy vector-ref
+               vector-set! vector->list
+               list? make-list list list-ref list-set! list-copy
+               string? make-string string string-copy string-ref string->list
+               string-set!)
+       (prefix (only (scheme base) list-ref) r7rs:)
+       (srfi 8)
+       (srfi 44)
+       (srfi 64)))
     ((= srfi-number 87)
      '((except (scheme base) case)
        (scheme char)
