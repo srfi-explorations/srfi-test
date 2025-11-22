@@ -127,9 +127,7 @@
 (define (r6rs-imports srfi-number)
   (cond (else '((rnrs base)
                 (rnrs programs)
-                (rnrs control)
-                (only (rnrs hashtables)
-                      equal-hash)))))
+                (rnrs control)))))
 
 (define (r7rs-imports srfi-number)
   (cond
