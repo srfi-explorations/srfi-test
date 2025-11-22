@@ -88,10 +88,7 @@
 
 ;;
 
-(define r6rs-prelude
-  '((define (symbol<? a b) (string<? (symbol->string a) (symbol->string b)))))
-
-(define r7rs-prelude
+(define prelude
   '(
 
     ;; Sort with SRFI 132 procedure name and args.
@@ -262,7 +259,7 @@
                            (export)
                            (import ,@(r7rs-imports srfi-number)
                                    ,@(r7rs-srfi-imports srfi-number 64))
-                           (begin ,@r7rs-prelude)
+                           (begin ,@prelude)
                            (include ,(string-append "../../" scm-basename)))))))
 
 (define (write-r7rs-test-program srfi-number)
@@ -273,7 +270,7 @@
                                  ,@(if (= srfi-number 64)
                                     (r7rs-srfi-imports srfi-number)
                                     (r7rs-srfi-imports srfi-number 64)))
-                         ,@r7rs-prelude
+                         ,@prelude
                          ,@(read-source-file basename)
                          (exit 0)))))
 
@@ -298,7 +295,7 @@
                                              #f)))))
                          (define (call-with-false-on-error proc)
                            (guard (_ (else #f)) (proc)))
-                         ,@r7rs-prelude
+                         ,@prelude
                          ,@(read-source-file basename)))))
 
 (define (write-chicken-test srfi-number)
@@ -315,7 +312,7 @@
                            (call-with-current-continuation
                             (lambda (return)
                               (handle-exceptions _ (return #f) (proc)))))
-                         ,@r7rs-prelude
+                         ,@prelude
                          ,@(read-source-file basename)))))
 
 (define (write-gauche-test srfi-number)
@@ -325,7 +322,7 @@
                                  ,@(r7rs-srfi-imports srfi-number 64))
                          (define (call-with-false-on-error proc)
                            (guard (_ (else #f)) (proc)))
-                         ,@r7rs-prelude
+                         ,@prelude
                          ,@(read-source-file basename)))))
 
 (define (write-guile-test srfi-number)
@@ -340,7 +337,7 @@
                                  (srfi-import-numbers srfi-number 64)))
                          (define (call-with-false-on-error proc)
                            (catch #t proc (lambda (return) (return #f))))
-                         ,@r7rs-prelude
+                         ,@prelude
                          ,@(read-source-file basename)))))
 
 (define (write-kawa-test srfi-number)
@@ -354,7 +351,7 @@
                              (source:nextInt limit)))
                          (define (call-with-false-on-error proc)
                            (guard (_ (else #f)) (proc)))
-                         ,@r7rs-prelude
+                         ,@prelude
                          ,@(read-source-file basename)))))
 
 ;;
