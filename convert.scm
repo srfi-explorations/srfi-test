@@ -139,7 +139,7 @@
              bytevector-length
              bytevector-u8-ref
              bytevector-u8-set!)
-       ))
+       (srfi :0)))
     ((= srfi-number 11)
      '((except (rnrs base)
                let-values
