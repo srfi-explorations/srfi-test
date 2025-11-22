@@ -143,7 +143,8 @@
        (only (rnrs mutable-strings)
              string-set!)
        (only (rnrs io simple)
-             write)
+             write
+             newline)
        (srfi :0)))
     ((= srfi-number 11)
      '((except (rnrs base)
