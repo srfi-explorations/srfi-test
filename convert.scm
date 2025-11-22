@@ -134,6 +134,7 @@
        (only (rnrs r5rs)
              remainder)
        (only (rnrs bytevectors)
+             make-bytevector
              bytevector-length)
        ))
     ((= srfi-number 11)
