@@ -115,6 +115,10 @@
 
     ))
 
+(define (r6rs-imports srfi-number)
+  (cond
+    (else '((rnrs)))))
+
 (define (r7rs-imports srfi-number)
   (cond
     ((= srfi-number 4)
@@ -215,6 +219,29 @@
        (apply srfi-import-numbers srfi-number extra-srfi-numbers)))
 
 ;;
+
+(define (write-r6rs-test-library srfi-number)
+  (let ((scm-basename (string-append (number->string srfi-number) ".sps"))
+        (sld-basename (string-append (number->string srfi-number) ".sls")))
+    (write-source-file "r6rs-libraries/srfi-test" sld-basename
+                       `((define-library (srfi-test ,srfi-number)
+                           (export)
+                           (import ,@(r6rs-imports srfi-number)
+                                   ,@(srfi-imports srfi-number 64))
+                           (begin ,@prelude)
+                           (include ,(string-append "../../" scm-basename)))))))
+
+(define (write-r6rs-test-program srfi-number)
+  (let ((basename (string-append (number->string srfi-number) ".scm")))
+    (write-source-file "r6rs-programs" basename
+                       ;; Do not double import SRFI-64, Foment throws error
+                       `((import ,@(r6rs-imports srfi-number)
+                                 ,@(if (= srfi-number 64)
+                                    (srfi-imports srfi-number)
+                                    (srfi-imports srfi-number 64)))
+                         ,@prelude
+                         ,@(read-source-file basename)
+                         (exit 0)))))
 
 (define (write-r7rs-test-library srfi-number)
   (let ((scm-basename (string-append (number->string srfi-number) ".scm"))
@@ -325,6 +352,8 @@
   '(1 2 4 5 8 11 13 14 16 19 25 26 27 28 29 31 37 38 39 41 42 43 44 48 51 54 64
     60 63 66 69 87 95 115 129 130 132 133 151 160 175 180))
 
+(for-each write-r6rs-test-library all-srfis)
+(for-each write-r6rs-test-program all-srfis)
 (for-each write-r7rs-test-library all-srfis)
 (for-each write-r7rs-test-program all-srfis)
 (for-each write-chibi-test all-srfis)
