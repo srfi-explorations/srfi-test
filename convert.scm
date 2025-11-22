@@ -129,7 +129,6 @@
                 (rnrs programs)
                 (rnrs control)
                 (only (rnrs hashtables)
-                      string-ci-hash
                       equal-hash)))))
 
 (define (r7rs-imports srfi-number)
