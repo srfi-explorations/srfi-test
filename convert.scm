@@ -132,7 +132,8 @@
        (rnrs control)
        (only (rnrs bytevectors) native-endianness)
        (only (rnrs r5rs)
-             remainder)
+             remainder
+             quotient)
        (only (rnrs bytevectors)
              make-bytevector
              bytevector-length)
