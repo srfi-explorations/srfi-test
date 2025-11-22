@@ -140,7 +140,8 @@
              bytevector-length
              bytevector-u8-ref
              bytevector-u8-set!
-             string->utf8)
+             string->utf8
+             utf8->string)
        (only (rnrs mutable-strings)
              string-set!)
        (only (rnrs io simple)
