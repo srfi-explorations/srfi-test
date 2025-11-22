@@ -126,6 +126,11 @@
 
 (define (r6rs-imports srfi-number)
   (cond
+    ((= srfi-number 4)
+     '((rnrs base)
+       (rnrs programs)
+       (rnrs control)
+       (only (rnrs bytevectors) native-endianness)))
     ((= srfi-number 11)
      '((except (rnrs base)
                let-values
