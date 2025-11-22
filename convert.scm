@@ -155,7 +155,8 @@
                let)
        (only (rnrs io simple)
              display
-             newline)))
+             newline)
+       (rnrs programs)))
     ((= srfi-number 11)
      '((except (rnrs base)
                let-values
