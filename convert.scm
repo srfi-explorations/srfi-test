@@ -125,9 +125,16 @@
     ))
 
 (define (r6rs-imports srfi-number)
-  (cond (else '((rnrs base)
-                (rnrs programs)
-                (rnrs control)))))
+  (cond
+    ((= srfi-number 11)
+     '((except (rnrs base)
+               let-values
+               let*-values)
+       (rnrs programs)
+       (rnrs control)))
+    (else '((rnrs base)
+            (rnrs programs)
+            (rnrs control)))))
 
 (define (r7rs-imports srfi-number)
   (cond
