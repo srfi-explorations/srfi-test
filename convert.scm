@@ -152,10 +152,10 @@
        (srfi :0)))
     ((= srfi-number 5)
      '((except (rnrs base)
-               let))
+               let)
        (only (rnrs io simple)
              display
-             newline))
+             newline)))
     ((= srfi-number 11)
      '((except (rnrs base)
                let-values
