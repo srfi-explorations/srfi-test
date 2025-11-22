@@ -136,7 +136,9 @@
              quotient)
        (only (rnrs bytevectors)
              make-bytevector
-             bytevector-length)
+             bytevector-length
+             bytevector-u8-ref
+             bytevector-u8-set!)
        ))
     ((= srfi-number 11)
      '((except (rnrs base)
