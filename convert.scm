@@ -88,7 +88,16 @@
 
 ;;
 
-(define prelude
+(define r6rs-prelude
+  '((define (symbol<? a b) (string<? (symbol->string a) (symbol->string b)))
+    (define (list-sort less? xs)
+      (if (null? xs) '()
+        (let insert ((x (car xs)) (xs (list-sort less? (cdr xs))))
+          (if (null? xs) (list x)
+            (let ((y (car xs)) (ys (cdr xs)))
+              (if (less? x y) (cons x xs) (cons y (insert x ys))))))))))
+
+(define r7rs-prelude
   '(
 
     ;; Sort with SRFI 132 procedure name and args.
@@ -116,8 +125,7 @@
     ))
 
 (define (r6rs-imports srfi-number)
-  (cond
-    (else '((rnrs base)))))
+  (cond (else '((rnrs base)))))
 
 (define (r7rs-imports srfi-number)
   (cond
@@ -235,7 +243,7 @@
                            (export)
                            (import ,@(r6rs-imports srfi-number)
                                    ,@(r6rs-srfi-imports srfi-number 64))
-                           (begin ,@prelude)
+                           (begin ,@r6rs-prelude)
                            (include ,(string-append "../../" scm-basename)))))))
 
 (define (write-r6rs-test-program srfi-number)
@@ -247,7 +255,7 @@
                                  ,@(if (= srfi-number 64)
                                     (r6rs-srfi-imports srfi-number)
                                     (r6rs-srfi-imports srfi-number 64)))
-                         ,@prelude
+                         ,@r6rs-prelude
                          ,@(read-source-file input-file)
                          (exit 0)))))
 
@@ -259,7 +267,7 @@
                            (export)
                            (import ,@(r7rs-imports srfi-number)
                                    ,@(r7rs-srfi-imports srfi-number 64))
-                           (begin ,@prelude)
+                           (begin ,@r7rs-prelude)
                            (include ,(string-append "../../" scm-basename)))))))
 
 (define (write-r7rs-test-program srfi-number)
@@ -270,7 +278,7 @@
                                  ,@(if (= srfi-number 64)
                                     (r7rs-srfi-imports srfi-number)
                                     (r7rs-srfi-imports srfi-number 64)))
-                         ,@prelude
+                         ,@r7rs-prelude
                          ,@(read-source-file basename)
                          (exit 0)))))
 
@@ -295,7 +303,7 @@
                                              #f)))))
                          (define (call-with-false-on-error proc)
                            (guard (_ (else #f)) (proc)))
-                         ,@prelude
+                         ,@r7rs-prelude
                          ,@(read-source-file basename)))))
 
 (define (write-chicken-test srfi-number)
@@ -312,7 +320,7 @@
                            (call-with-current-continuation
                             (lambda (return)
                               (handle-exceptions _ (return #f) (proc)))))
-                         ,@prelude
+                         ,@r7rs-prelude
                          ,@(read-source-file basename)))))
 
 (define (write-gauche-test srfi-number)
@@ -322,7 +330,7 @@
                                  ,@(r7rs-srfi-imports srfi-number 64))
                          (define (call-with-false-on-error proc)
                            (guard (_ (else #f)) (proc)))
-                         ,@prelude
+                         ,@r7rs-prelude
                          ,@(read-source-file basename)))))
 
 (define (write-guile-test srfi-number)
@@ -337,7 +345,7 @@
                                  (srfi-import-numbers srfi-number 64)))
                          (define (call-with-false-on-error proc)
                            (catch #t proc (lambda (return) (return #f))))
-                         ,@prelude
+                         ,@r7rs-prelude
                          ,@(read-source-file basename)))))
 
 (define (write-kawa-test srfi-number)
@@ -351,7 +359,7 @@
                              (source:nextInt limit)))
                          (define (call-with-false-on-error proc)
                            (guard (_ (else #f)) (proc)))
-                         ,@prelude
+                         ,@r7rs-prelude
                          ,@(read-source-file basename)))))
 
 ;;
