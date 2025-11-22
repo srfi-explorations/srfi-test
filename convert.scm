@@ -140,6 +140,8 @@
              bytevector-length
              bytevector-u8-ref
              bytevector-u8-set!)
+       (only (rnrs mutable-strings)
+             string-set!)
        (srfi :0)))
     ((= srfi-number 11)
      '((except (rnrs base)
