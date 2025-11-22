@@ -92,7 +92,7 @@
   '(
 
     ;; Sort with SRFI 132 procedure name and args.
-    (define (list-sort less? xs)
+    #;(define (list-sort less? xs)
       (if (null? xs) '()
           (let insert ((x (car xs)) (xs (list-sort less? (cdr xs))))
             (if (null? xs) (list x)
