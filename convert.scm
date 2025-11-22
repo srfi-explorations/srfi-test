@@ -133,6 +133,8 @@
        (only (rnrs bytevectors) native-endianness)
        (only (rnrs r5rs)
              remainder)
+       (only (rnrs bytevectors)
+             bytevector-length)
        ))
     ((= srfi-number 11)
      '((except (rnrs base)
