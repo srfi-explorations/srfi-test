@@ -214,7 +214,14 @@
           (srfi-dependencies srfi-number)
           extra-srfi-numbers))
 
-(define (srfi-imports srfi-number . extra-srfi-numbers)
+(define (r6rs-srfi-imports srfi-number . extra-srfi-numbers)
+  (map (lambda (n) `(srfi
+                      ,(string->symbol
+                         (string-append ":"
+                                        (number->string n)))))
+       (apply srfi-import-numbers srfi-number extra-srfi-numbers)))
+
+(define (r7rs-srfi-imports srfi-number . extra-srfi-numbers)
   (map (lambda (n) `(srfi ,n))
        (apply srfi-import-numbers srfi-number extra-srfi-numbers)))
 
@@ -227,7 +234,7 @@
                        `((define-library (srfi-test ,srfi-number)
                            (export)
                            (import ,@(r6rs-imports srfi-number)
-                                   ,@(srfi-imports srfi-number 64))
+                                   ,@(r6rs-srfi-imports srfi-number 64))
                            (begin ,@prelude)
                            (include ,(string-append "../../" scm-basename)))))))
 
@@ -238,8 +245,8 @@
                        ;; Do not double import SRFI-64, Foment throws error
                        `((import ,@(r6rs-imports srfi-number)
                                  ,@(if (= srfi-number 64)
-                                    (srfi-imports srfi-number)
-                                    (srfi-imports srfi-number 64)))
+                                    (r6rs-srfi-imports srfi-number)
+                                    (r6rs-srfi-imports srfi-number 64)))
                          ,@prelude
                          ,@(read-source-file input-file)
                          (exit 0)))))
@@ -251,7 +258,7 @@
                        `((define-library (srfi-test ,srfi-number)
                            (export)
                            (import ,@(r7rs-imports srfi-number)
-                                   ,@(srfi-imports srfi-number 64))
+                                   ,@(r7rs-srfi-imports srfi-number 64))
                            (begin ,@prelude)
                            (include ,(string-append "../../" scm-basename)))))))
 
@@ -261,8 +268,8 @@
                        ;; Do not double import SRFI-64, Foment throws error
                        `((import ,@(r7rs-imports srfi-number)
                                  ,@(if (= srfi-number 64)
-                                    (srfi-imports srfi-number)
-                                    (srfi-imports srfi-number 64)))
+                                    (r7rs-srfi-imports srfi-number)
+                                    (r7rs-srfi-imports srfi-number 64)))
                          ,@prelude
                          ,@(read-source-file basename)
                          (exit 0)))))
@@ -273,7 +280,7 @@
                        `((import ,@(r7rs-imports srfi-number)
                                  (chibi)
                                  ;; snow-chibi install '(srfi 64)'
-                                 ,@(srfi-imports srfi-number 64))
+                                 ,@(r7rs-srfi-imports srfi-number 64))
                          (define (arity-error? e)
                            (and (error-object? e)
                                 (let ((m (error-object-message e)))
@@ -296,7 +303,7 @@
     (write-source-file "chicken" basename
                        `((import (chicken base)
                                  (chicken port)
-                                 ,@(srfi-imports srfi-number 64))
+                                 ,@(r7rs-srfi-imports srfi-number 64))
                          (import (rename
                                   (only (chicken random)
                                         pseudo-random-integer)
@@ -312,7 +319,7 @@
   (let ((basename (string-append (number->string srfi-number) ".scm")))
     (write-source-file "gauche" basename
                        `((import ,@(r7rs-imports srfi-number)
-                                 ,@(srfi-imports srfi-number 64))
+                                 ,@(r7rs-srfi-imports srfi-number 64))
                          (define (call-with-false-on-error proc)
                            (guard (_ (else #f)) (proc)))
                          ,@prelude
@@ -338,7 +345,7 @@
     (write-source-file "kawa" basename
                        `((import
                           (kawa base) ; base includes SRFI 64
-                          ,@(srfi-imports srfi-number 64))
+                          ,@(r7rs-srfi-imports srfi-number 64))
                          (define (random-integer limit)
                            (let ((source (java.util.Random)))
                              (source:nextInt limit)))
