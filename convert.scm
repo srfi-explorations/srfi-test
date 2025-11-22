@@ -130,7 +130,10 @@
      '((rnrs base)
        (rnrs programs)
        (rnrs control)
-       (only (rnrs bytevectors) native-endianness)))
+       (only (rnrs bytevectors) native-endianness)
+       (only (rnrs r5rs)
+             remainder)
+       ))
     ((= srfi-number 11)
      '((except (rnrs base)
                let-values
