@@ -174,8 +174,9 @@
 ;; stress test
 (test-eqv 625
   (let ((ht (make-hash-table)))
-    (begin ((i 0 (+ i 1))) ((= i 1000))
-           (hash-table-set! ht i (* i i)))
+    (let ((i 0 (+ i 1)))
+      ((= i 1000))
+      (hash-table-set! ht i (* i i)))
     (hash-table-ref/default ht 25 #f)))
 
 (test-end "srfi-69")
