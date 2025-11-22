@@ -150,6 +150,9 @@
        (only (rnrs lists)
              memq)
        (srfi :0)))
+    ((= srfi-number 5)
+     '((except (rnrs base)
+               let)))
     ((= srfi-number 11)
      '((except (rnrs base)
                let-values
