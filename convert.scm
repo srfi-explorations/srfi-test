@@ -92,7 +92,7 @@
   '(
 
     ;; Sort with SRFI 132 procedure name and args.
-    #;(define (list-sort less? xs)
+    (define (list-sort less? xs)
       (if (null? xs) '()
           (let insert ((x (car xs)) (xs (list-sort less? (cdr xs))))
             (if (null? xs) (list x)
@@ -235,7 +235,6 @@
                            (export)
                            (import ,@(r6rs-imports srfi-number)
                                    ,@(r6rs-srfi-imports srfi-number 64))
-                           (begin ,@prelude)
                            (include ,(string-append "../../" scm-basename)))))))
 
 (define (write-r6rs-test-program srfi-number)
@@ -247,7 +246,6 @@
                                  ,@(if (= srfi-number 64)
                                     (r6rs-srfi-imports srfi-number)
                                     (r6rs-srfi-imports srfi-number 64)))
-                         ,@prelude
                          ,@(read-source-file input-file)
                          (exit 0)))))
 
