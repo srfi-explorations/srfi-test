@@ -125,7 +125,8 @@
     ))
 
 (define (r6rs-imports srfi-number)
-  (cond (else '((rnrs base)))))
+  (cond (else '((rnrs base)
+                (rnrs programs)))))
 
 (define (r7rs-imports srfi-number)
   (cond
