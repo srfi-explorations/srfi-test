@@ -145,6 +145,8 @@
        (only (rnrs io simple)
              write
              newline)
+       (only (rnrs lists)
+             memq)
        (srfi :0)))
     ((= srfi-number 11)
      '((except (rnrs base)
