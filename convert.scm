@@ -129,7 +129,6 @@
                 (rnrs programs)
                 (rnrs control)
                 (only (rnrs hashtables)
-                      string-hash
                       string-ci-hash
                       equal-hash)))))
 

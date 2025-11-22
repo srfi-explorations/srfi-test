@@ -155,7 +155,7 @@
     (list-sort car-string<? (hash-table->alist ht))))
 
 ;; string-ci keys
-#;(let ((ht (make-hash-table string-ci=? string-ci-hash)))
+(let ((ht (make-hash-table string-ci=? string-ci-hash)))
   (hash-table-set! ht "cat" 'black)
   (hash-table-set! ht "dog" 'white)
   (hash-table-set! ht "elephant" 'pink)
