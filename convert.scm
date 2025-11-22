@@ -142,6 +142,8 @@
              bytevector-u8-set!)
        (only (rnrs mutable-strings)
              string-set!)
+       (only (rnrs io simple)
+             write)
        (srfi :0)))
     ((= srfi-number 11)
      '((except (rnrs base)
