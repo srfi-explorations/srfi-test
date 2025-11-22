@@ -235,7 +235,7 @@
                            (export)
                            (import ,@(r6rs-imports srfi-number)
                                    ,@(r6rs-srfi-imports srfi-number 64))
-                           (begin ,@r6rs-prelude)
+                           (begin ,@prelude)
                            (include ,(string-append "../../" scm-basename)))))))
 
 (define (write-r6rs-test-program srfi-number)
@@ -247,7 +247,7 @@
                                  ,@(if (= srfi-number 64)
                                     (r6rs-srfi-imports srfi-number)
                                     (r6rs-srfi-imports srfi-number 64)))
-                         ,@r6rs-prelude
+                         ,@prelude
                          ,@(read-source-file input-file)
                          (exit 0)))))
 
