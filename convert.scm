@@ -232,15 +232,16 @@
                            (include ,(string-append "../../" scm-basename)))))))
 
 (define (write-r6rs-test-program srfi-number)
-  (let ((basename (string-append (number->string srfi-number) ".scm")))
-    (write-source-file "r6rs-programs" basename
+  (let ((input-file (string-append (number->string srfi-number) ".scm"))
+        (output-file (string-append (number->string srfi-number) ".sps")))
+    (write-source-file "r6rs-programs" output-file
                        ;; Do not double import SRFI-64, Foment throws error
                        `((import ,@(r6rs-imports srfi-number)
                                  ,@(if (= srfi-number 64)
                                     (srfi-imports srfi-number)
                                     (srfi-imports srfi-number 64)))
                          ,@prelude
-                         ,@(read-source-file basename)
+                         ,@(read-source-file input-file)
                          (exit 0)))))
 
 (define (write-r7rs-test-library srfi-number)
