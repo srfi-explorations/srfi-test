@@ -135,6 +135,7 @@
              quotient)
        (only (rnrs bytevectors)
              make-bytevector
+             bytevector?
              bytevector-length
              bytevector-u8-ref
              bytevector-u8-set!)
