@@ -127,8 +127,7 @@
 (define (r6rs-imports srfi-number)
   (cond
     ((= srfi-number 1)
-     '((except (rnrs base)
-               map)
+     '((rnrs base)
        (rnrs programs)))
     ((= srfi-number 4)
      '((rnrs base)
@@ -169,19 +168,13 @@
        (rnrs control)))
     (else '((rnrs base)
             (rnrs programs)
-            (rnrs control)))))
+            (rnrs control)
+            (rnrs lists)))))
 
 (define (r7rs-imports srfi-number)
   (cond
     ((= srfi-number 1)
-     '((except (scheme base)
-               make-list
-               list-copy
-               list-ref
-               member
-               memv
-               assv
-               assoc)
+     '((scheme base)
        (scheme process-context)))
     ((= srfi-number 4)
      '((scheme base)

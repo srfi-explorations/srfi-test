@@ -120,6 +120,7 @@
 
 (test-begin "1.1. test-assert")
 
+(test-assert (= 1 0))
 (define (t)
   (triv-runner
     (lambda ()
