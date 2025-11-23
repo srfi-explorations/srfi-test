@@ -165,7 +165,8 @@
        (rnrs control)))
     (else '((rnrs base)
             (rnrs programs)
-            (rnrs control)))))
+            (rnrs control)
+            (rnrs lists)))))
 
 (define (r7rs-imports srfi-number)
   (cond
