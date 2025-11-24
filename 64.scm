@@ -70,12 +70,14 @@
       (lambda (runner count expected-count)
         (error (string-append "bad count " (number->string count)
                               " but expected "
-                              (number->string expected-count)))))
+                              (number->string expected-count))
+               '())))
     (test-runner-on-bad-end-name!
       r
       (lambda (runner begin end)
         (error (string-append "bad end group name " end
-                              " but expected " begin))))
+                              " but expected " begin)
+               '())))
     (test-runner-on-test-end! 
       r 
       (lambda (runner)
@@ -142,7 +144,7 @@
   '(("a" "a") () () () () (2 0 0 0 0))
   (triv-runner (lambda () (test-assert "a" #t) (test-assert "a" #t))))
 
-(define (choke) (error "Intentional test error"))
+(define (choke) (error "Intentional test error" '()))
 
 (test-equal
 "1.1.4. One way to FAIL is to throw an error"
