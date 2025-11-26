@@ -176,7 +176,12 @@
 (define (r7rs-imports srfi-number)
   (cond
     ((= srfi-number 1)
-     '((scheme base)
+     '((except (scheme base)
+               caar
+               cdar
+               cddr
+               map)
+       (scheme write)
        (scheme process-context)))
     ((= srfi-number 4)
      '((scheme base)
