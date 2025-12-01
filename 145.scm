@@ -1,6 +1,5 @@
-
-(test-begin "srfi-8")
+(test-begin "srfi-145")
 
 (test-assert (assume (number? 0) "True"))
 
-(test-end "srfi-8")
+(test-end "srfi-145")
