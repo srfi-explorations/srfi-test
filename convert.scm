@@ -179,6 +179,7 @@
      '((except (scheme base)
                caar
                cdar
+               cadr
                cddr
                map)
        (scheme write)
