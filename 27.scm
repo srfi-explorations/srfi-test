@@ -64,18 +64,30 @@
 ; (check expr)
 ;    evals expr and issues an error if it is not #t.
 
-(define (check expr)
+#;(define (check expr)
   (if (not (eq? (eval expr (interaction-environment)) #t))
     (error "check failed" expr)))
 
 ; Basic Tests of the Interface
 ; ============================
 
-(define (my-random-integer n)
+#;(define (my-random-integer n)
   (let ((x (random-integer n)))
     (if (<= 0 x (- n 1))
       x
       (error "(random-integer n) returned illegal value" x))))
+
+(define (my-random-integer n)
+  (let ((x (random-integer n)))
+    (call-with-current-continuation
+      (lambda (k)
+        (with-exception-handler
+          (lambda (e)
+            (k (error "(random-integer n) returned illegal value" x)))
+          (lambda ()
+            (if (<= 0 x (- n 1))
+              x
+              (error "(random-integer n) returned illegal value" x))))))))
 
 (define (my-random-real)
   (let ((x (random-real)))
@@ -174,7 +186,7 @@
       ((= k 16)
        (let ((state2 (random-source-state-ref s)))
          (if (not (equal? state1 state2))
-           (error "16-th state after (1 0 0 1 0 0) is wrong"))))
+           (error "16-th state after (1 0 0 1 0 0) is wrong" '()))))
       (rand)))
   (display "ok")
   (newline)
@@ -191,7 +203,7 @@
                         3322526864 
                         623307378 
                         2983662421)))
-      (error "pseudo-randomize! gives wrong result")))
+      (error "pseudo-randomize! gives wrong result" '())))
   (display "ok")
   (newline)
 

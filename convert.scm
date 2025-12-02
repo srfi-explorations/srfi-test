@@ -171,7 +171,10 @@
     (else '((rnrs base)
             (rnrs programs)
             (rnrs control)
-            (rnrs lists)))))
+            (rnrs lists)
+            (rnrs io simple)
+            (rnrs exceptions)
+            (only (rnrs r5rs) modulo quotient)))))
 
 (define (r7rs-imports srfi-number)
   (cond
