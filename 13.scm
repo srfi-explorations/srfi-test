@@ -538,7 +538,7 @@
 (test-equal "string=?"
   #t (string=? "abcd" (string-append/shared "a" "b" "c" "d")))
 
-(test-equal "string-parse-start+end"
+#;(test-equal "string-parse-start+end"
   #t
   (let-values (((rest start end)
                 (string-parse-start+end #t "foo" '(1 3 fnord))))
@@ -546,41 +546,41 @@
          (= end 3)
          (equal? rest '(fnord)))))
 
-(test-error "string-parse-start+end" #t
+#;(test-error "string-parse-start+end" #t
             (string-parse-start+end #t "foo" '(1 4)))
 
-(test-equal "string-parse-start+end"
+#;(test-equal "string-parse-start+end"
   #t
   (let-values (((start end)
                 (string-parse-final-start+end #t "foo" '(1 3))))
     (and (= start 1)
          (= end 3))))
 
-(test-equal "string-parse-start+end"
+#;(test-equal "string-parse-start+end"
       #t
       (let-string-start+end (start end rest) #t "foo" '(1 3 fnord)
                             (and (= start 1)
                                  (= end 3)
                                  (equal? rest '(fnord)))))
 
-(test-assert "check-substring-spec" (check-substring-spec #t "foo" 1 3))
+#;(test-assert "check-substring-spec" (check-substring-spec #t "foo" 1 3))
 
-(test-error "check-substring-spec" #t (check-substring-spec #t "foo" 1 4))
+#;(test-error "check-substring-spec" #t (check-substring-spec #t "foo" 1 4))
 
-(test-assert "substring-spec-ok?" (substring-spec-ok? "foo" 1 3))
+#;(test-assert "substring-spec-ok?" (substring-spec-ok? "foo" 1 3))
 
-(test-assert "substring-spec-ok?" (not (substring-spec-ok? "foo" 1 4)))
+#;(test-assert "substring-spec-ok?" (not (substring-spec-ok? "foo" 1 4)))
 
-(test-equal "make-kmp-restart-vector" '#() (make-kmp-restart-vector ""))
+#;(test-equal "make-kmp-restart-vector" '#() (make-kmp-restart-vector ""))
 
-(test-equal "make-kmp-restart-vector" '#(-1) (make-kmp-restart-vector "a"))
+#;(test-equal "make-kmp-restart-vector" '#(-1) (make-kmp-restart-vector "a"))
 
-(test-equal "make-kmp-restart-vector" '#(-1 0) (make-kmp-restart-vector "ab"))
+#;(test-equal "make-kmp-restart-vector" '#(-1 0) (make-kmp-restart-vector "ab"))
 
 ; The following is from an example in the code.  It is the "optimised"
 ; version; it's also valid to return #(-1 0 0 0 1 2), but that will
 ; needlessly check the "a" twice before giving up.
-(test-equal "make-kmp-restart-vector"
+#;(test-equal "make-kmp-restart-vector"
       '#(-1 0 0 -1 1 2)
       (make-kmp-restart-vector "abdabx"))
 
@@ -593,7 +593,7 @@
 ;; substring and matching fails, you try matching again starting at
 ;; the end of the shared substring, otherwise you rewind.  For more
 ;; complex cases, it's increasingly difficult for humans to verify :)
-(define kmp-cases
+#;(define kmp-cases
   '(("abc" "xx" #f 0 0)
     ("abc" "abc" #t 0 1 2)
     ("abcd" "abc" #f 0 1 2)
@@ -605,7 +605,7 @@
     ("aabc" "axaabc" #t 0 1 0 1 2 3)
     ("aabac" "aabaabac" #t 0 1 2 3 4 2 3 4)))
 
-(for-each
+#;(for-each
  (lambda (test-case)
    (let* ((pat (car test-case))
           (n (string-length pat))

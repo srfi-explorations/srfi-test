@@ -1,5 +1,7 @@
 ;;; simple test procedures
 
+(test-begin "srfi-19")
+
 (define s19-tests (list))
 
 (define (define-s19-test! name thunk)
@@ -259,3 +261,4 @@
 (begin (newline) (run-s19-tests #t))
 
 
+(test-end "srfi-19")

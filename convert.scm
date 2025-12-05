@@ -68,15 +68,17 @@
               (loop (cons form forms))))))))
 
 (define (write-source-file dirname basename top-level-forms)
+  (when (file-exists? (string-append dirname "/" basename))
+    (delete-file (string-append dirname "/" basename)))
   (ensure-directory-exists dirname)
-  (with-output-to-file (string-append dirname "/" basename)
+  (with-output-to-file
+    (string-append dirname "/" basename)
     (lambda ()
       (let loop ((first? #t) (forms top-level-forms))
         (unless (null? forms)
           (unless first? (newline))
           (pretty-print (car forms))
           (loop #f (cdr forms)))))))
-
 ;;
 
 (define (srfi-dependencies srfi-number)
@@ -86,7 +88,16 @@
 
 ;;
 
-(define prelude
+(define r6rs-prelude
+  '((define (symbol<? a b) (string<? (symbol->string a) (symbol->string b)))
+    (define (list-sort less? xs)
+      (if (null? xs) '()
+        (let insert ((x (car xs)) (xs (list-sort less? (cdr xs))))
+          (if (null? xs) (list x)
+            (let ((y (car xs)) (ys (cdr xs)))
+              (if (less? x y) (cons x xs) (cons y (insert x ys))))))))))
+
+(define r7rs-prelude
   '(
 
     ;; Sort with SRFI 132 procedure name and args.
@@ -113,8 +124,89 @@
 
     ))
 
+(define (r6rs-imports srfi-number)
+  (cond
+    ((= srfi-number 4)
+     '((rnrs base)
+       (rnrs programs)
+       (rnrs control)
+       (only (rnrs r5rs)
+             remainder
+             quotient)
+       (only (rnrs bytevectors)
+             make-bytevector
+             bytevector-copy
+             bytevector?
+             bytevector-length
+             bytevector-u8-ref
+             bytevector-u8-set!
+             string->utf8
+             utf8->string)
+       (only (rnrs mutable-strings)
+             string-set!)
+       (only (rnrs io simple)
+             write
+             newline)
+       (only (rnrs lists)
+             memq)
+       (srfi :0)))
+    ((= srfi-number 5)
+     '((except (rnrs base)
+               let)
+       (only (rnrs io simple)
+             display
+             newline)
+       (rnrs programs)))
+    ((= srfi-number 11)
+     '((except (rnrs base)
+               let-values
+               let*-values)
+       (rnrs programs)
+       (rnrs control)))
+    ((= srfi-number 113)
+     '((rnrs base)
+       (rnrs programs)
+       (rnrs control)
+       (only (rnrs r5rs) modulo quotient)
+       (only (rnrs unicode)
+             string-ci=?
+             string-ci<?)
+       (srfi :128)))
+    ((= srfi-number 116)
+     '((rnrs base)
+       (rnrs programs)
+       (rnrs control)
+       (only (rnrs r5rs) modulo quotient)
+       (srfi :128)))
+    (else '((rnrs base)
+            (rnrs programs)
+            (rnrs control)
+            (rnrs lists)
+            (rnrs io simple)
+            (rnrs exceptions)
+            (only (rnrs r5rs) modulo quotient)
+            (rnrs bytevectors)))))
+
 (define (r7rs-imports srfi-number)
   (cond
+    ((= srfi-number 4)
+     '((scheme base)
+       (scheme char)
+       (scheme write)
+       (scheme file)
+       (scheme inexact)
+       (scheme process-context)))
+    ((= srfi-number 5)
+     '((except (scheme base)
+               let)
+       (scheme write)
+       (scheme process-context)))
+    ((= srfi-number 11)
+     '((except (scheme base)
+               let-values
+               let*-values)
+       (scheme write)
+       (scheme process-context)))
     ((= srfi-number 13)
      '((except (scheme base)
                string-copy
@@ -145,9 +237,63 @@
        (scheme process-context)
        (scheme file)
        (scheme cxr)))
+    ((= srfi-number 44)
+     '((except (scheme base)
+               vector? make-vector vector map vector-copy vector-ref
+               vector-set! vector->list
+               list? make-list list list-ref list-set! list-copy
+               string? make-string string string-copy string-ref string->list
+               string-set!)
+       (prefix (only (scheme base) list-ref) r7rs:)
+       (srfi 8)
+       (srfi 44)
+       (srfi 64)))
+    ((= srfi-number 44)
+     '((except (scheme base)
+               vector? make-vector vector map vector-copy vector-ref
+               vector-set! vector->list
+               list? make-list list list-ref list-set! list-copy
+               string? make-string string string-copy string-ref string->list
+               string-set!)
+       (prefix (only (scheme base) list-ref) r7rs:)
+       (srfi 8)
+       (srfi 44)
+       (srfi 64)))
+    ((= srfi-number 87)
+     '((except (scheme base) case)
+       (scheme char)
+       (scheme inexact)
+       (scheme read)
+       (scheme write)
+       (scheme process-context)
+       (scheme file)
+       (scheme cxr)))
+    ((= srfi-number 113)
+     '((scheme base)
+       (scheme complex)
+       (scheme char)
+       (scheme inexact)
+       (scheme read)
+       (scheme write)
+       (scheme process-context)
+       (scheme file)
+       (scheme cxr)
+       (srfi 128)))
+    ((= srfi-number 116)
+     '((scheme base)
+       (scheme complex)
+       (scheme char)
+       (scheme inexact)
+       (scheme read)
+       (scheme write)
+       (scheme process-context)
+       (scheme file)
+       (scheme cxr)
+       (srfi 128)))
     (else '((scheme base)
             (scheme char)
             (scheme inexact)
+            (scheme read)
             (scheme write)
             (scheme process-context)
             (scheme file)
@@ -158,11 +304,42 @@
           (srfi-dependencies srfi-number)
           extra-srfi-numbers))
 
-(define (srfi-imports srfi-number . extra-srfi-numbers)
+(define (r6rs-srfi-imports srfi-number . extra-srfi-numbers)
+  (map (lambda (n) `(srfi
+                      ,(string->symbol
+                         (string-append ":"
+                                        (number->string n)))))
+       (apply srfi-import-numbers srfi-number extra-srfi-numbers)))
+
+(define (r7rs-srfi-imports srfi-number . extra-srfi-numbers)
   (map (lambda (n) `(srfi ,n))
        (apply srfi-import-numbers srfi-number extra-srfi-numbers)))
 
 ;;
+
+(define (write-r6rs-test-library srfi-number)
+  (let ((scm-basename (string-append (number->string srfi-number) ".sps"))
+        (sld-basename (string-append (number->string srfi-number) ".sls")))
+    (write-source-file "r6rs-libraries/srfi-test" sld-basename
+                       `((define-library (srfi-test ,srfi-number)
+                           (export)
+                           (import ,@(r6rs-imports srfi-number)
+                                   ,@(r6rs-srfi-imports srfi-number 64))
+                           (begin ,@r6rs-prelude)
+                           (include ,(string-append "../../" scm-basename)))))))
+
+(define (write-r6rs-test-program srfi-number)
+  (let ((input-file (string-append (number->string srfi-number) ".scm"))
+        (output-file (string-append (number->string srfi-number) ".sps")))
+    (write-source-file "r6rs-programs" output-file
+                       ;; Do not double import SRFI-64, Foment throws error
+                       `((import ,@(r6rs-imports srfi-number)
+                                 ,@(if (= srfi-number 64)
+                                    (r6rs-srfi-imports srfi-number)
+                                    (r6rs-srfi-imports srfi-number 64)))
+                         ,@r6rs-prelude
+                         ,@(read-source-file input-file)
+                         (exit 0)))))
 
 (define (write-r7rs-test-library srfi-number)
   (let ((scm-basename (string-append (number->string srfi-number) ".scm"))
@@ -171,8 +348,8 @@
                        `((define-library (srfi-test ,srfi-number)
                            (export)
                            (import ,@(r7rs-imports srfi-number)
-                                   ,@(srfi-imports srfi-number 64))
-                           (begin ,@prelude)
+                                   ,@(r7rs-srfi-imports srfi-number 64))
+                           (begin ,@r7rs-prelude)
                            (include ,(string-append "../../" scm-basename)))))))
 
 (define (write-r7rs-test-program srfi-number)
@@ -181,9 +358,9 @@
                        ;; Do not double import SRFI-64, Foment throws error
                        `((import ,@(r7rs-imports srfi-number)
                                  ,@(if (= srfi-number 64)
-                                    (srfi-imports srfi-number)
-                                    (srfi-imports srfi-number 64)))
-                         ,@prelude
+                                    (r7rs-srfi-imports srfi-number)
+                                    (r7rs-srfi-imports srfi-number 64)))
+                         ,@r7rs-prelude
                          ,@(read-source-file basename)
                          (exit 0)))))
 
@@ -193,7 +370,7 @@
                        `((import ,@(r7rs-imports srfi-number)
                                  (chibi)
                                  ;; snow-chibi install '(srfi 64)'
-                                 ,@(srfi-imports srfi-number 64))
+                                 ,@(r7rs-srfi-imports srfi-number 64))
                          (define (arity-error? e)
                            (and (error-object? e)
                                 (let ((m (error-object-message e)))
@@ -208,7 +385,7 @@
                                              #f)))))
                          (define (call-with-false-on-error proc)
                            (guard (_ (else #f)) (proc)))
-                         ,@prelude
+                         ,@r7rs-prelude
                          ,@(read-source-file basename)))))
 
 (define (write-chicken-test srfi-number)
@@ -216,7 +393,7 @@
     (write-source-file "chicken" basename
                        `((import (chicken base)
                                  (chicken port)
-                                 ,@(srfi-imports srfi-number 64))
+                                 ,@(r7rs-srfi-imports srfi-number 64))
                          (import (rename
                                   (only (chicken random)
                                         pseudo-random-integer)
@@ -225,17 +402,17 @@
                            (call-with-current-continuation
                             (lambda (return)
                               (handle-exceptions _ (return #f) (proc)))))
-                         ,@prelude
+                         ,@r7rs-prelude
                          ,@(read-source-file basename)))))
 
 (define (write-gauche-test srfi-number)
   (let ((basename (string-append (number->string srfi-number) ".scm")))
     (write-source-file "gauche" basename
                        `((import ,@(r7rs-imports srfi-number)
-                                 ,@(srfi-imports srfi-number 64))
+                                 ,@(r7rs-srfi-imports srfi-number 64))
                          (define (call-with-false-on-error proc)
                            (guard (_ (else #f)) (proc)))
-                         ,@prelude
+                         ,@r7rs-prelude
                          ,@(read-source-file basename)))))
 
 (define (write-guile-test srfi-number)
@@ -250,7 +427,7 @@
                                  (srfi-import-numbers srfi-number 64)))
                          (define (call-with-false-on-error proc)
                            (catch #t proc (lambda (return) (return #f))))
-                         ,@prelude
+                         ,@r7rs-prelude
                          ,@(read-source-file basename)))))
 
 (define (write-kawa-test srfi-number)
@@ -258,20 +435,23 @@
     (write-source-file "kawa" basename
                        `((import
                           (kawa base) ; base includes SRFI 64
-                          ,@(srfi-imports srfi-number 64))
+                          ,@(r7rs-srfi-imports srfi-number 64))
                          (define (random-integer limit)
                            (let ((source (java.util.Random)))
                              (source:nextInt limit)))
                          (define (call-with-false-on-error proc)
                            (guard (_ (else #f)) (proc)))
-                         ,@prelude
+                         ,@r7rs-prelude
                          ,@(read-source-file basename)))))
 
 ;;
 
 (define all-srfis
-  '(1 2 8 11 13 14 16 19 26 28 38 39 48 64 60 69 115 129 130 132 133 151 160 175))
+  '(1 2 4 5 8 11 13 14 16 19 25 26 27 28 29 31 37 38 39 41 42 43 44 48 51 54 64
+    60 63 66 69 87 95 111 113 115 116 128 129 130 132 133 145 151 160 175 180))
 
+(for-each write-r6rs-test-library all-srfis)
+(for-each write-r6rs-test-program all-srfis)
 (for-each write-r7rs-test-library all-srfis)
 (for-each write-r7rs-test-program all-srfis)
 (for-each write-chibi-test all-srfis)

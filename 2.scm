@@ -41,7 +41,7 @@
   (let ((x 0)) (and-let* (x (y (- x 1)) ((positive? y))) (/ x y))))
 (test-equal #f
   (let ((x #f)) (and-let* (x (y (- x 1)) ((positive? y))) (/ x y))))
-(test-equal 3/2
+(test-equal (/ 3 2)
   (let ((x 3)) (and-let* (x (y (- x 1)) ((positive? y))) (/ x y))))
 
 (test-end "srfi-2")
