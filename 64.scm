@@ -105,8 +105,8 @@
   (let ((r (test-runner-null))
         (seq '()))
     ;;
-    (test-runner-on-test-end! 
-      r 
+    (test-runner-on-test-end!
+      r
       (lambda (runner)
         (set! seq (cons (list (test-runner-group-path runner)
                               (test-runner-test-name runner))
@@ -149,9 +149,9 @@
 ; Will stop execution on choke, so skip
 (cond-expand ((or chibi skint) (test-skip 1)))
 (test-equal
-"1.1.4. One way to FAIL is to throw an error"
-'(() ("a") () () () (0 1 0 0 0))
-(triv-runner (lambda () (test-assert "a" (choke)))))
+  "1.1.4. One way to FAIL is to throw an error"
+  '(() ("a") () () () (0 1 0 0 0))
+  (triv-runner (lambda () (test-assert "a" (choke)))))
 
 (test-end);1.1
 
@@ -191,6 +191,8 @@
       ;; PASS
       (test-error (choke)))))
 
+; Will stop execution on choke, so skip
+(cond-expand ((or chibi skint) (test-skip 1)))
 (test-equal
   "2.1.2. Baseline test; FAIL with no optional args"
   '(() ("") () () () (0 1 0 0 0))
@@ -242,57 +244,57 @@
 ;;; error, we actually expect the triv-runner itself to fail
 
 #;(test-error
-  "3.3. test-begin with mismatched test-end"
-  #t
-  (triv-runner
-    (lambda ()
-      (test-begin "a")
-      (test-assert "b" #t)
-      (test-end "x"))))
+"3.3. test-begin with mismatched test-end"
+#t
+(triv-runner
+  (lambda ()
+    (test-begin "a")
+    (test-assert "b" #t)
+    (test-end "x"))))
 
 #;(test-equal
-  "3.4. test-begin with name and count"
-  '(("b" "c") () () () () (2 0 0 0 0))
-  (triv-runner
-    (lambda ()
-      (test-begin "a" 2)
-      (test-assert "b" #t)
-      (test-assert "c" #t)
-      (test-end "a"))))
+"3.4. test-begin with name and count"
+'(("b" "c") () () () () (2 0 0 0 0))
+(triv-runner
+  (lambda ()
+    (test-begin "a" 2)
+    (test-assert "b" #t)
+    (test-assert "c" #t)
+    (test-end "a"))))
 
 ;; similarly here, a mismatched count is a lexical error
 ;; and not a test failure...
 
 #;(test-error
-  "3.5. test-begin with mismatched count"
-  #t
-  (triv-runner
-    (lambda ()
-      (test-begin "a" 99)
-      (test-assert "b" #t)
-      (test-end "a"))))
+"3.5. test-begin with mismatched count"
+#t
+(triv-runner
+  (lambda ()
+    (test-begin "a" 99)
+    (test-assert "b" #t)
+    (test-end "a"))))
 
 #;(test-equal
-  "3.6. introspecting on the group path"
-  '((() "w")
-    (("a" "b") "x")
-    (("a" "b") "y")
-    (("a") "z"))
-  ;;
-  ;;  `path-revealing-runner' is designed to return a list
-  ;;  of the tests executed, in order.  Each entry is a list
-  ;;  (GROUP-PATH TEST-NAME), and each GROUP-PATH is a list
-  ;;  of test groups starting from the topmost
-  ;;
-  (path-revealing-runner
-    (lambda ()
-      (test-assert "w" #t)
-      (test-begin "a")
-      (test-begin "b")
-      (test-assert "x" #t)
-      (test-assert "y" #t)
-      (test-end)
-      (test-assert "z" #t))))
+"3.6. introspecting on the group path"
+'((() "w")
+  (("a" "b") "x")
+  (("a" "b") "y")
+  (("a") "z"))
+;;
+;;  `path-revealing-runner' is designed to return a list
+;;  of the tests executed, in order.  Each entry is a list
+;;  (GROUP-PATH TEST-NAME), and each GROUP-PATH is a list
+;;  of test groups starting from the topmost
+;;
+(path-revealing-runner
+  (lambda ()
+    (test-assert "w" #t)
+    (test-begin "a")
+    (test-begin "b")
+    (test-assert "x" #t)
+    (test-assert "y" #t)
+    (test-end)
+    (test-assert "z" #t))))
 
 
 (test-end "3. Test groups and paths")
