@@ -144,8 +144,10 @@
   '(("a" "a") () () () () (2 0 0 0 0))
   (triv-runner (lambda () (test-assert "a" #t) (test-assert "a" #t))))
 
-(define (choke) (error "Intentional test error" '()))
+(define (choke) (cond-expand (error "Intentional test error" '())))
 
+; Will stop execution on choke, so skip
+(cond-expand ((or chibi skint) (skip-test 1)))
 (test-equal
 "1.1.4. One way to FAIL is to throw an error"
 '(() ("a") () () () (0 1 0 0 0))
@@ -179,6 +181,8 @@
 
 (test-begin "2.1. test-error")
 
+; Will stop execution on choke, so skip
+(cond-expand ((or chibi skint) (skip-test 1)))
 (test-equal
   "2.1.1. Baseline test; PASS with no optional args"
   '(("") () () () () (1 0 0 0 0))
@@ -196,6 +200,8 @@
       ;;       claiming that it will, so this test should FAIL
       (test-error (vector-ref '#(1 2) 0)))))
 
+; Will stop execution on choke, so skip
+(cond-expand ((or chibi skint) (skip-test 1)))
 (test-equal
   "2.1.3. PASS with a test name and error type"
   '(("a") () () () () (1 0 0 0 0))
@@ -311,6 +317,8 @@
                     (set! ex (cons 'out ex)))))
               (reverse ex)))
 
+; Will stop execution on choke, so skip
+(cond-expand ((or chibi skint) (skip-test 1)))
 (test-equal "4.2. Exception exit path"
             '(in 1 out)
             (let ((ex '()))
@@ -606,6 +614,8 @@
                 (test-expect-fail "z")
                 (test-assert "z" #f))))
 
+; Will stop execution on choke, so skip
+(cond-expand ((or chibi skint) (skip-test 1)))
 (test-equal "7.2. Expected exception"
             '(() ("x") ("z") () () (0 1 1 0 0))
             (triv-runner
@@ -675,6 +685,8 @@
 (test-assert "8.3.1. default factory"
              (eq? (test-runner-factory) test-runner-simple))
 
+; Will stop execution on choke, so skip
+(cond-expand ((or chibi skint) (skip-test 1)))
 (test-assert "8.3.2. settable factory"
              (with-factory-saved
                (lambda ()
