@@ -144,10 +144,10 @@
   '(("a" "a") () () () () (2 0 0 0 0))
   (triv-runner (lambda () (test-assert "a" #t) (test-assert "a" #t))))
 
-(define (choke) (cond-expand (error "Intentional test error" '())))
+(define (choke) (error "Intentional test error" '()))
 
 ; Will stop execution on choke, so skip
-(cond-expand ((or chibi skint) (test-skip 1)))
+(cond-expand ((or chibi skint) (test-skip 1)) (else))
 (test-equal
   "1.1.4. One way to FAIL is to throw an error"
   '(() ("a") () () () (0 1 0 0 0))
@@ -182,7 +182,7 @@
 (test-begin "2.1. test-error")
 
 ; Will stop execution on choke, so skip
-(cond-expand ((or chibi skint) (test-skip 1)))
+(cond-expand ((or chibi skint) (test-skip 1)) (else))
 (test-equal
   "2.1.1. Baseline test; PASS with no optional args"
   '(("") () () () () (1 0 0 0 0))
@@ -192,7 +192,7 @@
       (test-error (choke)))))
 
 ; Will stop execution on choke, so skip
-(cond-expand ((or chibi skint) (test-skip 1)))
+(cond-expand ((or chibi skint) (test-skip 1)) (else))
 (test-equal
   "2.1.2. Baseline test; FAIL with no optional args"
   '(() ("") () () () (0 1 0 0 0))
@@ -203,7 +203,7 @@
       (test-error (vector-ref '#(1 2) 0)))))
 
 ; Will stop execution on choke, so skip
-(cond-expand ((or chibi skint) (test-skip 1)))
+(cond-expand ((or chibi skint) (test-skip 1)) (else))
 (test-equal
   "2.1.3. PASS with a test name and error type"
   '(("a") () () () () (1 0 0 0 0))
@@ -320,7 +320,7 @@
               (reverse ex)))
 
 ; Will stop execution on choke, so skip
-(cond-expand ((or chibi skint) (test-skip 1)))
+(cond-expand ((or chibi skint) (test-skip 1)) (else))
 (test-equal "4.2. Exception exit path"
             '(in 1 out)
             (let ((ex '()))
@@ -617,7 +617,7 @@
                 (test-assert "z" #f))))
 
 ; Will stop execution on choke, so skip
-(cond-expand ((or chibi skint) (test-skip 1)))
+(cond-expand ((or chibi skint) (test-skip 1)) (else))
 (test-equal "7.2. Expected exception"
             '(() ("x") ("z") () () (0 1 1 0 0))
             (triv-runner
@@ -688,7 +688,7 @@
              (eq? (test-runner-factory) test-runner-simple))
 
 ; Will stop execution on choke, so skip
-(cond-expand ((or chibi skint) (test-skip 1)))
+(cond-expand ((or chibi skint) (test-skip 1)) (else))
 (test-assert "8.3.2. settable factory"
              (with-factory-saved
                (lambda ()
