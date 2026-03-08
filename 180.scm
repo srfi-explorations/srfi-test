@@ -1,10 +1,22 @@
 
 (test-begin "srfi-180")
 
+(define tmpfile ".srfi-180-tmp")
+
+(define (slurp file)
+  (letrec
+    ((looper (lambda (c result)
+               (if (eof-object? c)
+                 (list->string (reverse result))
+                 (looper (read-char) (cons c result))))))
+    (with-input-from-file file (lambda () (looper (read-char) '())))))
+
 (define (json->string json)
-  (let ((port (open-output-string)))
-    (json-write json port)
-    (get-output-string port)))
+  (with-output-to-file
+    tmpfile
+    (lambda ()
+    (json-write json)))
+  (slurp tmpfile))
 
 (test-equal "{\"a\":1,\"b\":2,\"b\":3}" (json->string `((a . 1) (b . 2) (b . 3))))
 
