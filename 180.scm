@@ -12,10 +12,8 @@
     (with-input-from-file file (lambda () (looper (read-char) '())))))
 
 (define (json->string json)
-  (with-output-to-file
-    tmpfile
-    (lambda ()
-    (json-write json)))
+  (when (file-exists? tmpfile) (delete-file tmpfile))
+  (with-output-to-file tmpfile (lambda () (json-write json)))
   (slurp tmpfile))
 
 (test-equal "{\"a\":1,\"b\":2,\"b\":3}" (json->string `((a . 1) (b . 2) (b . 3))))
