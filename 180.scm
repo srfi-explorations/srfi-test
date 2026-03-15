@@ -1,9 +1,5 @@
 (test-begin "srfi-180")
 
-;(define tmpfile ".srfi-180-tmp")
-;(define (slurp file) (letrec ((looper (lambda (c result) (if (eof-object? c) (list->string (reverse result)) (looper (read-char) (cons c result)))))) (with-input-from-file file (lambda () (looper (read-char) '())))))
-;(define (json->string json) (when (file-exists? tmpfile) (delete-file tmpfile)) (with-output-to-file tmpfile (lambda () (json-write json))) (slurp tmpfile))
-
 (define (file->json path) (with-input-from-file path (lambda () (json-read))))
 
 (define testdir "180")
