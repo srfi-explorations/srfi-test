@@ -179,6 +179,7 @@
        (only (rnrs r5rs) modulo quotient)
        (srfi :128)))
     (else '((rnrs base)
+            (rnrs files)
             (rnrs programs)
             (rnrs control)
             (rnrs lists)
