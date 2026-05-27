@@ -126,6 +126,11 @@
 
 (define (r6rs-imports srfi-number)
   (cond
+    ((= srfi-number 1)
+     '((except (rnrs base)
+               for-each
+               map)
+       (rnrs programs)))
     ((= srfi-number 4)
      '((rnrs base)
        (rnrs programs)
