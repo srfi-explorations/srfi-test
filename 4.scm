@@ -551,13 +551,13 @@
           (val val (bytevector:div val 256)))
        ((>= i size)
         (unspecified))
-       (bytevector-u8-set! bytevector (+ index i) (bytevector:mod val 256))))
+       (bytevector-u8-set! bytevector (+ index i) (exact (bytevector:mod val 256)))))
     ((big)
      (do ((i (- size 1) (- i 1))
           (val val (bytevector:div val 256)))
        ((< i 0)
         (unspecified))
-       (bytevector-u8-set! bytevector (+ index i) (bytevector:mod val 256))))
+       (bytevector-u8-set! bytevector (+ index i) (exact (bytevector:mod val 256)))))
     (else
       (bytevector-uint-set! bytevector index val (native-endianness) size))))
 
