@@ -61,29 +61,10 @@
 ;   SE, 04-Apr-2002: some quick timings; check up
 
 
-; (check expr)
-;    evals expr and issues an error if it is not #t.
-
-#;(define (check expr)
-(if (not (eq? (eval expr (interaction-environment)) #t))
-  (error "check failed" expr)))
-
 ; Basic Tests of the Interface
 ; ============================
 
 (test-begin "srfi-27")
-
-(define (my-random-integer n)
-  (let ((x (random-integer n)))
-    (call-with-current-continuation
-      (lambda (k)
-        (with-exception-handler
-          (lambda (e)
-            (k (error "(random-integer n) returned illegal value" x)))
-          (lambda ()
-            (if (<= 0 x (- n 1))
-              x
-              (error "(random-integer n) returned illegal value" x))))))))
 
 (test-begin "generate increasingly large numbers")
 (define (large count)
@@ -108,36 +89,36 @@
 
 (test-begin "get/set state")
 (let* ((state1 (random-source-state-ref default-random-source))
-       (x1 (my-random-integer (expt 2 32)))
+       (x1 (random-integer (expt 2 32)))
        (state2 (random-source-state-ref default-random-source))
-       (x2 (my-random-integer (expt 2 32))))
+       (x2 (random-integer (expt 2 32))))
   (random-source-state-set! default-random-source state1)
-  (let ((y1 (my-random-integer (expt 2 32))))
+  (let ((y1 (random-integer (expt 2 32))))
     (test-assert (= x1 y1))
     (random-source-state-set! default-random-source state2)
-    (let ((y2 (my-random-integer (expt 2 32))))
+    (let ((y2 (random-integer (expt 2 32))))
       (test-assert (= x2 y2)))))
 (test-end "get/set state")
 
 (test-begin "randomize!")
 (let* ((state1 (random-source-state-ref default-random-source))
-       (x1 (my-random-integer (expt 2 32))))
+       (x1 (random-integer (expt 2 32))))
   (random-source-state-set! default-random-source state1)
   (random-source-randomize! default-random-source)
-  (let ((y1 (my-random-integer (expt 2 32))))
+  (let ((y1 (random-integer (expt 2 32))))
     (test-assert (not (= x1 y1)))))
 (test-end "randomize!")
 
 (test-begin "pseudo-randomize!")
 (let* ((state1 (random-source-state-ref default-random-source))
-       (x1 (my-random-integer (expt 2 32))))
+       (x1 (random-integer (expt 2 32))))
   (random-source-state-set! default-random-source state1)
   (random-source-pseudo-randomize! default-random-source 0 1)
-  (let ((y1 (my-random-integer (expt 2 32))))
-    (test-assert (not (x1 y1))))
+  (let ((y1 (random-integer (expt 2 32))))
+    (test-assert (not (= x1 y1))))
   (random-source-state-set! default-random-source state1)
   (random-source-pseudo-randomize! default-random-source 1 0)
-  (let ((y1 (my-random-integer (expt 2 32))))
+  (let ((y1 (random-integer (expt 2 32))))
     (test-assert (not (= x1 y1)))))
 (test-end "pseudo-randomize!")
 
