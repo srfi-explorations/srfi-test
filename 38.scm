@@ -1,13 +1,14 @@
 (test-begin "srfi-38")
 
 (define (obj->string obj)
-  (parameterize
-    ((current-output-port (open-output-string)))
-    (write-with-shared-structure obj)
-    (get-output-string (current-output-port))))
+  (let ((port (open-output-string)))
+    (write-with-shared-structure obj port)
+    (let ((str (get-output-string port)))
+      (close-port port)
+      str)))
 
 (define (string->obj str)
-  (read-shared-structure (open-input-string str)))
+  (read-with-shared-structure (open-input-string str)))
 
 (let ((a '(val1 val2)))
   (set! a (cons a (list a)))
@@ -17,10 +18,13 @@
                      (string=? teststr "(#1=(val1 val2) #1#)")
                      (string=? teststr "(#2=(val1 val2) #2#)")))))
 
-(test-equal "list" (obj->string '(val1 val2)) "(val1 val2)")
+(test-equal "list->string" (obj->string '(val1 val2)) "(val1 val2)")
+(test-equal "string->list" '(val1 val2) (string->obj "(val1 val2)"))
 
-(test-equal "number" (obj->string 5) "5")
+(test-equal "number->string" (obj->string 5) "5")
+(test-equal "string->number" 5 (string->obj "5"))
 
-(test-equal "string" (obj->string "Just a string") "\"Just a string\"")
+(test-equal "string->string" (obj->string "Just a string") "\"Just a string\"")
+(test-equal "string->string" "Just a string" (string->obj "\"Just a string\""))
 
 (test-end "srfi-38")
