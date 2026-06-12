@@ -252,6 +252,15 @@
        (scheme process-context)
        (scheme file)
        (scheme cxr)))
+    ((= srfi-number 43)
+     '((except (scheme base)
+               vector-copy
+               vector-map
+               vector-for-each)
+       (scheme char)
+       (scheme read)
+       (scheme write)
+       (scheme process-context)))
     ((= srfi-number 44)
      '((except (scheme base)
                vector? make-vector vector map vector-copy vector-ref
