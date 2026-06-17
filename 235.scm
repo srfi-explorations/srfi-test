@@ -1,3 +1,5 @@
+;; SPDX-FileCopyrightText: 2026 Arthur A. Gleckler
+;; SPDX-License-Identifier: MIT
 (test-begin "srfi-235")
 
 (test-group
