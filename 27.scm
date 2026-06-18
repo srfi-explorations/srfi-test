@@ -61,108 +61,66 @@
 ;   SE, 04-Apr-2002: some quick timings; check up
 
 
-; (check expr)
-;    evals expr and issues an error if it is not #t.
-
-#;(define (check expr)
-  (if (not (eq? (eval expr (interaction-environment)) #t))
-    (error "check failed" expr)))
-
 ; Basic Tests of the Interface
 ; ============================
 
-#;(define (my-random-integer n)
-  (let ((x (random-integer n)))
-    (if (<= 0 x (- n 1))
-      x
-      (error "(random-integer n) returned illegal value" x))))
+(test-begin "srfi-27")
 
-(define (my-random-integer n)
-  (let ((x (random-integer n)))
-    (call-with-current-continuation
-      (lambda (k)
-        (with-exception-handler
-          (lambda (e)
-            (k (error "(random-integer n) returned illegal value" x)))
-          (lambda ()
-            (if (<= 0 x (- n 1))
-              x
-              (error "(random-integer n) returned illegal value" x))))))))
+(test-begin "generate increasingly large numbers")
+(define (large count)
+  (when (< count 1024)
+    (let ((x (random-integer count)))
+      (test-assert (number? x))
+      (test-assert (> x 0))
+      (test-assert (< x (- count 1))))
+    (large (+ count 1))))
+(large 1)
+(test-end "generate increasingly large numbers")
 
-(define (my-random-real)
-  (let ((x (random-real)))
-    (if (< 0 x 1)
-      x
-      (error "(random-real) returned illegal value" x))))
+(test-begin "reals [1000 times]")
+(define (reals count)
+  (when (< count 1000)
+    (let ((x (random-real)))
+      (test-assert (real? x))
+      (test-assert (> x 0)))
+    (reals (+ count 1))))
+(reals 1)
+(test-end "reals [1000 times]")
 
-(define (check-basics-1)
-
-  ; generate increasingly large numbers
-  (display "; generating large numbers [bits]: ")
-  (do ((k 0 (+ k 1))
-       (n 1 (* n 2)))
-    ((> k 1024))
-    (display k)
-    (display " ")
-    (my-random-integer n))
-  (display "ok")
-  (newline)
-
-  ; generate some reals
-  (display "; generating reals [1000 times]: ")
-  (do ((k 0 (+ k 1))
-       (x (my-random-real) (+ x (my-random-real))))
-    ((= k 1000)
-     x))
-  (display "ok")
-  (newline)
-
-  ; get/set the state
-  (display "; get/set state: ")
-  (let* ((state1 (random-source-state-ref default-random-source))
-         (x1 (my-random-integer (expt 2 32)))
-         (state2 (random-source-state-ref default-random-source))
-         (x2 (my-random-integer (expt 2 32))))
-    (random-source-state-set! default-random-source state1)
-    (let ((y1 (my-random-integer (expt 2 32))))
-      (if (not (= x1 y1))
-        (error "state get/set doesn't work" x1 y1 state1)))
+(test-begin "get/set state")
+(let* ((state1 (random-source-state-ref default-random-source))
+       (x1 (random-integer (expt 2 32)))
+       (state2 (random-source-state-ref default-random-source))
+       (x2 (random-integer (expt 2 32))))
+  (random-source-state-set! default-random-source state1)
+  (let ((y1 (random-integer (expt 2 32))))
+    (test-assert (= x1 y1))
     (random-source-state-set! default-random-source state2)
-    (let ((y2 (my-random-integer (expt 2 32))))
-      (if (not (= x2 y2))
-        (error "state get/set doesn't work" x2 y2 state2))))
-  (display "ok")
-  (newline)
+    (let ((y2 (random-integer (expt 2 32))))
+      (test-assert (= x2 y2)))))
+(test-end "get/set state")
 
-  ; randomize!
-  (display "; randomize!: ")
-  (let* ((state1 (random-source-state-ref default-random-source))
-         (x1 (my-random-integer (expt 2 32))))
-    (random-source-state-set! default-random-source state1)
-    (random-source-randomize! default-random-source)
-    (let ((y1 (my-random-integer (expt 2 32))))
-      (if (= x1 y1)
-        (error "random-source-randomize! didn't work" x1 state1))))
-  (display "ok")
-  (newline)
+(test-begin "randomize!")
+(let* ((state1 (random-source-state-ref default-random-source))
+       (x1 (random-integer (expt 2 32))))
+  (random-source-state-set! default-random-source state1)
+  (random-source-randomize! default-random-source)
+  (let ((y1 (random-integer (expt 2 32))))
+    (test-assert (not (= x1 y1)))))
+(test-end "randomize!")
 
-  ; pseudo-randomize!
-  (display "; pseudo-randomize!: ")
-  (let* ((state1 (random-source-state-ref default-random-source))
-         (x1 (my-random-integer (expt 2 32))))
-    (random-source-state-set! default-random-source state1)
-    (random-source-pseudo-randomize! default-random-source 0 1)
-    (let ((y1 (my-random-integer (expt 2 32))))
-      (if (= x1 y1)
-        (error "random-source-pseudo-randomize! didn't work" x1 state1)))
-    (random-source-state-set! default-random-source state1)
-    (random-source-pseudo-randomize! default-random-source 1 0)
-    (let ((y1 (my-random-integer (expt 2 32))))
-      (if (= x1 y1)
-        (error "random-source-pseudo-randomize! didn't work" x1 state1))))
-  (display "ok")
-  (newline)
-  (newline))
+(test-begin "pseudo-randomize!")
+(let* ((state1 (random-source-state-ref default-random-source))
+       (x1 (random-integer (expt 2 32))))
+  (random-source-state-set! default-random-source state1)
+  (random-source-pseudo-randomize! default-random-source 0 1)
+  (let ((y1 (random-integer (expt 2 32))))
+    (test-assert (not (= x1 y1))))
+  (random-source-state-set! default-random-source state1)
+  (random-source-pseudo-randomize! default-random-source 1 0)
+  (let ((y1 (random-integer (expt 2 32))))
+    (test-assert (not (= x1 y1)))))
+(test-end "pseudo-randomize!")
 
 
 ; Testing the MRG32k3a Generator (if implemented)
@@ -174,58 +132,57 @@
 ;   is useful to check whether the reference implementation computes
 ;   the right numbers.
 
-(define (check-mrg32k3a)
+#|
+;; Not portable
+(test-begin "check A^16 * (1 0 0 1 0 0)")
+(let* ((s (make-random-source))
+       (state1 (random-source-state-ref s))
+       (rand (random-source-make-reals s)))
+  (random-source-state-set! s '(lecuyer-mrg32k3a 1 0 0 1 0 0))
+  (do ((k 0 (+ k 1)))
+    ((= k 16)
+     (let ((state2 (random-source-state-ref s)))
+       (test-equal state1 state2)))
+    (rand)))
+(test-end "check A^16 * (1 0 0 1 0 0)")
+|#
 
-  ; check if the initial state is A^16 * (1 0 0 1 0 0)
-  (display "; check A^16 * (1 0 0 1 0 0)")
-  (let* ((s (make-random-source))
-         (state1 (random-source-state-ref s))
-         (rand (random-source-make-reals s)))
-    (random-source-state-set! s '(lecuyer-mrg32k3a 1 0 0 1 0 0))
-    (do ((k 0 (+ k 1)))
-      ((= k 16)
-       (let ((state2 (random-source-state-ref s)))
-         (if (not (equal? state1 state2))
-           (error "16-th state after (1 0 0 1 0 0) is wrong" '()))))
-      (rand)))
-  (display "ok")
-  (newline)
+#|
+;; Not portable
+(test-begin "(random-source-pseudo-randomize! s 1 2)")
+(let ((s (make-random-source)))
+  (random-source-pseudo-randomize! s 1 2)
+  (test-assert (equal? (random-source-state-ref s)
+                   '(lecuyer-mrg32k3a
+                      1250826159
+                      3004357423
+                      431373563
+                      3322526864
+                      623307378
+                      2983662421))))
+(test-end "(random-source-pseudo-randomize! s 1 2)")
+|#
 
-  ; check if pseudo-randomize! advances properly
-  (display "; checking (random-source-pseudo-randomize! s 1 2)")
-  (let ((s (make-random-source)))
-    (random-source-pseudo-randomize! s 1 2)
-    (if (not (equal? (random-source-state-ref s)
-                     '(lecuyer-mrg32k3a 
-                        1250826159 
-                        3004357423 
-                        431373563 
-                        3322526864 
-                        623307378 
-                        2983662421)))
-      (error "pseudo-randomize! gives wrong result" '())))
-  (display "ok")
-  (newline)
-
-  ; run the check published by Pierre L'Ecuyer:
-  ;   Note that the reference implementation deals slightly different
-  ;   with reals mapping m1-1 into 1-1/(m1+1) and not into 0 as in
-  ;   L'Ecuyer's original proposal. However, for the first 10^7 reals
-  ;   that makes no difference as m1-1 is not generated.
-  (display "; checking (random-source-pseudo-randomize! s 1 2)...")
-  (let* ((x 0.0) 
-         (s (make-random-source))
-         (rand (random-source-make-reals s)))
-    (random-source-state-set!
-      s
-      '(lecuyer-mrg32k3a 12345 12345 12345 12345 12345 12345))
-    (do ((k 0 (+ k 1)))
-      ((= k 10000000)
-       (if (not (< (abs (- x 5001090.95)) 0.01))
-         (error "bad sum over 10^7 reals" x)))
-      (set! x (+ x (rand)))))
-  (display "ok")
-  (newline))
+#|
+;; Not portable
+; run the check published by Pierre L'Ecuyer:
+;   Note that the reference implementation deals slightly different
+;   with reals mapping m1-1 into 1-1/(m1+1) and not into 0 as in
+;   L'Ecuyer's original proposal. However, for the first 10^7 reals
+;   that makes no difference as m1-1 is not generated.
+(test-begin "checking (random-source-pseudo-randomize! s 1 2)...")
+(let* ((x 0.0)
+       (s (make-random-source))
+       (rand (random-source-make-reals s)))
+  (random-source-state-set!
+    s
+    '(lecuyer-mrg32k3a 12345 12345 12345 12345 12345 12345))
+  (do ((k 0 (+ k 1)))
+    ((= k 10000000)
+     (test-assert (< (abs (- x 5001090.95)) 0.01)))
+    (set! x (+ x (rand)))))
+(test-end "checking (random-source-pseudo-randomize! s 1 2)...")
+|#
 
 
 ; Writing Data to DIEHARD
@@ -285,9 +242,5 @@
           (write-char (integer->char (modulo x 256)) port)
           (set! x (quotient x 256)))))))
 
-; run some tests
-(check-basics-1)
-(display "passed (check-basics-1)")
-(newline)
-
+(test-end "srfi-27")
 

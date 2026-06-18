@@ -126,6 +126,11 @@
 
 (define (r6rs-imports srfi-number)
   (cond
+    ((= srfi-number 1)
+     '((except (rnrs base)
+               for-each
+               map)
+       (rnrs programs)))
     ((= srfi-number 4)
      '((rnrs base)
        (rnrs programs)
@@ -247,6 +252,15 @@
        (scheme process-context)
        (scheme file)
        (scheme cxr)))
+    ((= srfi-number 43)
+     '((except (scheme base)
+               vector-copy
+               vector-map
+               vector-for-each)
+       (scheme char)
+       (scheme read)
+       (scheme write)
+       (scheme process-context)))
     ((= srfi-number 44)
      '((except (scheme base)
                vector? make-vector vector map vector-copy vector-ref
@@ -300,6 +314,14 @@
        (scheme file)
        (scheme cxr)
        (srfi 128)))
+    ((= srfi-number 235)
+     '((scheme base)
+       (scheme read)
+       (scheme write)
+       (scheme process-context)
+       (scheme file)
+       (scheme cxr)
+       (srfi 1)))
     (else '((scheme base)
             (scheme char)
             (scheme inexact)
@@ -459,7 +481,7 @@
 (define all-srfis
   '(1 2 4 5 8 11 13 14 16 19 25 26 27 28 29 31 37 38 39 41 42 43 44 48 51 54 64
     60 63 66 69 87 95 111 113 115 116 128 129 130 132 133 145 151 160 175 180
-    227))
+    197 227 235))
 
 (for-each write-r6rs-test-library all-srfis)
 (for-each write-r6rs-test-program all-srfis)
