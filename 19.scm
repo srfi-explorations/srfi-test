@@ -6,7 +6,8 @@
   (let ((name (if (symbol? name) name (string->symbol name)))
         (pr (assoc name s19-tests)))
     (if pr
-      (set-cdr! pr thunk)
+      ;(set-cdr! pr thunk)
+      (set! pr (cons (car pr) thunk))
       (set! s19-tests (append s19-tests (list (cons name thunk)))))))
 
 (define (run-s19-test name thunk verbose)
@@ -116,8 +117,7 @@
          (utc-basic+2 (make-time 'time-utc hs (+ utc shy)))
          (tai-basic+2 (make-time 'time-tai hs (+ (+ utc tai-diff) shy)))
          (utc->tai-basic+2 (time-utc->time-tai utc-basic+2))
-         (tai->utc-basic+2 (time-tai->time-utc tai-basic+2))
-         )
+         (tai->utc-basic+2 (time-tai->time-utc tai-basic+2)))
     (and (time=? utc-basic tai->utc-basic)
          (time=? tai-basic utc->tai-basic)
          (time=? utc-basic-1 tai->utc-basic-1)
@@ -125,8 +125,7 @@
          (time=? utc-basic+1 tai->utc-basic+1)
          (time=? tai-basic+1 utc->tai-basic+1)
          (time=? utc-basic+2 tai->utc-basic+2)
-         (time=? tai-basic+2 utc->tai-basic+2) 
-         )))
+         (time=? tai-basic+2 utc->tai-basic+2))))
 
 (define-s19-test! "TAI-UTC Conversions"
                   (lambda ()
@@ -216,6 +215,13 @@
                         (string=? "03:02:01Z" (date->string d "~2"))))
                     ))
 
+(define (read-all-from-port port)
+  (letrec ((looper (lambda (c result)
+                     (if (eof-object? c)
+                       result
+                       (looper (read-char port) (string-append result (string c)))))))
+    (looper (read-char port) "")))
+
 (let ((dates '((2020 12 31 . "53") ; Thursday, week 53
                (2021 1 1   . "53") ; Friday, week 53 (previous year)
                (2021 1 3   . "53") ; Sunday, week 53 (previous year)
@@ -241,19 +247,28 @@
                (2015 1 3   . "01") ; Saturday, week 1
                (2015 1 4   . "01") ; Sunday, week 1
                (2015 1 5   . "02") ; Monday, week 2
-               )))
+               ))
+      (tmpfile "/tmp/srfi-19-test.txt"))
+
   (for-each
     (lambda (date)
-      (let ((p (open-output-string)))
-        (display "date->string ~V " p)
-        (write date p)
-        (define-s19-test! (get-output-string p)
-                          (lambda ()
-                            (equal? (date->string (make-date 0 0 0 0
-                                                             (caddr date) (cadr date) (car date)
-                                                             0)
-                                                  "~V")
-                                    (cdddr date))))))
+      (when (file-exists? tmpfile) (delete-file tmpfile))
+      (with-output-to-file
+        tmpfile
+        (lambda ()
+          (display "date->string ~V ")
+          (write date)))
+      (define-s19-test!
+        (with-input-from-file
+          tmpfile
+          (lambda () (read-all-from-port (current-input-port))))
+        (lambda ()
+          (equal? (date->string
+                    (make-date 0 0 0 0
+                               (caddr date) (cadr date) (car date)
+                               0)
+                    "~V")
+                  (cdddr date)))))
     dates))
 
 (begin (newline) (run-s19-tests #t))
