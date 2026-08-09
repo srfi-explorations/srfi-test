@@ -555,11 +555,13 @@
 )
 
 (define (check-all)
+  (test-begin "ranges")
   (check-predicates)
   (check-conversion)
   (check-constructors)
   (check-accessors)
   (check-iteration)
-  (check-searching))
+  (check-searching)
+  (test-end))
 
 (check-all)
