@@ -460,7 +460,6 @@
                                       'z))
    => #t))
 
-(load "test-syntax.scm")
 
 ;;;; Trivalent logic
 
