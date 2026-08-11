@@ -1,5 +1,8 @@
 ;;; SPDX-License-Identifier: MIT
 ;;; SPDX-FileCopyrightText: 2024 Wolfgang Corcoran-Mathe
+
+(test-begin "flexible curried procedures")
+
 (test-group "Simple currying"
   (test-eqv 5 ((curried (x y) (+ x y)) 2 3))
   (test-eqv 5 (((curried (x y) (+ x y)) 2) 3))
@@ -38,3 +41,5 @@
   (test-eqv 20 ((curried (x y) (curried (z) (* z (+ x y)))) 2 3 4))
   (test-eqv 20 (((curried (x y) (curried (z) (* z (+ x y)))) 2) 3 4))
   )
+
+(test-end)
