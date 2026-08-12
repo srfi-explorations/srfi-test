@@ -1484,4 +1484,3 @@
       (get-output-string port)))
 )
 )
-(test-exit)
