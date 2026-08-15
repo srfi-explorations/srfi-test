@@ -47,6 +47,11 @@ or report version. Example for SRFI 64:
     guile r7rs-programs/64.scm
     kawa r7rs-programs/64.scm
 
+If you want Test Anything Protocol (TAP) output install (retropikzel tap) and
+run the tap- prefixed versions, currently only r7rs-programs have these.
+
+    chibi-scheme r7rs-programs/tap-64.scm
+
 ## Contributing new tests
 
 Tests for new SRFIs, as well as new tests for already covered SRFIs,
