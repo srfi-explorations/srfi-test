@@ -409,6 +409,20 @@
                          ,@(read-source-file basename)
                          (exit 0)))))
 
+(define (write-r7rs-test-program-tap srfi-number)
+  (let ((basename (string-append (number->string srfi-number) ".scm")))
+    (write-source-file "r7rs-programs" (string-append "tap-" basename)
+                       ;; Do not double import SRFI-64, Foment throws error
+                       `((import ,@(r7rs-imports srfi-number)
+                                 ,@(if (= srfi-number 64)
+                                    (r7rs-srfi-imports srfi-number)
+                                    (r7rs-srfi-imports srfi-number 64))
+                                 (retropikzel tap))
+                         (test-runner-current (tap-runner))
+                         ,@r7rs-prelude
+                         ,@(read-source-file basename)
+                         (exit 0)))))
+
 (define (write-chibi-test srfi-number)
   (let ((basename (string-append (number->string srfi-number) ".scm")))
     (write-source-file "chibi" basename
@@ -500,6 +514,7 @@
 (for-each write-r6rs-test-program all-srfis)
 (for-each write-r7rs-test-library all-srfis)
 (for-each write-r7rs-test-program all-srfis)
+(for-each write-r7rs-test-program-tap all-srfis)
 (for-each write-chibi-test all-srfis)
 (for-each write-chicken-test all-srfis)
 (for-each write-gauche-test all-srfis)
