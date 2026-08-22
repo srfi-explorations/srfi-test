@@ -1,3 +1,5 @@
+(test-begin "29")
+
 (define translations
   '(((en) . ((time . "Its ~a, ~a.")
              (goodbye . "Goodbye, ~a.")))
@@ -14,21 +16,19 @@
 
 (define localized-message
   (lambda (message-name . args)
-    (apply format (cons (localized-template 'hello-program
-                                            message-name)
-                        args))))
+    (apply format (cons (localized-template 'hello-program message-name) args))))
 
-(let ((myname "Fred"))
-  (display (localized-message 'time "12:00" myname))
-  (display #\newline)
-
-  (display (localized-message 'goodbye myname))
-  (display #\newline))
+(define myname "Fred")
 
 ;; Displays (English):
 ;; Its 12:00, Fred.
 ;; Goodbye, Fred.
-;;
+(test-equal "Its 12:00, Fred." (localized-message 'time "12:00" myname))
+(test-equal "Goodbye, Fred." (localized-message 'goodbye myname))
+
 ;; French:
 ;; Fred, c'est 12:00.
 ;; Au revoir, Fred.
+
+(test-end "29")
+
